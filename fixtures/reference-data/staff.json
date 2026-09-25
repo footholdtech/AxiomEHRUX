@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "description": "Fictional staff/provider records for EHR prototyping.",
+    "fields": ["staff_id", "npi", "first_name", "last_name", "credentials", "role_id", "email", "phone", "site_id", "supervises"]
+  },
+  "records": [
+    {"staff_id": "ST-2001", "npi": "1234567890", "first_name": "Karen", "last_name": "Mitchell", "credentials": "MD", "role_id": "ROLE-PCP", "email": "karen.mitchell.demo@example.com", "phone": "555-020-3001", "site_id": "SITE-MAIN-01", "supervises": []},
+    {"staff_id": "ST-2002", "npi": "1234567891", "first_name": "David", "last_name": "Okafor", "credentials": "PMHNP", "role_id": "ROLE-PSYCH", "email": "david.okafor.demo@example.com", "phone": "555-020-3002", "site_id": "SITE-MAIN-01", "supervises": []},
+    {"staff_id": "ST-2003", "npi": "1234567892", "first_name": "Priya", "last_name": "Raman", "credentials": "LCSW", "role_id": "ROLE-SW", "email": "priya.raman.demo@example.com", "phone": "555-020-3003", "site_id": "SITE-MAIN-02", "supervises": ["ST-2006"]},
+    {"staff_id": "ST-2004", "npi": null, "first_name": "Anthony", "last_name": "Ruiz", "credentials": "CM", "role_id": "ROLE-CM", "email": "anthony.ruiz.demo@example.com", "phone": "555-020-3004", "site_id": "SITE-RES-A", "supervises": []},
+    {"staff_id": "ST-2005", "npi": null, "first_name": "Brenda", "last_name": "Lucas", "credentials": null, "role_id": "ROLE-HOUSING-SUP", "email": "brenda.lucas.demo@example.com", "phone": "555-020-3005", "site_id": "SITE-RES-A", "supervises": ["ST-2004"]},
+    {"staff_id": "ST-2006", "npi": null, "first_name": "Jonathan", "last_name": "Price", "credentials": "LPC", "role_id": "ROLE-CLINICAL-PROVIDER", "email": "jonathan.price.demo@example.com", "phone": "555-020-3006", "site_id": "SITE-MAIN-02", "supervises": []},
+    {"staff_id": "ST-2007", "npi": null, "first_name": "Sandra", "last_name": "Kim", "credentials": null, "role_id": "ROLE-PROGRAM-DIR", "email": "sandra.kim.demo@example.com", "phone": "555-020-3007", "site_id": "SITE-MAIN-01", "supervises": ["ST-2002", "ST-2003"]},
+    {"staff_id": "ST-2008", "npi": null, "first_name": "Miguel", "last_name": "Torres", "credentials": "RN", "role_id": "ROLE-NURSE", "email": "miguel.torres.demo@example.com", "phone": "555-020-3008", "site_id": "SITE-RES-B", "supervises": []},
+    {"staff_id": "ST-2009", "npi": null, "first_name": "Heather", "last_name": "Douglas", "credentials": null, "role_id": "ROLE-INTAKE-COORD", "email": "heather.douglas.demo@example.com", "phone": "555-020-3009", "site_id": "SITE-MAIN-02", "supervises": []},
+    {"staff_id": "ST-2010", "npi": null, "first_name": "Omar", "last_name": "Farouk", "credentials": null, "role_id": "ROLE-QA-COMPLIANCE", "email": "omar.farouk.demo@example.com", "phone": "555-020-3010", "site_id": "SITE-MAIN-01", "supervises": []}
+  ]
+}

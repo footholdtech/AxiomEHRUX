@@ -1,0 +1,20 @@
+{
+  "_meta": {"description": "Client attribute flags / tags commonly tracked in behavioral health EHRs (language needs, legal status, medical flags, communication preferences)."},
+  "records": [
+    {"attribute_id": "ATTR-SPANISH", "name": "Spanish Speaking", "category": "Language/Communication"},
+    {"attribute_id": "ATTR-INTERPRETER", "name": "Requires Interpreter", "category": "Language/Communication"},
+    {"attribute_id": "ATTR-DONOTMAIL", "name": "Do Not Mail", "category": "Communication Preference"},
+    {"attribute_id": "ATTR-DONOTCALL", "name": "Do Not Call", "category": "Communication Preference"},
+    {"attribute_id": "ATTR-COURTORDERED", "name": "Court Ordered Treatment", "category": "Legal"},
+    {"attribute_id": "ATTR-PROBATION", "name": "On Probation/Parole", "category": "Legal"},
+    {"attribute_id": "ATTR-SICKLECELL", "name": "Sickle Cell Disease", "category": "Medical Flag"},
+    {"attribute_id": "ATTR-DIABETIC", "name": "Diabetic", "category": "Medical Flag"},
+    {"attribute_id": "ATTR-ALLERGY", "name": "Known Medication Allergy", "category": "Medical Flag"},
+    {"attribute_id": "ATTR-VETERAN", "name": "Veteran Status", "category": "Demographic"},
+    {"attribute_id": "ATTR-LGBTQ", "name": "LGBTQ+ Identified", "category": "Demographic"},
+    {"attribute_id": "ATTR-FOSTERCARE", "name": "Foster Care Involvement", "category": "Legal/Social"},
+    {"attribute_id": "ATTR-HIGHRISK", "name": "High Risk Flag", "category": "Safety"},
+    {"attribute_id": "ATTR-MINOR", "name": "Minor / Requires Guardian Consent", "category": "Legal"},
+    {"attribute_id": "ATTR-PREGNANT", "name": "Pregnant / Postpartum", "category": "Medical Flag"}
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "_meta": {"description": "Common behavioral health / HHS role/title reference list."},
+  "records": [
+    {"role_id": "ROLE-PCP", "name": "Primary Care Provider", "category": "Medical", "typical_credentials": ["MD", "DO", "NP", "PA"]},
+    {"role_id": "ROLE-PSYCH", "name": "Psychiatric Provider", "category": "Medical", "typical_credentials": ["MD", "PMHNP", "DO"]},
+    {"role_id": "ROLE-SW", "name": "Social Worker", "category": "Clinical", "typical_credentials": ["LCSW", "LSW", "MSW"]},
+    {"role_id": "ROLE-CLINICAL-PROVIDER", "name": "Clinical Provider / Therapist", "category": "Clinical", "typical_credentials": ["LPC", "LMFT", "LPCC", "PhD", "PsyD"]},
+    {"role_id": "ROLE-CM", "name": "Case Manager", "category": "Care Coordination", "typical_credentials": ["CM", "BA", "BSW"]},
+    {"role_id": "ROLE-NURSE", "name": "Nurse", "category": "Medical", "typical_credentials": ["RN", "LPN"]},
+    {"role_id": "ROLE-HOUSING-SUP", "name": "Housing Supervisor", "category": "Residential Operations", "typical_credentials": []},
+    {"role_id": "ROLE-PROGRAM-DIR", "name": "Program Director", "category": "Administration", "typical_credentials": []},
+    {"role_id": "ROLE-INTAKE-COORD", "name": "Intake Coordinator", "category": "Administration", "typical_credentials": []},
+    {"role_id": "ROLE-QA-COMPLIANCE", "name": "QA / Compliance Specialist", "category": "Administration", "typical_credentials": []},
+    {"role_id": "ROLE-PEER-SUPPORT", "name": "Peer Support Specialist", "category": "Clinical", "typical_credentials": ["CPRS", "CPS"]},
+    {"role_id": "ROLE-BILLING-SPEC", "name": "Billing / Revenue Cycle Specialist", "category": "Administration", "typical_credentials": []},
+    {"role_id": "ROLE-FRONT-DESK", "name": "Front Desk / Administrative Assistant", "category": "Administration", "typical_credentials": []},
+    {"role_id": "ROLE-CLINICAL-DIR", "name": "Clinical Director", "category": "Administration", "typical_credentials": ["LCSW", "LPC", "PhD"]},
+    {"role_id": "ROLE-EXEC-DIR", "name": "Executive Director", "category": "Administration", "typical_credentials": []}
+  ]
+}

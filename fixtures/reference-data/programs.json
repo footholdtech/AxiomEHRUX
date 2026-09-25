@@ -1,0 +1,12 @@
+{
+  "_meta": {"description": "Program reference mapping friendly/customer-facing names to internal service-type identifiers."},
+  "records": [
+    {"program_id": "PRG-GEN-THX", "friendly_name": "Recovery Today", "internal_type": "General Therapy", "modality": "Outpatient", "description": "General individual/family therapy services"},
+    {"program_id": "PRG-OUTP-01", "friendly_name": "Back on Track", "internal_type": "Outpatient", "modality": "Outpatient", "description": "Structured outpatient behavioral health program"},
+    {"program_id": "PRG-COUNSEL", "friendly_name": "Steady Path Counseling", "internal_type": "Counseling", "modality": "Outpatient", "description": "Short-term counseling services, often court-referred"},
+    {"program_id": "PRG-RES-01", "friendly_name": "New Foundations", "internal_type": "Residential", "modality": "Residential", "description": "Residential treatment / supportive housing program"},
+    {"program_id": "PRG-IOP-01", "friendly_name": "Bridge Forward", "internal_type": "Intensive Outpatient", "modality": "IOP", "description": "Intensive outpatient program, higher frequency of contact"},
+    {"program_id": "PRG-CRISIS-01", "friendly_name": "Safe Harbor", "internal_type": "Crisis Stabilization", "modality": "Crisis", "description": "Short-term crisis stabilization services"},
+    {"program_id": "PRG-PEER-01", "friendly_name": "Peer Connect", "internal_type": "Peer Support", "modality": "Community-based", "description": "Peer support specialist services"}
+  ]
+}

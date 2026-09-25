@@ -1,0 +1,21 @@
+{
+  "_meta": {"description": "Sites, facilities, and sub-locations (e.g. suites within a campus, housing units within a residential facility)."},
+  "records": [
+    {"site_id": "SITE-MAIN-01", "name": "Springfield Main Clinic", "type": "Outpatient Clinic", "address": "100 Center St, Springfield, OH 45501", "sublocations": [
+      {"sub_id": "SITE-MAIN-01-SUITE-A", "name": "Suite A - Adult Outpatient"},
+      {"sub_id": "SITE-MAIN-01-SUITE-B", "name": "Suite B - Psychiatry"}
+    ]},
+    {"site_id": "SITE-MAIN-02", "name": "Riverton Community Office", "type": "Outpatient Clinic", "address": "45 River Rd, Riverton, OH 45601", "sublocations": [
+      {"sub_id": "SITE-MAIN-02-SUITE-A", "name": "Suite A - Counseling"}
+    ]},
+    {"site_id": "SITE-RES-A", "name": "Maple Grove Residential Campus - Building A", "type": "Residential Facility", "address": "700 Maple Grove Way, Millbrook, OH 45602", "sublocations": [
+      {"sub_id": "SITE-RES-A-UNIT-1", "name": "Unit 1 - Men's Housing"},
+      {"sub_id": "SITE-RES-A-UNIT-2", "name": "Unit 2 - Step-Down Housing"}
+    ]},
+    {"site_id": "SITE-RES-B", "name": "Maple Grove Residential Campus - Building B", "type": "Residential Facility", "address": "702 Maple Grove Way, Millbrook, OH 45602", "sublocations": [
+      {"sub_id": "SITE-RES-B-UNIT-1", "name": "Unit 1 - Women's Housing"},
+      {"sub_id": "SITE-RES-B-UNIT-2", "name": "Unit 2 - Family Housing"}
+    ]},
+    {"site_id": "SITE-CRISIS-01", "name": "Safe Harbor Crisis Center", "type": "Crisis Stabilization Unit", "address": "12 Response Way, Springfield, OH 45503", "sublocations": []}
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "_meta": {"description": "Common medication reference list (generic names, typical strengths) used across behavioral health prescribing prototypes. Not medical advice; for UI mockups only."},
+  "records": [
+    {"medication_id": "MED-001", "name": "Adderall", "strengths": ["5 mg", "10 mg", "12.5 mg", "20 mg"], "class": "Stimulant", "common_use": "ADHD - Focus and Concentration"},
+    {"medication_id": "MED-002", "name": "Abilify", "strengths": ["2 mg", "5 mg", "10 mg", "15 mg"], "class": "Atypical Antipsychotic", "common_use": "Agitation / mood stabilization"},
+    {"medication_id": "MED-003", "name": "Sertraline (Zoloft)", "strengths": ["25 mg", "50 mg", "100 mg"], "class": "SSRI", "common_use": "Depression / anxiety"},
+    {"medication_id": "MED-004", "name": "Fluoxetine (Prozac)", "strengths": ["10 mg", "20 mg", "40 mg"], "class": "SSRI", "common_use": "Depression"},
+    {"medication_id": "MED-005", "name": "Lithium Carbonate", "strengths": ["300 mg", "600 mg"], "class": "Mood Stabilizer", "common_use": "Bipolar disorder"},
+    {"medication_id": "MED-006", "name": "Carbamazepine", "strengths": ["200 mg", "400 mg"], "class": "Anticonvulsant / Mood Stabilizer", "common_use": "Mood stabilization"},
+    {"medication_id": "MED-007", "name": "Trazodone", "strengths": ["50 mg", "100 mg"], "class": "Atypical Antidepressant", "common_use": "Sleep / depression"},
+    {"medication_id": "MED-008", "name": "Buspirone", "strengths": ["5 mg", "10 mg", "15 mg"], "class": "Anxiolytic", "common_use": "Generalized anxiety"},
+    {"medication_id": "MED-009", "name": "Risperidone", "strengths": ["0.5 mg", "1 mg", "2 mg"], "class": "Atypical Antipsychotic", "common_use": "Psychosis / irritability"},
+    {"medication_id": "MED-010", "name": "Naltrexone", "strengths": ["50 mg"], "class": "Opioid Antagonist", "common_use": "Alcohol / opioid use disorder"}
+  ]
+}

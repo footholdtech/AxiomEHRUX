@@ -1,0 +1,24 @@
+{
+  "_meta": {"description": "Common funding types/payer sources relevant to publicly-funded behavioral health revenue cycle prototyping."},
+  "funding_types": [
+    {"funding_type_id": "FUND-MEDICAID", "name": "Medicaid", "category": "Government - Federal/State"},
+    {"funding_type_id": "FUND-MEDICARE", "name": "Medicare", "category": "Government - Federal"},
+    {"funding_type_id": "FUND-STATE-BLOCK", "name": "State Block Grant (SAMHSA/SABG)", "category": "Government - State"},
+    {"funding_type_id": "FUND-COUNTY", "name": "County Contract Funding", "category": "Government - Local"},
+    {"funding_type_id": "FUND-COMMERCIAL", "name": "Commercial Insurance", "category": "Private Payer"},
+    {"funding_type_id": "FUND-SLIDING", "name": "Sliding Fee Scale / Self-Pay", "category": "Client-Paid"},
+    {"funding_type_id": "FUND-GRANT", "name": "Grant Funding (Private Foundation)", "category": "Grant"},
+    {"funding_type_id": "FUND-VA", "name": "Veterans Affairs", "category": "Government - Federal"},
+    {"funding_type_id": "FUND-HUD", "name": "HUD Housing Assistance", "category": "Government - Federal"},
+    {"funding_type_id": "FUND-UNINSURED", "name": "Uninsured / Charity Care", "category": "Uncompensated"}
+  ],
+  "providers": [
+    {"provider_id": "PAYER-OHMEDICAID", "name": "Ohio Medicaid", "funding_type_id": "FUND-MEDICAID"},
+    {"provider_id": "PAYER-MEDICAREB", "name": "Medicare Part B", "funding_type_id": "FUND-MEDICARE"},
+    {"provider_id": "PAYER-ANTHEM", "name": "Anthem Blue Cross Blue Shield (Demo Payer)", "funding_type_id": "FUND-COMMERCIAL"},
+    {"provider_id": "PAYER-UHC", "name": "UnitedHealthcare (Demo Payer)", "funding_type_id": "FUND-COMMERCIAL"},
+    {"provider_id": "PAYER-COUNTY-MH", "name": "County Mental Health Board Contract", "funding_type_id": "FUND-COUNTY"},
+    {"provider_id": "PAYER-SABG", "name": "Substance Abuse Block Grant", "funding_type_id": "FUND-STATE-BLOCK"},
+    {"provider_id": "PAYER-COMMUNITY-FDN", "name": "Community Wellness Foundation Grant (Demo)", "funding_type_id": "FUND-GRANT"}
+  ]
+}

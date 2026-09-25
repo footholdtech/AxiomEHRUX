@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "axiom-discharge",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["tools/serve.py"],
+      "port": 8791
+    }
+  ]
+}

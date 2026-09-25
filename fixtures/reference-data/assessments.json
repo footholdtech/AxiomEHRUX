@@ -1,0 +1,22 @@
+{
+  "_meta": {"description": "Common standardized assessments/screening tools used in behavioral health EHRs. Sample scored records are illustrative only, not real scoring guidance."},
+  "instruments": [
+    {"assessment_id": "PHQ9", "name": "Patient Health Questionnaire-9", "domain": "Depression screening", "score_range": "0-27", "typical_cadence": "Intake + every 90 days"},
+    {"assessment_id": "GAD7", "name": "Generalized Anxiety Disorder-7", "domain": "Anxiety screening", "score_range": "0-21", "typical_cadence": "Intake + every 90 days"},
+    {"assessment_id": "CANS", "name": "Child and Adolescent Needs and Strengths", "domain": "Youth functional assessment", "score_range": "N/A (domain ratings 0-3)", "typical_cadence": "Intake + every 6 months"},
+    {"assessment_id": "ANSA", "name": "Adult Needs and Strengths Assessment", "domain": "Adult functional assessment", "score_range": "N/A (domain ratings 0-3)", "typical_cadence": "Intake + every 6 months"},
+    {"assessment_id": "PCL5", "name": "PTSD Checklist for DSM-5", "domain": "PTSD screening", "score_range": "0-80", "typical_cadence": "Intake + as clinically indicated"},
+    {"assessment_id": "AUDIT", "name": "Alcohol Use Disorders Identification Test", "domain": "Substance use screening", "score_range": "0-40", "typical_cadence": "Intake"},
+    {"assessment_id": "DAST10", "name": "Drug Abuse Screening Test-10", "domain": "Substance use screening", "score_range": "0-10", "typical_cadence": "Intake"},
+    {"assessment_id": "CSSRS", "name": "Columbia-Suicide Severity Rating Scale", "domain": "Suicide risk screening", "score_range": "Categorical risk level", "typical_cadence": "Intake + every visit if indicated"},
+    {"assessment_id": "ASAM", "name": "ASAM Criteria Level of Care Assessment", "domain": "Level of care determination", "score_range": "Level 0.5-4", "typical_cadence": "Intake + level of care review"},
+    {"assessment_id": "VBSAT", "name": "Vanderbilt ADHD Diagnostic Rating Scale", "domain": "ADHD screening (youth)", "score_range": "Varies", "typical_cadence": "As clinically indicated"}
+  ],
+  "sample_results": [
+    {"client_id": "CL-100234", "assessment_id": "PHQ9", "date": "2024-02-10", "score": 14, "interpretation": "Moderately severe depression"},
+    {"client_id": "CL-100235", "assessment_id": "AUDIT", "date": "2023-09-01", "score": 22, "interpretation": "High risk / likely dependence"},
+    {"client_id": "CL-100238", "assessment_id": "CANS", "date": "2024-01-08", "score": null, "interpretation": "Elevated needs in Family Functioning, Moderate strengths in Peer Relations"},
+    {"client_id": "CL-100241", "assessment_id": "CSSRS", "date": "2023-07-04", "score": null, "interpretation": "Low risk, no active ideation at time of screening"},
+    {"client_id": "CL-100236", "assessment_id": "GAD7", "date": "2024-06-21", "score": 11, "interpretation": "Moderate anxiety"}
+  ]
+}

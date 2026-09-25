@@ -1,0 +1,13 @@
+{
+  "_meta": {
+    "description": "Synthetic internal direct messages between staff members (e.g. clinical coordination, coverage requests).",
+    "fields": ["message_id", "thread_id", "sender_staff_id", "recipient_staff_id", "timestamp", "body", "read_status", "related_client_id"]
+  },
+  "records": [
+    {"message_id": "MSG-S-7001", "thread_id": "THR-S-01", "sender_staff_id": "ST-2003", "recipient_staff_id": "ST-2007", "timestamp": "2026-08-01T09:12:00", "body": "Can you review the updated treatment plan for CL-100236 before Friday's review?", "read_status": "Read", "related_client_id": "CL-100236"},
+    {"message_id": "MSG-S-7002", "thread_id": "THR-S-01", "sender_staff_id": "ST-2007", "recipient_staff_id": "ST-2003", "timestamp": "2026-08-01T10:05:00", "body": "Reviewed, looks good. Approved for Friday.", "read_status": "Read", "related_client_id": "CL-100236"},
+    {"message_id": "MSG-S-7003", "thread_id": "THR-S-02", "sender_staff_id": "ST-2008", "recipient_staff_id": "ST-2002", "timestamp": "2026-07-28T08:40:00", "body": "Vitals for CL-100244 came back elevated BP again this morning, flagging for your review.", "read_status": "Unread", "related_client_id": "CL-100244"},
+    {"message_id": "MSG-S-7004", "thread_id": "THR-S-03", "sender_staff_id": "ST-2004", "recipient_staff_id": "ST-2005", "timestamp": "2026-07-30T14:22:00", "body": "Can someone cover my 3pm check-in at Building A, I have a conflicting court appearance for a client.", "read_status": "Read", "related_client_id": null},
+    {"message_id": "MSG-S-7005", "thread_id": "THR-S-04", "sender_staff_id": "ST-2010", "recipient_staff_id": "ST-2003", "timestamp": "2026-07-25T16:00:00", "body": "Discharge summary for CL-100237 is missing a signature, please complete when you have a moment.", "read_status": "Unread", "related_client_id": "CL-100237"}
+  ]
+}

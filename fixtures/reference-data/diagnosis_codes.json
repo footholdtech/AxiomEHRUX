@@ -1,0 +1,20 @@
+{
+  "_meta": {"description": "Common behavioral health diagnosis codes for prototyping. ICD-10-CM codes are real standard codes (public code sets, not PHI); SNOMED CT concept IDs included where commonly used. Verify against current code sets before any production/billing use."},
+  "records": [
+    {"icd10": "F32.1", "snomed_ct": "36923009", "description": "Major depressive disorder, single episode, moderate"},
+    {"icd10": "F33.1", "snomed_ct": "66344007", "description": "Major depressive disorder, recurrent, moderate"},
+    {"icd10": "F41.1", "snomed_ct": "21897009", "description": "Generalized anxiety disorder"},
+    {"icd10": "F43.10", "snomed_ct": "47505003", "description": "Post-traumatic stress disorder, unspecified"},
+    {"icd10": "F90.2", "snomed_ct": "192127007", "description": "Attention-deficit hyperactivity disorder, combined type"},
+    {"icd10": "F60.3", "snomed_ct": "20010003", "description": "Borderline personality disorder"},
+    {"icd10": "F25.9", "snomed_ct": "111484008", "description": "Schizoaffective disorder, unspecified"},
+    {"icd10": "F20.9", "snomed_ct": "58214004", "description": "Schizophrenia, unspecified"},
+    {"icd10": "F31.9", "snomed_ct": "13746004", "description": "Bipolar disorder, unspecified"},
+    {"icd10": "F10.20", "snomed_ct": "7200002", "description": "Alcohol use disorder, moderate"},
+    {"icd10": "F11.20", "snomed_ct": "191816009", "description": "Opioid use disorder, moderate"},
+    {"icd10": "F12.10", "snomed_ct": "84758004", "description": "Cannabis use disorder, mild"},
+    {"icd10": "F91.3", "snomed_ct": "38112007", "description": "Oppositional defiant disorder"},
+    {"icd10": "F84.0", "snomed_ct": "408856003", "description": "Autism spectrum disorder"},
+    {"icd10": "F43.21", "snomed_ct": "288995006", "description": "Adjustment disorder with depressed mood"}
+  ]
+}

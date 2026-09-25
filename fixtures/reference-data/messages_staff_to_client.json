@@ -1,0 +1,13 @@
+{
+  "_meta": {
+    "description": "Synthetic direct messages between staff and clients (e.g. patient portal / secure messaging).",
+    "fields": ["message_id", "thread_id", "sender_type", "sender_id", "recipient_type", "recipient_id", "timestamp", "body", "read_status"]
+  },
+  "records": [
+    {"message_id": "MSG-C-8001", "thread_id": "THR-C-01", "sender_type": "staff", "sender_id": "ST-2003", "recipient_type": "client", "recipient_id": "CL-100234", "timestamp": "2026-07-31T11:00:00", "body": "Hi Maria, just confirming our appointment on 7/29 went well. Let me know if you need anything before our next session.", "read_status": "Read"},
+    {"message_id": "MSG-C-8002", "thread_id": "THR-C-01", "sender_type": "client", "sender_id": "CL-100234", "recipient_type": "staff", "recipient_id": "ST-2003", "timestamp": "2026-07-31T14:30:00", "body": "Thank you, I felt good about it. Can we move next week's appointment to the morning?", "read_status": "Unread"},
+    {"message_id": "MSG-C-8003", "thread_id": "THR-C-02", "sender_type": "staff", "sender_id": "ST-2002", "recipient_type": "client", "recipient_id": "CL-100238", "timestamp": "2026-08-02T09:15:00", "body": "Reminder: please pick up your refill by Friday, the pharmacy said it's ready.", "read_status": "Read"},
+    {"message_id": "MSG-C-8004", "thread_id": "THR-C-03", "sender_type": "client", "sender_id": "CL-100245", "recipient_type": "staff", "recipient_id": "ST-2006", "timestamp": "2026-08-03T18:42:00", "body": "I need to reschedule Monday's session, something came up at work.", "read_status": "Unread"},
+    {"message_id": "MSG-C-8005", "thread_id": "THR-C-04", "sender_type": "staff", "sender_id": "ST-2004", "recipient_type": "client", "recipient_id": "CL-100235", "timestamp": "2026-07-29T16:00:00", "body": "Following up on housing paperwork, please stop by the front desk when you get a chance.", "read_status": "Read"}
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "_meta": {
+    "description": "Synthetic pending-notifications queue records, modeled on typical EHR notification center tabs (internal orders, radiology, specialist referral, messaging, patient notes, patient requests, client alerts, pending labs). Includes category counts + sample rows for the largest category.",
+    "category_counts": {
+      "pending_notifications_total": 42,
+      "internal_orders": 9,
+      "radiology_order": 4,
+      "specialist_referral": 3,
+      "messaging": 6,
+      "patient_notes": 2,
+      "pending_patient_requests": 5,
+      "client_alerts": 1,
+      "pending_labs": 12
+    },
+    "fields": ["notification_id", "form_type", "section", "site_id", "pended_by_staff_id", "client_id", "current_status", "comment", "pend_for", "form_date", "create_date", "update_date"]
+  },
+  "records": [
+    {"notification_id": "NTF-900001", "form_type": "Crisis Prevention Plan", "section": "Unassigned", "site_id": "SITE-RES-A", "pended_by_staff_id": "ST-2004", "client_id": "CL-100241", "current_status": "Pend for Review", "comment": "Updated safety plan after weekend incident", "pend_for": "ST-2007", "form_date": "2026-07-30", "create_date": "2026-07-30T03:36:00", "update_date": "2026-07-30T03:36:00"},
+    {"notification_id": "NTF-900002", "form_type": "Crisis Prevention Plan", "section": "Unassigned", "site_id": "SITE-RES-A", "pended_by_staff_id": "ST-2005", "client_id": "CL-100238", "current_status": "Pend for Review", "comment": "Routine 90-day update", "pend_for": "ST-2003", "form_date": "2026-07-30", "create_date": "2026-07-30T03:33:00", "update_date": "2026-07-30T03:33:00"},
+    {"notification_id": "NTF-900003", "form_type": "Treatment Plan Review", "section": "Unassigned", "site_id": "SITE-MAIN-01", "pended_by_staff_id": "ST-2006", "client_id": "CL-100236", "current_status": "Pend for Review", "comment": "Quarterly review, needs supervisor sign-off", "pend_for": "ST-2007", "form_date": "2026-07-27", "create_date": "2026-07-27T12:22:00", "update_date": "2026-07-27T12:22:00"},
+    {"notification_id": "NTF-900004", "form_type": "Discharge Summary", "section": "Unassigned", "site_id": "SITE-MAIN-02", "pended_by_staff_id": "ST-2003", "client_id": "CL-100237", "current_status": "Pend for Review", "comment": "Discharge finalized, awaiting QA review", "pend_for": "ST-2010", "form_date": "2026-07-25", "create_date": "2026-07-25T21:34:00", "update_date": "2026-07-25T21:34:00"},
+    {"notification_id": "NTF-900005", "form_type": "Nurse Progress Note", "section": "Unassigned", "site_id": "SITE-RES-B", "pended_by_staff_id": "ST-2008", "client_id": "CL-100244", "current_status": "Pend for Review", "comment": "Vitals out of typical range, flagged for review", "pend_for": "ST-2002", "form_date": "2026-07-24", "create_date": "2026-07-24T21:34:00", "update_date": "2026-07-24T21:34:00"}
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "_meta": {"description": "Common clinical documentation / note type reference for behavioral health EHR prototyping."},
+  "records": [
+    {"note_type_id": "NOTE-INTAKE", "name": "Intake Note", "typical_author_roles": ["ROLE-INTAKE-COORD", "ROLE-SW", "ROLE-CLINICAL-PROVIDER"], "frequency": "Once at admission"},
+    {"note_type_id": "NOTE-PROGRESS", "name": "Progress Note", "typical_author_roles": ["ROLE-CLINICAL-PROVIDER", "ROLE-SW", "ROLE-CM"], "frequency": "Per session/contact"},
+    {"note_type_id": "NOTE-NURSE-PROGRESS", "name": "Nurse Progress Note", "typical_author_roles": ["ROLE-NURSE"], "frequency": "Per shift/contact"},
+    {"note_type_id": "NOTE-PCP", "name": "Primary Care / Medical Note", "typical_author_roles": ["ROLE-PCP"], "frequency": "Per visit"},
+    {"note_type_id": "NOTE-PSYCH", "name": "Psychiatric Note", "typical_author_roles": ["ROLE-PSYCH"], "frequency": "Per visit"},
+    {"note_type_id": "NOTE-TX-PLAN", "name": "Treatment Plan / Plan of Care", "typical_author_roles": ["ROLE-CLINICAL-PROVIDER", "ROLE-CM"], "frequency": "Initial + periodic review"},
+    {"note_type_id": "NOTE-DISCHARGE", "name": "Discharge Summary", "typical_author_roles": ["ROLE-CLINICAL-PROVIDER", "ROLE-SW"], "frequency": "Once at discharge"},
+    {"note_type_id": "NOTE-CASE-MGMT", "name": "Case Management Note", "typical_author_roles": ["ROLE-CM"], "frequency": "Per contact"},
+    {"note_type_id": "NOTE-GROUP", "name": "Group Note", "typical_author_roles": ["ROLE-CLINICAL-PROVIDER"], "frequency": "Per group session"},
+    {"note_type_id": "NOTE-CRISIS", "name": "Crisis / Safety Note", "typical_author_roles": ["ROLE-CLINICAL-PROVIDER", "ROLE-SW", "ROLE-PSYCH"], "frequency": "As needed"},
+    {"note_type_id": "NOTE-SUPERVISION", "name": "Clinical Supervision Note", "typical_author_roles": ["ROLE-CLINICAL-DIR"], "frequency": "Per supervision session"},
+    {"note_type_id": "NOTE-COLLATERAL", "name": "Collateral Contact Note", "typical_author_roles": ["ROLE-CM", "ROLE-SW"], "frequency": "As needed"},
+    {"note_type_id": "NOTE-MED-MGMT", "name": "Medication Management Note", "typical_author_roles": ["ROLE-PSYCH", "ROLE-PCP"], "frequency": "Per med visit"}
+  ]
+}

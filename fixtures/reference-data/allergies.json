@@ -1,0 +1,16 @@
+{
+  "_meta": {
+    "description": "Synthetic allergy records covering drug, other, and 'no known allergy' patterns typical of EHR allergy panels.",
+    "fields": ["allergy_id", "client_id", "allergen", "allergen_category", "reaction", "severity_flag", "medication_context", "status"]
+  },
+  "records": [
+    {"allergy_id": "ALG-6001", "client_id": "CL-100234", "allergen": "Amphetamines", "allergen_category": "Drug Class", "reaction": "Hives", "severity_flag": "High", "medication_context": null, "status": "Active"},
+    {"allergy_id": "ALG-6002", "client_id": "CL-100234", "allergen": "ACE Inhibitors", "allergen_category": "Drug Class", "reaction": "Cough", "severity_flag": "Moderate", "medication_context": "ACE Inhibitors (test)", "status": "Active"},
+    {"allergy_id": "ALG-6003", "client_id": "CL-100236", "allergen": "Penicillins", "allergen_category": "Drug Class", "reaction": "Rash", "severity_flag": "Moderate", "medication_context": null, "status": "Active"},
+    {"allergy_id": "ALG-6004", "client_id": "CL-100241", "allergen": "Fentanyl", "allergen_category": "Medication", "reaction": "Anaphylaxis", "severity_flag": "High", "medication_context": "Fentanyl (Do not prescribe!!)", "status": "Active"},
+    {"allergy_id": "ALG-6005", "client_id": "CL-100238", "allergen": "E. coli-derived Products", "allergen_category": "Other", "reaction": "Unknown / not documented", "severity_flag": "Unknown", "medication_context": null, "status": "Active"},
+    {"allergy_id": "ALG-6006", "client_id": "CL-100239", "allergen": "No Known Allergies", "allergen_category": "None", "reaction": null, "severity_flag": null, "medication_context": null, "status": "N/A"},
+    {"allergy_id": "ALG-6007", "client_id": "CL-100244", "allergen": "Angiotensin Receptor Blockers", "allergen_category": "Drug Class", "reaction": "Swelling", "severity_flag": "Moderate", "medication_context": null, "status": "Active"},
+    {"allergy_id": "ALG-6008", "client_id": "CL-100245", "allergen": "Aspirin", "allergen_category": "Medication", "reaction": "GI upset", "severity_flag": "Low", "medication_context": null, "status": "Active"}
+  ]
+}

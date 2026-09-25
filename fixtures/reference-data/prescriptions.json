@@ -1,0 +1,16 @@
+{
+  "_meta": {
+    "description": "Synthetic prescription records modeled on a typical Current Rx table (medication, SIG, qty, days, refills, provider, start date, renew-by, Rx status).",
+    "rx_status_values": ["PAPER/FAX", "E-PRESCRIBED", "PENDING", "DISCONTINUED", "EXPIRED"],
+    "fields": ["rx_id", "client_id", "medication_id", "medication_display", "sig", "qty", "days", "refills", "prescriber_staff_id", "start_date", "renew_by", "rx_status", "rx_type"]
+  },
+  "records": [
+    {"rx_id": "RX-30001", "client_id": "CL-100238", "medication_id": "MED-001", "medication_display": "Adderall 12.5 mg", "sig": "Take 1 Tablet by mouth daily; for Focus and Concentration", "qty": 1, "days": 90, "refills": 0, "prescriber_staff_id": "ST-2002", "start_date": "2026-06-26", "renew_by": "2026-09-24", "rx_status": "PAPER/FAX", "rx_type": "Current"},
+    {"rx_id": "RX-30002", "client_id": "CL-100238", "medication_id": "MED-002", "medication_display": "Abilify 5 mg", "sig": "Take 1 Tablet by mouth every day before noon as needed; for Agitation", "qty": 1, "days": 60, "refills": 0, "prescriber_staff_id": "ST-2002", "start_date": "2026-06-26", "renew_by": "2026-08-25", "rx_status": "PAPER/FAX", "rx_type": "Current"},
+    {"rx_id": "RX-30003", "client_id": "CL-100241", "medication_id": "MED-001", "medication_display": "Adderall 5 mg", "sig": "Take 1 Tablet by mouth once; for Hyperactivity", "qty": 90, "days": 90, "refills": 0, "prescriber_staff_id": "ST-2002", "start_date": "2026-06-26", "renew_by": "2026-09-24", "rx_status": "PAPER/FAX", "rx_type": "Current"},
+    {"rx_id": "RX-30004", "client_id": "CL-100244", "medication_id": "MED-001", "medication_display": "Adderall 20 mg", "sig": "Take 1 Tablet by mouth daily; for Focus and Concentration", "qty": 90, "days": 90, "refills": 0, "prescriber_staff_id": "ST-2001", "start_date": "2026-05-11", "renew_by": "2026-08-09", "rx_status": "PAPER/FAX", "rx_type": "Current"},
+    {"rx_id": "RX-30005", "client_id": "CL-100234", "medication_id": "MED-003", "medication_display": "Sertraline 50 mg", "sig": "Take 1 Tablet by mouth daily; for depression", "qty": 30, "days": 30, "refills": 3, "prescriber_staff_id": "ST-2002", "start_date": "2026-02-10", "renew_by": "2026-08-10", "rx_status": "E-PRESCRIBED", "rx_type": "Current"},
+    {"rx_id": "RX-30006", "client_id": "CL-100239", "medication_id": "MED-007", "medication_display": "Trazodone 50 mg", "sig": "Take 1 Tablet by mouth at bedtime as needed for sleep", "qty": 30, "days": 30, "refills": 2, "prescriber_staff_id": "ST-2001", "start_date": "2026-01-05", "renew_by": "2026-07-05", "rx_status": "EXPIRED", "rx_type": "Expired"},
+    {"rx_id": "RX-30007", "client_id": "CL-100235", "medication_id": "MED-010", "medication_display": "Naltrexone 50 mg", "sig": "Take 1 Tablet by mouth daily", "qty": 30, "days": 30, "refills": 1, "prescriber_staff_id": "ST-2002", "start_date": "2026-07-01", "renew_by": "2026-08-01", "rx_status": "PENDING", "rx_type": "Current"}
+  ]
+}

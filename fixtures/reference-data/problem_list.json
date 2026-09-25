@@ -1,0 +1,20 @@
+{
+  "_meta": {"description": "Problem list items — broader clinical/psychosocial concerns tracked alongside formal diagnoses. Not billing codes."},
+  "records": [
+    {"problem_id": "PROB-SI", "name": "Suicidal Ideation", "category": "Safety"},
+    {"problem_id": "PROB-HI", "name": "Homicidal Ideation", "category": "Safety"},
+    {"problem_id": "PROB-SELFHARM", "name": "Non-Suicidal Self-Injury", "category": "Safety"},
+    {"problem_id": "PROB-HOMELESS", "name": "Housing Instability / Homelessness", "category": "Social Determinants"},
+    {"problem_id": "PROB-FOODINSEC", "name": "Food Insecurity", "category": "Social Determinants"},
+    {"problem_id": "PROB-UNEMPLOYED", "name": "Unemployment / Underemployment", "category": "Social Determinants"},
+    {"problem_id": "PROB-DV", "name": "Domestic Violence Exposure", "category": "Safety"},
+    {"problem_id": "PROB-GRIEF", "name": "Unresolved Grief / Bereavement", "category": "Psychosocial"},
+    {"problem_id": "PROB-ISOLATION", "name": "Social Isolation", "category": "Psychosocial"},
+    {"problem_id": "PROB-NONCOMPLIANCE", "name": "Medication Non-Adherence", "category": "Medical"},
+    {"problem_id": "PROB-CHRONICPAIN", "name": "Chronic Pain", "category": "Medical"},
+    {"problem_id": "PROB-SLEEP", "name": "Sleep Disturbance", "category": "Medical"},
+    {"problem_id": "PROB-CUSTODY", "name": "Custody / Guardianship Dispute", "category": "Legal"},
+    {"problem_id": "PROB-JUSTICE", "name": "Involvement with Justice System", "category": "Legal"},
+    {"problem_id": "PROB-CAREGIVERSTRAIN", "name": "Caregiver Strain", "category": "Psychosocial"}
+  ]
+}
