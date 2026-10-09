@@ -56,15 +56,12 @@ Enrollment status and clinical status are different facts. A client can complete
 a residential episode with an alcohol use disorder that is still active. Today
 the product collapses the two.
 
-Saving the Discharge Plan now stops and asks one question — **which diagnoses
-and problems appear on the discharge summary** — and states in the same breath
-that the answer changes the document and nothing else.
+Saving the Discharge Plan goes straight to the discharge summary. The summary
+prints every diagnosis and problem-list item with an **active** status (Active,
+In Remission, Provisional); Resolved and Inactive items are left off. There is
+no selection step — an earlier version let the clinician pick items, but the
+customer confirmed that flexibility isn't needed.
 
-- Every diagnosis and problem-list item on the chart is listed with its status.
-- Anything carrying an **active** status (Active, In Remission, Provisional) is
-  **pre-checked**. Resolved and Inactive are listed but unchecked.
-- Excluded rows fade out, so what will print is legible at a glance.
-- Unchecking the **primary** diagnosis raises a payor warning.
 - Saving renders the summary as a paginated PDF-style document in the overlay,
   with a footnote recording that statuses are as of the chart on that date and
   were not changed by the discharge.
@@ -82,14 +79,12 @@ flips between the two so both paths can be demonstrated.
 2. **Documentation Due → Discharge Plan (due today) → Open.** Dee Carter's chart
    loads; the banner appears and names him.
 3. **Prefill demo answers** in the prototype bar fills the note.
-4. **Save as Complete.** The diagnosis intercept opens — four of five diagnoses
-   and four of six problems are pre-checked; the resolved cannabis use disorder
-   and the two resolved problems are not.
-5. Uncheck **F10.20 Alcohol use disorder** to see the primary-diagnosis warning,
-   then re-check it.
-6. **Generate summary** → the PDF preview → **File to chart**.
-7. Scroll to the note's **Diagnosis** section: every status is unchanged.
-8. Now try the navigation rules — switch client from the top-bar chip, navigate
+4. **Save as Complete.** The summary opens directly. Four of five diagnoses
+   and four of six problems print; the resolved cannabis use disorder and the
+   two resolved problems do not.
+5. **File to chart**.
+6. Scroll to the note's **Diagnosis** section: every status is unchanged.
+7. Now try the navigation rules — switch client from the top-bar chip, navigate
    to Reports, edit a field and change note tabs, or sign out and back in.
 
 To demo the manager-approval variant, flip **Agency configuration** in the
@@ -147,6 +142,7 @@ fixtures with anything that is not clearly fictional.
 
 ```bash
 python3 tools/build-clinical-fixtures.py   # regenerate the two per-client tables
+python3 tools/build-header-fixtures.py     # meds, immunizations, injections, vitals, assessments, client notes
 python3 tools/build-refdata.py             # bundle fixtures -> assets/refdata.js
 python3 tools/build.py                     # -> index.html + AxiomEHR-Discharge-Plan.html
 python3 tools/serve.py                     # dev server on :8791, sends no-store
@@ -200,7 +196,7 @@ you won't get an intercept on those two paths.
 | `src/30-chrome.jsx` | Top bar, client switcher, persistent banner, left nav, sign-in |
 | `src/40-home.jsx` | Home, All Clients, non-client stubs |
 | `src/50-discharge.jsx` | Chart page and the Discharge Plan form |
-| `src/60-summary.jsx` | Diagnosis selection intercept and the generated summary |
+| `src/60-summary.jsx` | The generated discharge summary |
 | `src/90-app.jsx` | Routes and mount |
 | `vendor/` | React, ReactDOM and Babel, vendored so nothing loads from a CDN |
 | `index.html` · `AxiomEHR-Discharge-Plan.html` | Generated output — identical, self-contained, never hand-edited |

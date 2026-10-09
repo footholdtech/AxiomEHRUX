@@ -49,7 +49,14 @@
   border-radius: var(--radius-sm);
   color: var(--foreground-primary);
 }
-.gsearch-box:focus-within { border-color: var(--border-input-control-secondary-active); }
+/* Active/focused while the clinician is typing. A 1px border change alone was
+   invisible here — the box sits on the theme-coloured bar, so a theme-coloured
+   edge just merges into it. The inset shadow thickens the edge to 2px on the
+   inside, against the white field, where it can actually be seen. */
+.gsearch-box:focus-within {
+  border-color: var(--border-input-control-primary-focus);
+  box-shadow: inset 0 0 0 1px var(--border-input-control-primary-focus);
+}
 
 /* 3. Search w/prefix — the category prefix filter */
 .gsearch-scope { position: relative; display: flex; align-items: center; flex: none; }
@@ -175,16 +182,16 @@
  * Roboto SemiBold 16/24 (font/size/2xl + line-height/md) — never the display
  * face — and the dismiss control in a trailing group pinned right.
  */
-.intercept-head, .dxmodal-head {
+.intercept-head {
   display: flex; align-items: center; gap: var(--sp-xs);
   padding: var(--sp-md) var(--sp-lg);
   border-bottom: 1px solid var(--border-secondary);
 }
-.modal-head-content, .dxmodal-head-content { flex: 1 0 0; min-width: 0; }
+.modal-head-content { flex: 1 0 0; min-width: 0; }
 .modal-head-actions { display: flex; align-items: center; gap: var(--sp-xs); flex: none; }
 /* Shape and colour come from the standard `.icon-btn` (app.css) — this class
    now only marks the DS node for Code Connect. */
-.intercept-title, .dxmodal-title {
+.intercept-title {
   font-family: var(--font-sans); font-size: 16px; line-height: 24px; font-weight: 600;
   margin: 0; color: var(--foreground-primary);
 }
@@ -281,13 +288,36 @@
 .dd-trigger svg { margin-left: auto; color: var(--foreground-tertiary); flex: none; }
 .dd-value { flex: 1; min-width: 0; }
 .dd-placeholder { flex: 1; color: var(--foreground-secondary); }
-.dd-menu { position: absolute; z-index: 40; top: calc(100% + 4px); left: 0; right: 0; max-height: 280px; overflow-y: auto;
-  background: var(--background-surface-primary); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); padding: var(--sp-3xs); }
+/* Menus are portalled to <body> (FloatMenu) and positioned inline, so nothing
+   here sets top/left — and the z-index clears dialogs (80), the PDF shell (85)
+   and tooltips (90). */
+.float-menu { z-index: 95; display: flex; flex-direction: column; animation: menu-in var(--dur) var(--ease); }
+@keyframes menu-in { from { opacity: 0; } to { opacity: 1; } }
+.dd-menu { background: var(--background-surface-primary); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); overflow: hidden; }
+.dd-list { overflow-y: auto; padding: var(--sp-3xs); min-height: 0; flex: 1 1 auto; }
 .dd-opt { display: flex; align-items: center; gap: var(--sp-xs); width: 100%; text-align: left; background: none; border: none; cursor: pointer;
   padding: 8px var(--sp-md); border-radius: var(--radius-sm); font-size: 13px; font-family: var(--font-sans); color: var(--foreground-primary); }
 .dd-opt:hover { background: var(--background-surface-secondary); }
 .dd-opt.active { background: var(--background-interactive-tertiary-selected, #f0fcf6); }
 .dd-opt svg { margin-left: auto; color: var(--foreground-interactive-primary-default); }
+.dd-opt--rich { align-items: flex-start; padding-top: var(--sp-xs); padding-bottom: var(--sp-xs); }
+.dd-opt--rich > svg { margin-top: 2px; }
+.dd-opt.is-disabled { cursor: not-allowed; }
+.dd-opt.is-disabled:hover { background: none; }
+.dd-opt.is-disabled .dd-opt-label, .dd-opt.is-disabled .dd-opt-sub { color: var(--foreground-disabled-primary); }
+.dd-opt-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.dd-opt-label { font-weight: 500; color: var(--foreground-primary); }
+.dd-opt-sub { font-size: 12px; color: var(--foreground-secondary); }
+.dd-opt-tags { display: flex; flex-wrap: wrap; gap: var(--sp-3xs); margin-top: 2px; }
+.dd-tag { font-size: 11px; line-height: 16px; padding: 0 6px; border-radius: var(--radius-xs);
+  background: var(--background-surface-secondary); color: var(--foreground-secondary); }
+.dd-tag--good { background: var(--background-system-success-light); color: var(--foreground-system-success-dark); }
+.dd-tag--warn { background: var(--background-system-warning-light); color: var(--foreground-system-warning-dark); }
+.dd-tag--info { background: var(--background-system-info-light); color: var(--foreground-system-info-dark); }
+.dd-opt-reason { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--foreground-secondary); }
+.dd-opt-reason svg { margin: 0; color: var(--foreground-secondary); }
+.dd-foot { flex: none; padding: var(--sp-xs) var(--sp-md); border-top: 1px solid var(--divider-primary);
+  font-size: 11.5px; color: var(--foreground-secondary); }
 
 .sig-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 260px) minmax(0, 1fr); gap: var(--sp-md) var(--sp-lg); align-items: start; }
 .sig-done { display: flex; align-items: center; gap: var(--sp-xs); min-height: 36px; padding: 2px var(--sp-md);
@@ -346,39 +376,6 @@
 .due-text { flex: 1; min-width: 0; }
 .due-title { font-size: 13px; font-weight: 600; color: var(--foreground-primary); }
 .due-meta { font-size: 11.5px; color: var(--foreground-secondary); }
-
-/* ================= Diagnosis selection intercept ================= */
-.dxmodal { position: fixed; z-index: 80; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  width: 940px; max-width: 95vw; max-height: 92vh; display: flex; flex-direction: column;
-  background: var(--background-surface-primary); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
-  overflow: hidden; animation: modal-in var(--dur) var(--ease); }
-.dxmodal-sub { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--foreground-secondary); margin-top: 2px; }
-
-/* Tabs inside the modal. The lists can be long, so only one is mounted at a
-   time and its table scrolls rather than growing the dialog. */
-.dxmodal-tabs { margin-bottom: var(--sp-md); }
-.dxmodal .seltable .table-wrap { max-height: 46vh; overflow-y: auto; }
-.dxmodal-body { padding: var(--sp-lg) var(--sp-xl); overflow-y: auto; display: flex; flex-direction: column; gap: var(--sp-lg); }
-.dxmodal-foot { display: flex; align-items: center; gap: var(--sp-xs); padding: var(--sp-md) var(--sp-xl); border-top: 1px solid var(--divider-primary, #e7eaec); background: var(--background-surface-secondary); }
-.dxmodal-total { display: flex; flex-direction: column; line-height: 1.3; font-size: 12.5px; font-weight: 600; color: var(--foreground-secondary); margin-right: var(--sp-xs); text-align: right; }
-.dxmodal-next { font-size: 11px; font-weight: 400; color: var(--foreground-secondary); }
-.dxmodal-alert { display: flex; gap: var(--sp-md); align-items: flex-start; padding: var(--sp-md) var(--sp-lg); border-radius: var(--radius-md); font-size: 12.5px; line-height: 1.5; }
-.dxmodal-alert.tone-warn { background: var(--background-system-warning-light, #fff4e5); color: var(--foreground-system-warning-dark, #a15c07); }
-.dxmodal-alert.tone-info { background: var(--background-surface-secondary); color: var(--foreground-secondary); }
-.dxmodal-alert svg { flex: none; margin-top: 1px; }
-
-.seltable { border: 1px solid var(--divider-primary, #e7eaec); border-radius: var(--radius-md); overflow: hidden; }
-.seltable-head { display: flex; align-items: center; gap: var(--sp-md); padding: var(--sp-xs) var(--sp-md); background: var(--background-surface-secondary); border-bottom: 1px solid var(--divider-primary, #e7eaec); }
-.seltable-caption { font-size: 13px; font-weight: 600; color: var(--foreground-primary); }
-.seltable-count { margin-left: auto; font-size: 11.5px; color: var(--foreground-secondary); }
-/* Inclusion is carried by the checkbox and a left accent bar only. Excluded
-   rows are NOT dimmed: a resolved diagnosis is a valid, current fact about the
-   chart, and greying it implies it is defunct or unavailable. The 'Resolved'
-   label does that work, in blue (see STATUS_TONE in 10-data.jsx). */
-.data-table.select-rows tbody tr { cursor: pointer; }
-.data-table.select-rows tbody tr > td:first-child { box-shadow: inset 3px 0 0 transparent; }
-.data-table.select-rows tr.is-selected > td:first-child { box-shadow: inset 3px 0 0 var(--background-interactive-primary-default); }
-.data-table .col-check { width: 40px; padding-right: 0; }
 
 /* Indeterminate checkboxes. The DS fills the box for :indeterminate but only
    reveals the checkmark for :checked, so a partial selection rendered as a
@@ -1236,8 +1233,6 @@
  */
 .msd { position: relative; }
 .msd-menu {
-  position: absolute; z-index: 40; top: calc(100% + 4px); left: 0; right: 0;
-  max-height: 320px; display: flex; flex-direction: column;
   background: var(--background-surface-primary); border: 1px solid var(--border-input-control-primary-default, #b6c2c8);
   border-radius: var(--radius-sm); box-shadow: var(--shadow-lg); overflow: hidden;
 }
@@ -1247,7 +1242,7 @@
   color: var(--foreground-tertiary);
 }
 .msd-search input { flex: 1; min-width: 0; border: none; outline: none; background: none; font-size: 13px; color: var(--foreground-primary); font-family: var(--font-sans); }
-.msd-list { overflow-y: auto; padding: var(--sp-2xs); }
+.msd-list { overflow-y: auto; min-height: 0; padding: var(--sp-2xs); }
 .msd-opt {
   display: flex; align-items: center; gap: var(--sp-xs); width: 100%;
   padding: var(--sp-xs) var(--sp-sm); border-radius: var(--radius-sm); cursor: pointer;
@@ -1268,3 +1263,235 @@
 .chc-previewmodal .modal-head-actions { gap: var(--sp-md); }
 .chc-previewmodal .modal-head-actions .dd { min-width: 200px; }
 .chc-previewmodal-body { padding: var(--sp-lg); overflow-y: auto; }
+
+/* ================= Tooltip =================
+ * Shown above its anchor on hover and keyboard focus. Built from DS tokens
+ * (inverse surface, radius-xs, shadow-lg) pending the DS tooltip frame
+ * (2:34), which wasn't reachable when this was built — see HANDOFF.
+ */
+.tip-anchor { position: relative; display: inline-flex; }
+.tip {
+  position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  z-index: 90; white-space: nowrap; pointer-events: none;
+  padding: var(--sp-3xs) var(--sp-xs); border-radius: var(--radius-xs);
+  background: var(--background-surface-inverse); color: var(--background-surface-primary);
+  font-family: var(--font-sans); font-size: 12px; line-height: 16px; font-weight: 500;
+  box-shadow: var(--shadow-lg);
+}
+.tip::after {
+  content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  border: 5px solid transparent; border-top-color: var(--background-surface-inverse);
+}
+
+/* ================= Overlays (records without leaving the page) ========= */
+.ovl {
+  position: fixed; z-index: 80; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  max-width: 94vw; max-height: 90vh; display: flex; flex-direction: column;
+  background: var(--background-surface-primary); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg); overflow: hidden; animation: modal-in var(--dur) var(--ease);
+}
+.ovl--sm { width: 480px; } .ovl--md { width: 720px; } .ovl--lg { width: 1040px; }
+.ovl-sub { font-size: 12.5px; color: var(--foreground-secondary); margin-top: 2px; }
+.ovl-body { padding: var(--sp-lg) var(--sp-xl); overflow-y: auto; display: flex; flex-direction: column; gap: var(--sp-md); }
+.ovl-body > .ff { margin-bottom: 0; }
+.ovl-grid { display: grid; gap: 0 var(--sp-lg); }
+.ovl-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ovl-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ovl-grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.ovl-calc { font-weight: 600; color: var(--foreground-primary); }
+.ovl-checks { display: flex; gap: var(--sp-lg); flex-wrap: wrap; }
+.ovl-checks--col { flex-direction: column; gap: var(--sp-2xs); }
+.ovl-hint { font-size: 12px; color: var(--foreground-secondary); }
+.ovl-running { font-size: 12.5px; font-weight: 500; color: var(--foreground-secondary); }
+.form-suffix { flex: none; font-size: 12px; color: var(--foreground-secondary); }
+.ovl-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-md); padding-bottom: var(--sp-md); border-bottom: 1px solid var(--divider-primary, #e7eaec); }
+.ovl-facts > div { display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: var(--foreground-primary); }
+.ovl-facts span { font-size: 12px; color: var(--foreground-secondary); }
+.ovl-prompt { font-size: 13px; font-weight: 600; color: var(--foreground-primary); }
+.ovl-answers, .ovl-form, .ovl-list { list-style: none; margin: 0; padding: 0; counter-reset: q; }
+.ovl-answers li, .ovl-form li {
+  counter-increment: q; display: flex; align-items: flex-start; gap: var(--sp-lg);
+  padding: var(--sp-xs) 0; border-bottom: 1px solid var(--divider-secondary);
+  font-size: 13px; color: var(--foreground-primary);
+}
+.ovl-answers li::before, .ovl-form li::before { content: counter(q) '.'; flex: none; width: 22px; color: var(--foreground-secondary); }
+.ovl-q { flex: 1; min-width: 0; line-height: 1.45; }
+.ovl-a { flex: none; font-weight: 500; text-align: right; max-width: 40%; }
+.ovl-answers li.is-flagged { background: var(--background-system-warning-light); }
+.ovl-form li { flex-direction: column; gap: var(--sp-2xs); padding-left: 0; }
+.ovl-form li::before { display: none; }
+.ovl-form .ovl-q::before { content: counter(q) '. '; color: var(--foreground-secondary); }
+.ovl-form li.is-missing .ovl-q { color: var(--foreground-system-error, #b3261e); }
+.ovl-opts { display: flex; flex-wrap: wrap; gap: var(--sp-2xs) var(--sp-lg); }
+.ovl-total { display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; color: var(--foreground-primary); padding-top: var(--sp-xs); }
+.ovl-list li { padding: var(--sp-2xs) 0; font-size: 13px; color: var(--foreground-primary); }
+.ovl-blocked { border: 1px solid var(--divider-primary, #e7eaec); border-radius: var(--radius-md); padding: var(--sp-sm) var(--sp-md); }
+.ovl-blocked-head { font-size: 12px; font-weight: 600; color: var(--foreground-secondary); margin-bottom: var(--sp-3xs); }
+.ovl-blocked-row { font-size: 12.5px; color: var(--foreground-secondary); padding: 2px 0; }
+.ovl-blocked-row b { color: var(--foreground-primary); font-weight: 500; }
+.ovl-attest { padding: var(--sp-xs) var(--sp-sm); border-radius: var(--radius-sm); }
+.ovl-attest.is-missing { outline: 1px solid var(--foreground-system-error, #b3261e); }
+.ovl-attest-inline { margin-top: var(--sp-2xs); }
+.ovl-chosen { display: flex; align-items: center; gap: var(--sp-xs); flex-wrap: wrap; padding: var(--sp-xs) var(--sp-md);
+  border: 1px solid var(--border-input-control-primary-default); border-radius: var(--radius-sm); font-size: 13px; }
+.ovl-search { display: flex; flex-direction: column; gap: var(--sp-xs); }
+.ovl-results { border: 1px solid var(--divider-primary, #e7eaec); border-radius: var(--radius-md); }
+.ovl-alert { display: flex; gap: var(--sp-sm); align-items: flex-start; padding: var(--sp-sm) var(--sp-md); border-radius: var(--radius-md); font-size: 13px; line-height: 1.5; }
+.ovl-alert svg { flex: none; margin-top: 2px; }
+.ovl-alert--danger { background: var(--background-system-danger-light); border: 1px solid var(--border-system-danger-default); color: var(--foreground-system-danger-dark); }
+.chc-note--warn > div { min-width: 0; }
+
+/* ================= Clinical quick views (header detail row) ============ */
+/* Detail row can't grow without limit — it sits in the pinned header. */
+.cph-detail-inner { max-height: 46vh; overflow-y: auto; }
+.cph-qvx { flex: 1 1 100%; min-width: 0; display: flex; flex-direction: column; gap: var(--sp-sm); }
+.qvx-bar { display: flex; align-items: center; gap: var(--sp-md); flex-wrap: wrap; }
+.qvx-title { display: flex; align-items: baseline; gap: var(--sp-xs); flex: 1; min-width: 0; }
+.qvx-name { font-size: 14px; font-weight: 600; color: var(--foreground-primary); }
+.qvx-meta { font-size: 12px; color: var(--foreground-secondary); }
+.qvx-acts { display: flex; align-items: center; gap: var(--sp-md); flex: none; }
+.qvx-viewall { display: inline-flex; align-items: center; gap: 4px; }
+.qvx-viewall:disabled, .qvx-acts .btn:disabled { opacity: .45; cursor: not-allowed; text-decoration: none; }
+.qvx-recname { font-size: 13px; font-weight: 500; text-align: left; }
+.qvx-empty { padding: var(--sp-xs) 0; }
+.qvx-table td { color: var(--foreground-primary); }
+.qvx-table td.wrap, .qvx-sig { white-space: normal; }
+.qvx-sig { max-width: 320px; }
+.qvx-table tr.is-selected > td { background: var(--background-interactive-tertiary-selected); }
+.data-table .col-check { width: 36px; padding-right: 0; }
+.qvx-click { cursor: pointer; }
+.qvx-sched { margin-left: var(--sp-2xs); vertical-align: 1px; padding: 0 6px; font-size: 11px; }
+.qvx-split { display: flex; gap: var(--sp-xl); align-items: flex-start; flex-wrap: wrap; }
+.qvx-side { flex: 1 1 320px; width: auto; }
+.qvx-vitals { display: grid; grid-template-columns: repeat(4, minmax(110px, 1fr)); gap: var(--sp-sm) var(--sp-lg); flex: 1 1 440px; }
+.qvx-vital { display: flex; flex-direction: column; gap: 2px; }
+.qvx-vital-k { font-size: 12px; color: var(--foreground-secondary); }
+.qvx-vital-v { font-size: 16px; line-height: 22px; font-weight: 600; color: var(--foreground-primary); }
+.qvx-vital-u { font-size: 11px; font-weight: 400; color: var(--foreground-secondary); margin-left: 3px; }
+.qvx-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--sp-sm); }
+.qvx-card { border: 1px solid var(--divider-primary, #e7eaec); border-radius: var(--radius-md); padding: var(--sp-sm) var(--sp-md); display: flex; flex-direction: column; gap: 4px; }
+.qvx-card-head { display: flex; align-items: center; gap: var(--sp-2xs); flex-wrap: wrap; }
+.qvx-card-meta, .qvx-card-hist { font-size: 12px; color: var(--foreground-secondary); }
+.qvx-card-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-sm); flex-wrap: wrap; font-size: 13px; color: var(--foreground-primary); }
+.qvx-score {
+  display: flex; align-items: center; gap: var(--sp-md); text-align: left; cursor: pointer;
+  padding: var(--sp-sm) var(--sp-md); border-radius: var(--radius-md); flex: 0 1 380px;
+  background: var(--background-surface-secondary); border: 1px solid transparent; font-family: var(--font-sans);
+}
+.qvx-score:hover { border-color: var(--border-interactive-tertiary-hover); }
+.qvx-score:focus-visible { outline: 2px solid var(--background-interactive-primary-default); outline-offset: 2px; }
+.qvx-score-n { font-family: var(--font-display); font-size: 32px; line-height: 36px; color: var(--foreground-primary); }
+.qvx-score-max { font-family: var(--font-sans); font-size: 13px; color: var(--foreground-secondary); margin-left: 2px; }
+.qvx-score-text { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.qvx-score-date { font-size: 12px; color: var(--foreground-secondary); }
+.qvx-filterrow { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-md); flex-wrap: wrap; }
+.qvx-filters { display: flex; gap: var(--sp-xs); flex-wrap: wrap; }
+.qvx-filters .cph-pill { font-size: 13px; padding: 2px var(--sp-sm); }
+.qvx-bulk { display: flex; align-items: center; gap: var(--sp-xs); }
+.qvx-bulk-n { font-size: 12px; color: var(--foreground-secondary); }
+.qvx-bulk.on .qvx-bulk-n { color: var(--foreground-primary); font-weight: 600; }
+
+/* ================= Quick-view pill pager =================
+ * The pills get up to two rows; past that, previous/next arrows page through
+ * them. The mirror measures every pill at its widest (selected) weight.
+ */
+.cph-pager { position: relative; display: flex; align-items: center; gap: var(--sp-xs); flex: 1 0 0; min-width: 0; }
+.cph-pager-mirror { position: absolute; left: 0; top: 0; visibility: hidden; pointer-events: none; flex-wrap: nowrap; width: max-content; }
+/* flex: none — otherwise the nowrap mirror squeezes its pills to fit and the
+   measured widths come out too small to ever trigger paging. */
+.cph-pager-mirror .cph-pill { font-weight: 600; flex: none; }
+.cph-pager-rows { flex: 1 1 0; min-width: 0; }
+.cph-pager-arrows { width: 104px; flex: none; display: flex; align-items: center; justify-content: flex-end; gap: 2px; }
+.cph-pager-arrows .icon-btn:disabled { opacity: .35; cursor: not-allowed; }
+.cph-pager-count { font-size: 11.5px; color: var(--foreground-secondary); white-space: nowrap; padding: 0 2px; }
+
+/* ================= Client notes =================
+ * Same circular button as the action row, always shown, with a count badge
+ * anchored top-right. Badge = DS system/danger.
+ */
+.cph-notes-btn { position: relative; }
+.cph-badge {
+  position: absolute; top: -5px; right: -6px; min-width: 18px; height: 18px; padding: 0 5px;
+  display: grid; place-items: center; border-radius: var(--radius-full);
+  background: var(--background-system-danger-default); color: var(--background-surface-primary);
+  border: 2px solid var(--background-surface-primary);
+  font-family: var(--font-sans); font-size: 11px; line-height: 1; font-weight: 700;
+}
+/* Conversation layout: the thread scrolls, the composer stays put. Shared by
+   the Client Notes overlay and the Client Summary widget. */
+.ovl-body.cn-ovl-body { padding: 0; gap: 0; overflow: hidden; }
+.cn-wrap { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.cn-ovl-body .cn-wrap { min-height: min(380px, 60vh); max-height: min(620px, 72vh); }
+.cn-wrap--panel { margin: calc(var(--sp-xl) * -1); }
+.cn-wrap--panel .cn-thread { max-height: 380px; }
+.cn-wrap--panel .cn-compose { border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+.cn-unread-count { font-size: 12.5px; font-weight: 500; color: var(--foreground-secondary); }
+.cn-internal { font-size: 12.5px; font-weight: 500; color: var(--foreground-secondary); margin-left: 2px; }
+.cn-thread { flex: 1; min-height: 0; overflow-y: auto; padding: var(--sp-lg) var(--sp-xl) var(--sp-md) var(--sp-md);
+  display: flex; flex-direction: column; gap: var(--sp-md); }
+.cn-day { display: flex; align-items: center; gap: var(--sp-sm); font-size: 11.5px; font-weight: 600; color: var(--foreground-secondary); }
+.cn-day::before, .cn-day::after { content: ''; flex: 1; height: 1px; background: var(--divider-primary); }
+/* Avatar | note | read action. The action column is the same width on every
+   row, so Mark as Read always lands in one place. */
+.cn-msg { display: grid; grid-template-columns: 10px auto minmax(0, 1fr) 132px; align-items: start; gap: var(--sp-sm); }
+.cn-msg.is-mine { grid-template-columns: 10px minmax(0, 1fr) auto; }
+.cn-msg.is-mine > .avatar, .cn-msg.is-mine > span[data-node-id] { order: 2; }
+.cn-msg-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; max-width: 560px; }
+.cn-msg.is-mine .cn-msg-main { align-items: flex-end; justify-self: end; }
+.cn-msg-head { display: flex; align-items: baseline; gap: var(--sp-xs); flex-wrap: wrap; font-size: 12px; }
+.cn-msg-name { font-weight: 600; color: var(--foreground-primary); font-size: 13px; }
+.cn-msg-role, .cn-msg-time { color: var(--foreground-secondary); }
+/* Same red as the header's unread badge, so the two read as one signal.
+   Centred on the avatar. */
+.cn-gutter { display: flex; justify-content: center; height: 28px; align-items: center; }
+.cn-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; background: var(--background-system-danger-default); }
+.cn-bubble-row { display: flex; align-items: center; gap: var(--sp-2xs); max-width: 100%; }
+.cn-msg.is-mine .cn-bubble-row { flex-direction: row-reverse; }
+.cn-bubble { min-width: 0; padding: var(--sp-xs) var(--sp-md); border-radius: var(--radius-md); border-top-left-radius: var(--radius-xs);
+  background: var(--background-surface-secondary); border: 1px solid var(--divider-primary); color: var(--foreground-primary); }
+.cn-msg.is-mine .cn-bubble { border-radius: var(--radius-md); border-top-right-radius: var(--radius-xs);
+  background: var(--background-interactive-tertiary-selected); border-color: transparent; }
+.cn-bubble p { margin: 0; font-size: 13.5px; line-height: 1.5; white-space: pre-wrap; }
+.cn-subj { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 2px; }
+.cn-imp { display: inline-flex; align-items: center; gap: 4px; margin-bottom: 4px; }
+/* Aligned with the bubble, not the name line. */
+.cn-msg-acts { display: flex; justify-content: flex-end; padding-top: 22px; }
+.cn-unread-btn { opacity: 0; transition: opacity var(--dur) var(--ease); }
+.cn-msg:hover .cn-unread-btn, .cn-unread-btn:focus-visible { opacity: 1; }
+.cn-del { flex: none; color: var(--foreground-secondary); opacity: 0; transition: opacity var(--dur) var(--ease); }
+.cn-msg:hover .cn-del, .cn-del:focus-visible, .cn-bubble-row:focus-within .cn-del { opacity: 1; }
+.cn-confirm { display: flex; flex-direction: column; gap: var(--sp-xs); }
+.cn-confirm-acts { display: flex; justify-content: flex-end; gap: var(--sp-xs); }
+.cn-deleted { padding: 4px var(--sp-sm); border-radius: var(--radius-sm); font-size: 12px; font-style: italic;
+  background: var(--background-input-control-disabled-primary); color: var(--foreground-disabled-primary);
+  border: 1px solid var(--border-input-control-primary-disabled); }
+.cn-compose { flex: none; display: flex; align-items: flex-start; gap: var(--sp-sm);
+  padding: var(--sp-md) var(--sp-xl); border-top: 1px solid var(--divider-primary); background: var(--background-surface-primary); }
+.cn-compose-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--sp-xs); }
+.cn-input { width: 100%; resize: vertical; min-height: 56px; }
+.cn-compose-foot { display: flex; align-items: center; gap: var(--sp-md); flex-wrap: wrap; }
+.cn-compose.is-inert { opacity: .6; }
+
+/* Pharmacy routing (refill + add medication). */
+.chc-note--info {
+  display: flex; align-items: flex-start; gap: var(--sp-2xs);
+  padding: var(--sp-xs) var(--sp-sm); border-radius: var(--radius-sm);
+  background: var(--background-system-info-light); color: var(--foreground-system-info-dark);
+  border: 1px solid var(--border-system-info-default);
+}
+.chc-note--info svg { flex: none; margin-top: 1px; }
+.rx-route { display: flex; align-items: flex-end; gap: var(--sp-lg); justify-content: space-between; }
+.rx-route-copy { display: flex; flex-direction: column; gap: 2px; }
+.rx-route-all { display: flex; align-items: center; gap: var(--sp-xs); flex: none; }
+.rx-route-all .dd { width: 260px; }
+.rx-table { table-layout: fixed; width: 100%; }
+.rx-table td { vertical-align: top; }
+.rx-pharm { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.rx-pharm-meta { display: flex; flex-wrap: wrap; gap: var(--sp-3xs); }
+
+.switch.is-disabled { opacity: .5; }
+.switch.is-disabled .track { cursor: not-allowed; }
+.tip--bottom { bottom: auto; top: calc(100% + 8px); }
+.tip--bottom::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: var(--background-surface-inverse); }
+.chc-locked { margin-bottom: var(--sp-md); font-size: 13px; color: var(--foreground-secondary); }
+.chc-locked b { color: var(--foreground-primary); font-weight: 600; }

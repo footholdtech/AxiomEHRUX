@@ -62,8 +62,8 @@ function CheckGroup({ options, value = [], onChange, columns }) {
 }
 function MultiSelect({ value = [], options, onChange, placeholder = 'Please select...', invalid }) {
   const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-  useEffect(() => { const c = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); }; document.addEventListener('mousedown', c); return () => document.removeEventListener('mousedown', c); }, []);
+  const ref = useRef(null), menuRef = useRef(null);
+  useOutside([ref, menuRef], () => setOpen(false));
   const toggle = o => onChange(value.indexOf(o) !== -1 ? value.filter(x => x !== o) : value.concat([o]));
   return (
     <div className="dd" ref={ref}>
@@ -71,11 +71,11 @@ function MultiSelect({ value = [], options, onChange, placeholder = 'Please sele
         <span className={value.length ? 'dd-value' : 'dd-placeholder'}>{value.length ? value.join(', ') : placeholder}</span>
         <Icon name="chevronDown" size={16} />
       </button>
-      {open && <div className="dd-menu">{options.map(o => (
+      {open && <FloatMenu anchorRef={ref} menuRef={menuRef} className="dd-menu" onClose={() => setOpen(false)}><div className="dd-list">{options.map(o => (
         <div key={o} className={'dd-opt' + (value.indexOf(o) !== -1 ? ' active' : '')} onClick={() => toggle(o)}>
           <Checkbox checked={value.indexOf(o) !== -1} onChange={() => toggle(o)} label={o} />
         </div>
-      ))}</div>}
+      ))}</div></FloatMenu>}
     </div>
   );
 }
@@ -162,7 +162,7 @@ function DischargePlan({ client, config, onOpenModule }) {
   const guard = useGuard();
   const [form, setForm] = useState(() => initialForm(client));
   const [errors, setErrors] = useState({});
-  const [stage, setStage] = useState(null);      // null | 'select' | 'preview'
+  const [stage, setStage] = useState(null);      // null | 'preview'
   const [selection, setSelection] = useState(null);
   const [filed, setFiled] = useState(null);      // the completed record, once saved
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -196,11 +196,15 @@ function DischargePlan({ client, config, onOpenModule }) {
       return;
     }
     if (!form.completionStatus) set('completionStatus', config.requiresApproval ? 'Pend to Manager' : 'Complete');
-    setStage('select');
-  };
-
-  const onSelectionSaved = (sel) => {
-    setSelection(sel);
+    /* No selection step. Whatever is active on the chart at the moment of
+       saving is what the summary shows — the customer confirmed they don't
+       need to pick. Resolved and Inactive items stay off the document, and
+       nothing on the chart changes status either way. */
+    setSelection({
+      diagnoses: client.diagnoses.filter(d => isActiveStatus(d.status)),
+      problems: client.problems.filter(p => isActiveStatus(p.status)),
+      capturedOn: isoOf(TODAY),
+    });
     setStage('preview');
   };
   const onPreviewClose = (didFile) => {
@@ -427,17 +431,8 @@ function DischargePlan({ client, config, onOpenModule }) {
         </div>
       </Panel>
 
-      {stage === 'select' && (
-        <DiagnosisSelectionIntercept
-          client={client}
-          action={primaryLabel}
-          initial={selection}
-          onCancel={() => setStage(null)}
-          onSave={onSelectionSaved}
-        />
-      )}
       {stage === 'preview' && selection && (
-        <SummaryPreview client={client} form={form} selection={selection} config={config} filed={filed} onClose={onPreviewClose} onBack={() => setStage('select')} />
+        <SummaryPreview client={client} form={form} selection={selection} config={config} filed={filed} onClose={onPreviewClose} />
       )}
     </React.Fragment>
   );
@@ -728,6 +723,10 @@ function ClientSummary({ client, onOpenTab }) {
             </ul>
           </Panel>
         )}
+
+        {/* Care-team notes about this client — the same thread as the header's
+            Client Notes overlay, so read state is shared. */}
+        <ClientNotesPanel client={client} />
 
         <div className="cs-pair">
           {/* 2. What has been done */}

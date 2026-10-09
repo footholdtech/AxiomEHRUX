@@ -348,6 +348,60 @@ Behaviour and bug fixes completed and verified in-browser:
 
 ---
 
+### Client header — clinical quick views, pager, notes, tooltips (2026-10-09)
+
+- **Quick views no longer capped at 6.** `PillPager` (30-chrome.jsx) gives the
+  pills up to two rows and pages with previous/next arrows past that. Pages are
+  computed from a hidden mirror; the mirror's pills must be `flex: none` or they
+  get squeezed and paging never triggers (hit once). Paging browses — it does
+  not change the open quick view.
+- **"Medical" split** into Allergies, Medications, Vitals, plus Immunizations,
+  Injections and seven scored instruments (PHQ-9, PCL-5, PC-PTSD-5, ACE, AUDIT,
+  AIMS, SDOH). Saved headers containing `medical` are migrated in
+  `normaliseConfig`. Storage key bumped to `axiom-ui-config-v2` so reviewers get
+  the new seeds.
+- **32-quickviews.jsx** holds the clinical views and their overlays. Every view:
+  summary only, records link to their module route, "+ Add …" opens an
+  `Overlay` (00-core, sm/md/lg) and the new record appears at once.
+- **Medications**: Current/Expired/Discontinued filters, bulk Refill and
+  Discontinue, Add Medication (field set from production's form, structure
+  only). Safeguards demonstrated: C-II can't be refilled, controlled refills go
+  to "Pending signature" (EPCS) and need a PDMP attestation, DEA number required
+  for controlled, allergy cross-check that must be acknowledged, 42 CFR Part 2
+  sensitivity defaulted for SUD meds. Not a complete prescribing model.
+- **Client Notes** button: always first in the action row, not configurable,
+  red unread badge, overlay with Mark as Read / Unread. Notifications-center
+  behaviour is still to be defined.
+- **Tooltips** above every round action button. Built from DS tokens because
+  the DS tooltip frame (2:34) wasn't reachable — **confirm against Figma.**
+- **Records** (16-records.jsx): fixture rows + in-memory session edits. A
+  reload starts clean.
+- **Data**: `tools/build-header-fixtures.py` extends the shared synthetic set
+  (formulary additions with schedules, medication history, immunizations,
+  injections, vitals history, assessment forms + administrations, client
+  notes). Assessment item wording is **abbreviated** — production must use the
+  validated instrument text.
+- Fixed in passing: `Toggle` ignored `disabled`, so the default header's Active
+  toggle could be switched off.
+- **Dropdown menus are portalled** (`FloatMenu` in 00-core): rendered into
+  `<body>` at fixed coordinates, z-index 95, so no dialog, table cell or scroll
+  container clips them. They flip above the trigger only when their measured
+  height doesn't fit below, follow the trigger on scroll, and Escape closes the
+  menu without closing the dialog. Outside-click must check the trigger *and*
+  the portalled menu (`useOutside`). All three dropdowns (Dropdown,
+  MultiSelectDropdown, discharge MultiSelect) use it.
+- **Pharmacy routing** in Refill / Add Medication: per-medication pharmacy with
+  coverage, EPCS capability, preferred pharmacy and disabled-with-reason
+  options. Mocked in 16-records.jsx (`PHARMACIES`, `pharmacyBenefit`) — stands in
+  for Surescripts.
+- **Client Notes is a conversation** with avatars and a composer (`addNote`).
+  `ClientNotesThread` (32-quickviews) is shared by the header overlay and the
+  Client Summary panel (`ClientNotesPanel`), so read state is shared. Own notes
+  can be deleted (`deleteNote`); a tombstone "Message deleted" stays. No "New"
+  divider — it read as an error state in the system danger colour.
+- **Note icon** is `clientNote` in `ICONS20` (00-core): filled outlines on the
+  DS 20px grid. The earlier 24px stroke icon rendered soft at 20px.
+
 ## 4. Outstanding — needs the artboards
 
 Lisa's list, in her words, with what is blocking each:
@@ -388,6 +442,7 @@ Also outstanding from the "next set" Lisa mentioned but has not sent yet.
 
 ```bash
 python3 tools/build-clinical-fixtures.py   # per-client diagnosis + problem tables
+python3 tools/build-header-fixtures.py     # header quick-view tables (run before build-refdata)
 python3 tools/build-refdata.py             # fixtures -> assets/refdata.js
 python3 tools/build.py                     # -> index.html + AxiomEHR-Discharge-Plan.html
 python3 tools/serve.py                     # dev server, sends no-store
@@ -404,7 +459,7 @@ python3 tools/serve.py                     # dev server, sends no-store
 | `src/30-chrome.jsx` | Top bar, client switcher, client banner, left nav, sign-in |
 | `src/40-home.jsx` | Home, All Clients, stubs, client-module picker |
 | `src/50-discharge.jsx` | Chart page and the Discharge Plan form |
-| `src/60-summary.jsx` | Diagnosis selection intercept and the generated summary |
+| `src/60-summary.jsx` | The generated discharge summary (active diagnoses/problems only — the selection intercept was removed 2026-09-28 at the customer's direction) |
 | `src/90-app.jsx` | Routes and mount |
 | `styles/discharge.css` | Everything new; loads after the shared `app.css` |
 

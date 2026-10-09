@@ -62,7 +62,13 @@ input { font-family: inherit; }
 
 /* ================= Top navigation (theme-colored bar) ================= */
 .topnav {
-  height: var(--topnav-h); position: sticky; top: 0; z-index: 30;
+  /* 47, not 30: the bar is a stacking context, so everything that drops out
+     of it — the global-search results, the account menu — can only ever sit
+     as high as the bar itself. At 30 they slid underneath the open left nav
+     (46). The bar and the nav never overlap otherwise (the nav starts below
+     the bar), so raising it changes nothing else; flyouts and modals (50+)
+     still cover it. */
+  height: var(--topnav-h); position: sticky; top: 0; z-index: 47;
   display: flex; align-items: center; gap: var(--sp-lg);
   padding: 0 var(--sp-lg);
   background: var(--background-interactive-primary-default);

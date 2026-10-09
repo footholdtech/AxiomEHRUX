@@ -1,0 +1,368 @@
+{
+  "_meta": {
+    "description": "Instrument definitions for the header's assessment quick views. Item wording is ABBREVIATED for prototyping; production must use each instrument's validated wording and licensing terms.",
+    "fictional": true,
+    "fields": [
+      "form_id",
+      "name",
+      "full_name",
+      "module",
+      "prompt",
+      "scale",
+      "items",
+      "bands",
+      "flag_item"
+    ]
+  },
+  "records": [
+    {
+      "form_id": "PHQ9",
+      "name": "PHQ-9",
+      "full_name": "Patient Health Questionnaire-9",
+      "module": "PHQ",
+      "prompt": "Over the last 2 weeks, how often have you been bothered by\u2026",
+      "scale": [
+        [
+          "Not at all",
+          0
+        ],
+        [
+          "Several days",
+          1
+        ],
+        [
+          "More than half the days",
+          2
+        ],
+        [
+          "Nearly every day",
+          3
+        ]
+      ],
+      "items": [
+        "Little interest or pleasure in activities",
+        "Feeling down or hopeless",
+        "Trouble with sleep",
+        "Feeling tired or low energy",
+        "Poor appetite or overeating",
+        "Feeling bad about yourself",
+        "Trouble concentrating",
+        "Moving or speaking unusually slowly, or restless",
+        "Thoughts of self-harm or being better off dead"
+      ],
+      "bands": [
+        [
+          0,
+          "Minimal"
+        ],
+        [
+          5,
+          "Mild"
+        ],
+        [
+          10,
+          "Moderate"
+        ],
+        [
+          15,
+          "Moderately severe"
+        ],
+        [
+          20,
+          "Severe"
+        ]
+      ],
+      "flag_item": 9
+    },
+    {
+      "form_id": "PCL5",
+      "name": "PCL-5",
+      "full_name": "PTSD Checklist for DSM-5",
+      "module": "PCL5",
+      "prompt": "In the past month, how much were you bothered by\u2026",
+      "scale": [
+        [
+          "Not at all",
+          0
+        ],
+        [
+          "A little bit",
+          1
+        ],
+        [
+          "Moderately",
+          2
+        ],
+        [
+          "Quite a bit",
+          3
+        ],
+        [
+          "Extremely",
+          4
+        ]
+      ],
+      "items": [
+        "Repeated disturbing memories",
+        "Repeated disturbing dreams",
+        "Feeling as if it were happening again",
+        "Feeling upset when reminded",
+        "Strong physical reactions to reminders",
+        "Avoiding memories or feelings",
+        "Avoiding external reminders",
+        "Trouble remembering parts of it",
+        "Strong negative beliefs",
+        "Blaming self or others",
+        "Strong negative feelings",
+        "Loss of interest in activities",
+        "Feeling distant from others",
+        "Trouble feeling positive emotions",
+        "Irritability or angry outbursts",
+        "Taking risks or self-destructive behavior",
+        "Being superalert or on guard",
+        "Feeling jumpy or easily startled",
+        "Difficulty concentrating",
+        "Trouble falling or staying asleep"
+      ],
+      "bands": [
+        [
+          0,
+          "Below threshold"
+        ],
+        [
+          33,
+          "Probable PTSD"
+        ]
+      ]
+    },
+    {
+      "form_id": "ACE",
+      "name": "ACE",
+      "full_name": "Adverse Childhood Experiences",
+      "module": "ACE",
+      "prompt": "Before your 18th birthday\u2026",
+      "scale": [
+        [
+          "No",
+          0
+        ],
+        [
+          "Yes",
+          1
+        ]
+      ],
+      "items": [
+        "Emotional abuse by a parent or adult",
+        "Physical abuse by a parent or adult",
+        "Sexual abuse",
+        "Felt unloved or unsupported by family",
+        "Neglect of basic needs",
+        "Parents separated or divorced",
+        "Witnessed violence against a parent",
+        "Lived with someone who misused alcohol or drugs",
+        "Household member with mental illness",
+        "Household member incarcerated"
+      ],
+      "bands": [
+        [
+          0,
+          "No ACEs reported"
+        ],
+        [
+          1,
+          "1\u20133 ACEs"
+        ],
+        [
+          4,
+          "High (4 or more)"
+        ]
+      ]
+    },
+    {
+      "form_id": "PCPTSD5",
+      "name": "PC-PTSD-5",
+      "full_name": "Primary Care PTSD Screen for DSM-5",
+      "module": "PC-PTSD",
+      "prompt": "In the past month, have you\u2026",
+      "scale": [
+        [
+          "No",
+          0
+        ],
+        [
+          "Yes",
+          1
+        ]
+      ],
+      "items": [
+        "Had nightmares or unwanted thoughts about it",
+        "Tried hard not to think about it or avoided reminders",
+        "Been constantly on guard or easily startled",
+        "Felt numb or detached",
+        "Felt guilty or unable to stop blaming yourself"
+      ],
+      "bands": [
+        [
+          0,
+          "Negative screen"
+        ],
+        [
+          3,
+          "Positive screen"
+        ]
+      ]
+    },
+    {
+      "form_id": "AUDIT",
+      "name": "AUDIT",
+      "full_name": "Alcohol Use Disorders Identification Test",
+      "module": "AUDIT",
+      "prompt": "Thinking about the past year\u2026",
+      "scale": [
+        [
+          "Never",
+          0
+        ],
+        [
+          "Less than monthly",
+          1
+        ],
+        [
+          "Monthly",
+          2
+        ],
+        [
+          "Weekly",
+          3
+        ],
+        [
+          "Daily or almost daily",
+          4
+        ]
+      ],
+      "items": [
+        "How often you have a drink containing alcohol",
+        "Drinks on a typical drinking day (scored 0\u20134)",
+        "How often 6 or more drinks on one occasion",
+        "Unable to stop once started",
+        "Failed to do what was expected",
+        "Needed a drink in the morning",
+        "Felt guilt or remorse after drinking",
+        "Unable to remember the night before",
+        "You or someone else injured because of drinking (scored 0, 2, 4)",
+        "Others concerned about your drinking (scored 0, 2, 4)"
+      ],
+      "bands": [
+        [
+          0,
+          "Low risk"
+        ],
+        [
+          8,
+          "Hazardous"
+        ],
+        [
+          16,
+          "Harmful"
+        ],
+        [
+          20,
+          "Possible dependence"
+        ]
+      ]
+    },
+    {
+      "form_id": "AIMS",
+      "name": "AIMS",
+      "full_name": "Abnormal Involuntary Movement Scale",
+      "module": "AIMS",
+      "prompt": "Rate the highest severity observed in each area\u2026",
+      "scale": [
+        [
+          "None",
+          0
+        ],
+        [
+          "Minimal",
+          1
+        ],
+        [
+          "Mild",
+          2
+        ],
+        [
+          "Moderate",
+          3
+        ],
+        [
+          "Severe",
+          4
+        ]
+      ],
+      "items": [
+        "Muscles of facial expression",
+        "Lips and perioral area",
+        "Jaw",
+        "Tongue",
+        "Upper extremities",
+        "Lower extremities",
+        "Neck, shoulders and hips"
+      ],
+      "bands": [
+        [
+          0,
+          "No significant movements"
+        ],
+        [
+          2,
+          "Possible \u2014 review"
+        ],
+        [
+          6,
+          "Probable \u2014 review"
+        ]
+      ]
+    },
+    {
+      "form_id": "SDOH",
+      "name": "SDOH",
+      "full_name": "Social Determinants of Health Screen",
+      "module": "SDOH",
+      "prompt": "In the past 12 months\u2026",
+      "scale": [
+        [
+          "No",
+          0
+        ],
+        [
+          "Yes",
+          1
+        ]
+      ],
+      "items": [
+        "Worried about losing housing",
+        "Ran out of food before having money for more",
+        "Lacked transportation to appointments",
+        "Utilities shut off or threatened",
+        "Felt unsafe where you live",
+        "Felt lonely or isolated most of the time",
+        "Unemployed and seeking work",
+        "Trouble paying for medicine or care"
+      ],
+      "bands": [
+        [
+          0,
+          "No needs identified"
+        ],
+        [
+          1,
+          "Some needs"
+        ],
+        [
+          3,
+          "Multiple needs"
+        ]
+      ]
+    }
+  ]
+}

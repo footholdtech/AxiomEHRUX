@@ -59,12 +59,44 @@ const QUICKVIEW_CATALOG = [
       { key: 'showPayor', kind: 'bool', label: 'Show payor and authorisation', def: true },
     ],
   },
+  /* "Medical" was one quick view covering allergies, medications and vitals.
+     It is split into the views production already has as separate modules —
+     so nothing a clinician reaches today is lost when the header ships — and
+     each gets its own add-record action and link to its full page. */
   {
-    key: 'medical', label: 'Medical', icon: 'dsSyringe',
-    blurb: 'Allergies, medications and latest vitals.',
+    key: 'allergies', label: 'Allergies', icon: 'warn', module: 'Allergy',
+    blurb: 'Allergens, reactions and severity.',
     options: [
-      { key: 'activeMedsOnly', kind: 'bool', label: 'Active medications only', def: true },
-      { key: 'showVitals', kind: 'bool', label: 'Show latest vitals', def: true },
+      { key: 'activeOnly', kind: 'bool', label: 'Active allergies only', def: true },
+    ],
+  },
+  {
+    key: 'medications', label: 'Medications', icon: 'pill', module: 'Prescription',
+    blurb: 'Current, expired and discontinued — refill, discontinue or add.',
+    options: [
+      { key: 'defaultFilter', kind: 'choice', label: 'Opens on', choices: ['Current', 'Expired', 'Discontinued', 'All'], def: 'Current' },
+      { key: 'showPharmacy', kind: 'bool', label: 'Show pharmacy', def: true },
+    ],
+  },
+  {
+    key: 'vitals', label: 'Vitals', icon: 'heart', module: 'Vitals',
+    blurb: 'Latest reading and recent trend.',
+    options: [
+      { key: 'count', kind: 'choice', label: 'Readings to list', choices: ['3', '5'], def: '3' },
+    ],
+  },
+  {
+    key: 'immunizations', label: 'Immunizations', icon: 'shield', module: 'Immunization',
+    blurb: 'Vaccines given, reported and declined.',
+    options: [
+      { key: 'showDeclined', kind: 'bool', label: 'Include declined', def: true },
+    ],
+  },
+  {
+    key: 'injections', label: 'Injections', icon: 'dsSyringe', module: 'Injection',
+    blurb: 'Long-acting injectables, last given and next due.',
+    options: [
+      { key: 'count', kind: 'choice', label: 'Doses to list', choices: ['3', '5'], def: '3' },
     ],
   },
   {
@@ -140,11 +172,29 @@ const QUICKVIEW_CATALOG = [
       { key: 'customFields', kind: 'fields', label: 'Custom fields', choices: [], def: [] },
     ],
   },
+  /* Scored instruments. One pattern for all of them: the latest score, its
+     band and date up front; earlier administrations below; any row opens the
+     captured answers in an overlay, and New opens the form itself. The full
+     instrument is never laid out in the header. */
+  { key: 'phq9', label: 'PHQ-9', icon: 'clipboard', module: 'PHQ', form: 'PHQ9', blurb: 'Depression severity.',
+    options: [{ key: 'count', kind: 'choice', label: 'Earlier administrations to list', choices: ['2', '4'], def: '2' }] },
+  { key: 'pcl5', label: 'PCL-5', icon: 'clipboard', module: 'PCL5', form: 'PCL5', blurb: 'PTSD symptom severity.',
+    options: [{ key: 'count', kind: 'choice', label: 'Earlier administrations to list', choices: ['2', '4'], def: '2' }] },
+  { key: 'pcptsd5', label: 'PC-PTSD-5', icon: 'clipboard', module: 'PC-PTSD', form: 'PCPTSD5', blurb: 'Primary-care PTSD screen.',
+    options: [{ key: 'count', kind: 'choice', label: 'Earlier administrations to list', choices: ['2', '4'], def: '2' }] },
+  { key: 'ace', label: 'ACE', icon: 'clipboard', module: 'ACE', form: 'ACE', blurb: 'Adverse childhood experiences.',
+    options: [{ key: 'count', kind: 'choice', label: 'Earlier administrations to list', choices: ['2', '4'], def: '2' }] },
+  { key: 'audit', label: 'AUDIT', icon: 'clipboard', module: 'AUDIT', form: 'AUDIT', blurb: 'Alcohol use risk.',
+    options: [{ key: 'count', kind: 'choice', label: 'Earlier administrations to list', choices: ['2', '4'], def: '2' }] },
+  { key: 'aims', label: 'AIMS', icon: 'clipboard', module: 'AIMS', form: 'AIMS', blurb: 'Involuntary movement scale.',
+    options: [{ key: 'count', kind: 'choice', label: 'Earlier administrations to list', choices: ['2', '4'], def: '2' }] },
+  { key: 'sdoh', label: 'SDOH', icon: 'clipboard', module: 'SDOH', form: 'SDOH', blurb: 'Social needs screen.',
+    options: [{ key: 'count', kind: 'choice', label: 'Earlier administrations to list', choices: ['2', '4'], def: '2' }] },
 ];
 const QV_BY_KEY = Object.fromEntries(QUICKVIEW_CATALOG.map(q => [q.key, q]));
-/* Six is the design ceiling: the pill row lives on one line beside the
-   expand control, and seven pills wrap at 1440. */
-const QUICKVIEW_MAX = 6;
+/* No ceiling on how many quick views a header carries. The pill area wraps to
+   two rows and pages left/right past that (see `PillPager` in 30-chrome.jsx),
+   so an agency can match everything production offers today. */
 
 const qvOptionDefaults = key => {
   const out = {};
@@ -193,8 +243,9 @@ const SEED_CONFIG = {
         'Housing Supervisor', 'Program Director', 'Clinical Director', 'Executive Director', 'QA / Compliance Specialist'],
       showClinicalStrip: true,
       showActions: true, actions: DEFAULT_ACTIONS.slice(),
-      quickViews: [makeView('general'), makeView('enrollment'), makeView('medical'),
-        makeView('contact'), makeView('appointments'), makeView('notes')],
+      quickViews: [makeView('general'), makeView('enrollment'), makeView('allergies'),
+        makeView('medications'), makeView('vitals'), makeView('contact'), makeView('appointments'),
+        makeView('notes'), makeView('phq9')],
     },
     {
       id: 'hp-child', name: 'Default Child', status: 'active',
@@ -212,13 +263,20 @@ const SEED_CONFIG = {
       roles: ['Primary Care Provider', 'Psychiatric Provider', 'Nurse'],
       showClinicalStrip: true,
       showActions: true, actions: DEFAULT_ACTIONS.concat(['appointment']),
-      quickViews: [makeView('medical'), makeView('diagnoses'), makeView('problems'),
-        makeView('assessments'), makeView('general', { showCareTeam: false }), makeView('appointments', { count: '3' })],
+      /* Deliberately long — a prescriber's header is where the pill area has
+         to wrap and page, so the seed demonstrates it. */
+      quickViews: [makeView('medications'), makeView('allergies'), makeView('vitals'),
+        makeView('diagnoses'), makeView('problems'), makeView('injections'), makeView('phq9'),
+        makeView('pcl5'), makeView('aims'), makeView('audit'), makeView('assessments'),
+        makeView('general', { showCareTeam: false }), makeView('appointments', { count: '3' })],
     },
   ],
 };
 
-const UI_CONFIG_KEY = 'axiom-ui-config';
+/* v2: the quick-view catalogue changed shape (Medical split, clinical views
+   and instruments added). A new key gives every reviewer the new seed headers
+   instead of an older saved copy that predates them. */
+const UI_CONFIG_KEY = 'axiom-ui-config-v2';
 const UI_PREFS_KEY = 'axiom-ui-prefs';
 const DEFAULT_PREFS = { headerPreset: 'auto', collapsedByDefault: true };
 const clone = o => JSON.parse(JSON.stringify(o));
@@ -238,9 +296,12 @@ function normaliseConfig(raw) {
     showClinicalStrip: p.showClinicalStrip !== false,
     showActions: p.showActions !== false,
     actions: Array.isArray(p.actions) ? p.actions.filter(a => QUICK_ACTIONS_BY_KEY[a]) : DEFAULT_ACTIONS.slice(),
+    /* "medical" was split into Allergies, Medications and Vitals. A header
+       saved with it gets the three in its place, rather than silently losing
+       the clinical content it used to show. */
     quickViews: (Array.isArray(p.quickViews) ? p.quickViews : [])
-      .filter(v => v && QV_BY_KEY[v.key])
-      .slice(0, QUICKVIEW_MAX)
+      .flatMap(v => (v && v.key === 'medical' ? ['allergies', 'medications', 'vitals'].map(k => ({ key: k })) : [v]))
+      .filter((v, i, all) => v && QV_BY_KEY[v.key] && all.findIndex(x => x && x.key === v.key) === i)
       .map(v => ({ key: v.key, options: { ...qvOptionDefaults(v.key), ...(v.options || {}) } })),
   }));
   presets.forEach(p => { if (!p.quickViews.length) p.quickViews = [makeView('general')]; });

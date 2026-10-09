@@ -451,6 +451,27 @@ const PREVIEW_CLIENT = {
   rx: [{ rx_id: 'PREVIEW-RX1', medication_display: 'Wonder Vitamin, Chewable', sig: 'Chew one tablet daily with cheese', rx_type: 'Current', qty: 30, days: 30, refills: 2 }],
   diagnoses: [{ client_dx_id: 'PREVIEW-DX1', icd10: 'Z99.9', description: 'Chronic Cheerfulness (unspecified)', status: 'Active', precedence: 'Primary', onset_date: '2020-01-01' }],
   problems: [{ client_problem_id: 'PREVIEW-PR1', name: 'Occasional Mischief', category: 'Behavioral', status: 'Active', onset_date: '2020-01-01' }],
+  /* Records for the clinical quick views, so every one of them has something
+     to show in the preview — all as fictional as the rest of this record. The
+     getters in 16-records.jsx use these instead of the fixtures. */
+  records: {
+    meds: [
+      { med_rx_id: 'PREVIEW-M1', medication_display: 'Wonder Vitamin, Chewable 1 tab', drug_class: 'Supplement', schedule: null, sig: 'Chew one tablet daily with cheese',
+        refills_authorized: 3, refills_remaining: 2, prescriber_staff_id: null, pharmacy: 'Toontown Apothecary', start_date: '2026-06-01', end_date: '2026-12-01', last_filled: '2026-09-01', status: 'Active', rx_status: 'E-PRESCRIBED' },
+      { med_rx_id: 'PREVIEW-M2', medication_display: 'Calm-Down Cocoa 8 oz', drug_class: 'Comfort', schedule: 'C-IV', sig: 'One mug at bedtime as needed',
+        refills_authorized: 1, refills_remaining: 1, prescriber_staff_id: null, pharmacy: 'Toontown Apothecary', start_date: '2026-07-01', end_date: '2026-10-30', last_filled: '2026-08-15', status: 'Active', rx_status: 'E-PRESCRIBED' },
+      { med_rx_id: 'PREVIEW-M3', medication_display: 'Giggle Suppressant 5 mg', drug_class: 'Antitickle', schedule: null, sig: 'Take one before serious meetings',
+        refills_authorized: 0, refills_remaining: 0, prescriber_staff_id: null, pharmacy: 'Toontown Apothecary', start_date: '2025-01-01', end_date: '2025-04-01', last_filled: '2025-03-01', status: 'Discontinued', discontinued_date: '2025-02-10', discontinued_reason: 'Ineffective' },
+    ],
+    vitals: [{ vitals_id: 'PREVIEW-V1', date_time: '2026-08-01T09:00:00', height_in: 27, weight_lbs: 42, bmi: 15.2, temp_f: 98.6, pulse_bpm: 88, resp_rate: 16, bp_systolic: 100, bp_diastolic: 65, o2_sat_pct: 99, pain_scale: 0 }],
+    immunizations: [{ immunization_id: 'PREVIEW-I1', vaccine: 'Influenza (2025–26)', dose: '1 of 1', date: '2025-10-15', status: 'Administered', lot: 'LOT-TOON001' }],
+    injections: [{ injection_id: 'PREVIEW-J1', medication: 'Cyanocobalamin (Vitamin B12)', dose: '1000 mcg', date_given: '2026-09-01', next_due: '2026-10-01', interval_days: 30, site: 'Left deltoid' }],
+    admins: [{ administration_id: 'PREVIEW-A1', form_id: 'PHQ9', date: '2026-09-01', administered_by_staff_id: null, responses: [0, 0, 1, 0, 0, 0, 1, 0, 0], score: 2, band: 'Minimal', flagged: false }],
+    notes: [
+      { note_id: 'PREVIEW-N1', subject: 'Big ears, bigger heart', body: 'Brought cheese for the whole group again. Morale is excellent.', important: false, timestamp: '2026-09-21T10:00:00', author_staff_id: null, author_name: 'Sample Case Manager', author_role: 'Case Manager', read_by: [] },
+      { note_id: 'PREVIEW-N2', subject: 'Avoid haunted houses', body: 'Reminder: no field trips to anything resembling a lonesome-ghost situation.', important: true, timestamp: '2026-09-18T14:30:00', author_staff_id: null, author_name: 'Sample Clinician', author_role: 'Clinician', read_by: ['ST-2003'] },
+    ],
+  },
 };
 
 function HeaderPreviewModal({ preset, onClose }) {
@@ -558,12 +579,8 @@ function ClientHeaderEditPage({ id }) {
   const toggleRole = role => patch({ roles: draft.roles.indexOf(role) !== -1 ? draft.roles.filter(r => r !== role) : draft.roles.concat([role]) });
   const toggleAction = key => patch({ actions: draft.actions.indexOf(key) !== -1 ? draft.actions.filter(a => a !== key) : draft.actions.concat([key]) });
 
-  const addView = key => {
-    if (draft.quickViews.length >= QUICKVIEW_MAX) return;
-    patch({ quickViews: draft.quickViews.concat([makeView(key)]) });
-  };
+  const addView = key => patch({ quickViews: draft.quickViews.concat([makeView(key)]) });
   const available = QUICKVIEW_CATALOG.filter(q => !draft.quickViews.some(v => v.key === q.key));
-  const atMax = draft.quickViews.length >= QUICKVIEW_MAX;
 
   const clearDirtyThenGo = to => { guard.clearDirty(); rawNavigate(to); };
 
@@ -702,6 +719,13 @@ function ClientHeaderEditPage({ id }) {
             start a chat, schedule an appointment. Not every role messages or prescribes; show
             only what a role actually uses.
           </div>
+          {/* Same treatment as General's locked fields: Client Notes is in every
+              header and can't be turned off, so say so here rather than leave
+              an admin wondering where it's configured. */}
+          <div className="qvo-field-opt is-locked chc-locked">
+            <Checkbox checked disabled onChange={() => {}} ariaLabel="Client Notes" />
+            <span><b>Client Notes</b> — always shown, ahead of the actions below, with an unread count. Not configurable.</span>
+          </div>
           {draft.showActions ? (
             <MultiSelectDropdown id="chc-actions-select" placeholder="Select actions…"
               selected={draft.actions} onToggle={toggleAction} options={actionOptions} />
@@ -713,21 +737,18 @@ function ClientHeaderEditPage({ id }) {
         </div>
 
         <div className="chc-sec">
-          <h2 className="chc-sectitle">Quick Views ({draft.quickViews.length} of {QUICKVIEW_MAX})</h2>
+          <h2 className="chc-sectitle">Quick Views ({draft.quickViews.length})</h2>
           <div className="chc-note">
             The pills in the expanded header, in the order they appear. Drag the grip to reorder, or
-            use the arrows. Open <b>Options</b> on any row to narrow what it shows.
+            use the arrows. Open <b>Options</b> on any row to narrow what it shows. There's no limit:
+            pills wrap to two rows, and past that staff page through them with arrows.
           </div>
           <QuickViewOrder views={draft.quickViews} onChange={v => patch({ quickViews: v })} />
 
           <div className="pref-label">Add a quick view</div>
-          {atMax && <div className="chc-note chc-note--warn">
-            <Icon name="warn" size={15} /> Six is the maximum — the pill row has to stay on one
-            line beside the expand control. Remove one to add another.
-          </div>}
           <div className="chc-avail">
             {available.map(q => (
-              <button key={q.key} className="chc-add" disabled={atMax} onClick={() => addView(q.key)}>
+              <button key={q.key} className="chc-add" onClick={() => addView(q.key)}>
                 <Icon name={q.icon} size={18} />
                 <span className="chc-add-text">
                   <span className="chc-add-name">{q.label}</span>
