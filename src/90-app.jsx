@@ -45,6 +45,9 @@ function Routes({ config }) {
   if ((m = match('/module/:slug', path))) return <ModulePage slug={m.slug} />;
   /* Admin › User Interface Options. Agency configuration, never client data —
      these pages must not adopt a client, and they do not. */
+  if (match('/notifications', path)) return <NotificationsPage tab="task" />;
+  if (match('/notifications/preferences', path)) return <NotifPreferencesPage />;
+  if ((m = match('/notifications/:tab', path))) return <NotificationsPage tab={m.tab} />;
   if (match('/user-interface-options', path)) return <UIOptionsIndex />;
   if (match('/user-interface-options/client-header', path)) return <ClientHeaderListPage />;
   if ((m = match('/user-interface-options/client-header/:id', path))) return <ClientHeaderEditPage id={m.id} />;

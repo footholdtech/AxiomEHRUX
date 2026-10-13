@@ -54,6 +54,38 @@ function match(pattern, path) {
   return params;
 }
 
+/* ===== Soft page reload =====
+   Choosing the page you are already on (e.g. the client crumb while standing
+   on that client's summary) reloads it in place: a small local spinner, the
+   old content dimmed but not blocked, then the page remounts and its sections
+   fade in again one by one. The delay stands in for real fetch latency so the
+   prototype shows honest loading behaviour rather than instant swaps. */
+const PAGE_RELOAD_EVT = 'axiom-page-reload';
+const requestPageReload = () => window.dispatchEvent(new Event(PAGE_RELOAD_EVT));
+function usePageReload(ms = 650) {
+  const [st, setSt] = useState({ key: 0, busy: false });
+  useEffect(() => {
+    let t;
+    const f = () => {
+      setSt(x => ({ ...x, busy: true }));
+      window.scrollTo({ top: 0 });
+      clearTimeout(t);
+      t = setTimeout(() => setSt(x => ({ key: x.key + 1, busy: false })), ms);
+    };
+    window.addEventListener(PAGE_RELOAD_EVT, f);
+    return () => { window.removeEventListener(PAGE_RELOAD_EVT, f); clearTimeout(t); };
+  }, [ms]);
+  return st;
+}
+function Spinner({ size = 16, label }) {
+  return (
+    <span className="spinner-wrap" role="status">
+      <span className="spinner" style={{ width: size, height: size }} aria-hidden="true" />
+      {label && <span className="spinner-label">{label}</span>}
+    </span>
+  );
+}
+
 /* ===== Icons — Microsoft Fluent System Icons (window.FLUENT), with a small
    stroke-path fallback for glyphs the bundled set doesn't carry. ===== */
 const ICONS = {
@@ -93,8 +125,37 @@ const ICONS = {
      read as "move" controls, which this app already has as separate buttons;
      a grip reads as "drag", which is the other half of the same control. */
   grip: 'M9 5h.01M9 12h.01M9 19h.01M15 5h.01M15 12h.01M15 19h.01',
+  /* Clinical quick-view glyphs. Neither the DS export nor the bundled Fluent set
+     carries these, so they are stroke icons on the same 24px grid as the rest
+     of this fallback set (Lucide construction). */
+  pill: 'M10.5 20.5a5 5 0 0 1-7-7l7-7a5 5 0 0 1 7 7zM8.5 8.5l7 7',
+  heart: 'M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z',
+  clipboard: 'M9 2h6a1 1 0 0 1 1 1v2H8V3a1 1 0 0 1 1-1zM16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M9 12h6M9 16h6',
+  refill: 'M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5',
+  ban: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM4.9 4.9l14.2 14.2',
+  external: 'M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6',
+};
+/* Filled outlines on the DS 20px grid (1px strokes, whole-pixel edges), for
+   glyphs that sit beside the DS action-bar icons. A 24px stroke icon scaled to
+   20px lands its 2px strokes on fractional pixels and renders soft next to
+   them — this is the same construction as the DS vectors, so it stays sharp. */
+const ICONS20 = {
+  /* Sticky note: page with a folded bottom-right corner and two text lines. */
+  clientNote: 'M5.5 3h9A2.5 2.5 0 0 1 17 5.5v6.09a1 1 0 0 1-.29.7l-4.42 4.42a1 1 0 0 1-.7.29H5.5A2.5 2.5 0 0 1 3 14.5v-9A2.5 2.5 0 0 1 5.5 3Z'
+    + 'M5.5 4A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H11v-2.5a2.5 2.5 0 0 1 2.5-2.5H16V5.5A1.5 1.5 0 0 0 14.5 4Z'
+    + 'M12 15.3V13.5a1.5 1.5 0 0 1 1.5-1.5h1.8Z'
+    + 'M6.5 7h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1Z'
+    + 'M6.5 10h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1 0-1Z',
+  /* Trash can: lid bar with a handle, tapered can, two slats. */
+  trash: 'M8 4a2 2 0 0 1 4 0h4.5a.5.5 0 0 1 0 1h-.55l-.85 10.2A2 2 0 0 1 13.1 17H6.9a2 2 0 0 1-2-1.8L4.05 5H3.5a.5.5 0 0 1 0-1Z'
+    + 'M9 4h2a1 1 0 0 0-2 0Z'
+    + 'M5.05 5l.85 10.12a1 1 0 0 0 1 .88h6.2a1 1 0 0 0 1-.88L14.95 5Z'
+    + 'M8.5 7.5a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0V8a.5.5 0 0 1 .5-.5Z'
+    + 'M11.5 7.5a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0V8a.5.5 0 0 1 .5-.5Z',
 };
 function Icon({ name, size = 18, className, style }) {
+  const g20 = ICONS20[name];
+  if (g20) return <svg width={size} height={size} viewBox="0 0 20 20" fill="currentColor" className={className} style={style} aria-hidden="true"><path fillRule="evenodd" d={g20} /></svg>;
   /* DS client-header vectors come off the Figma asset endpoint authored on a
      20x20 grid, so they need their own viewBox — rendering them at 0 0 24 24
      would leave them floating small in the corner. Checked first because these
@@ -125,21 +186,78 @@ const AV_FONT = { XS: 10, S: 11, M: 12, L: 16, XL: 22 };
 const hashStr = (s = '') => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; };
 const inits = (n = '') => n.replace(/[,"“”]/g, '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
 const avatarColor = (name) => AV_COLORS[hashStr(name) % AV_COLORS.length];
+/* An image, not text: it sits beside the person's name, so it is hidden from
+   assistive tech (the name already says who) and carries its own class so
+   link styles that target text spans can exclude it. As an inline-grid box it
+   is also an atomic inline, which a parent link's underline doesn't reach. */
 function Avatar({ name = '', size = 'S', color, stroke = true, style }) {
   const S = AV_SIZE[size] || 28, F = AV_FONT[size] || 12, c = color || avatarColor(name);
   return (
-    <span data-node-id="1308:4204" style={{
+    <span className="avatar" role="img" aria-hidden="true" data-node-id="1308:4204" style={{
       width: S, height: S, borderRadius: '9999px', flex: 'none', display: 'inline-grid', placeItems: 'center',
       overflow: 'hidden', userSelect: 'none', background: c.bg, color: '#36435c',
       border: stroke ? '1px solid ' + c.border : 'none', fontFamily: 'var(--font-sans)',
-      fontWeight: 600, fontSize: F, lineHeight: 1, ...style,
+      fontWeight: 600, fontSize: F, lineHeight: 1, textDecoration: 'none', cursor: 'inherit', ...style,
     }}>{inits(name)}</span>
   );
 }
 
 /* ===== Primitives ===== */
-function Toggle({ checked, onChange, id }) {
-  return <label className="switch"><input type="checkbox" checked={!!checked} onChange={e => onChange(e.target.checked)} id={id} /><span className="track" /></label>;
+function Toggle({ checked, onChange, id, disabled }) {
+  return <label className={'switch' + (disabled ? ' is-disabled' : '')}><input type="checkbox" checked={!!checked} disabled={disabled} onChange={e => onChange(e.target.checked)} id={id} /><span className="track" /></label>;
+}
+
+/* Short label shown above its anchor on hover or keyboard focus. Never holds
+   anything needed to finish a task — the anchor's own accessible name still
+   says what it does; this is the sighted-mouse equivalent of that name. */
+/* `wide` wraps the label to a short paragraph, for the few tips that explain
+   behaviour rather than name a control. */
+function Tooltip({ label, children, placement = 'top', wide }) {
+  const [show, setShow] = useState(false);
+  if (!label) return children;
+  return (
+    <span className="tip-anchor" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}
+      onFocus={() => setShow(true)} onBlur={() => setShow(false)}>
+      {children}
+      {show && <span className={'tip tip--' + placement + (wide ? ' tip--wide' : '')} role="tooltip">{label}</span>}
+    </span>
+  );
+}
+
+/* Portalled to <body> like every dialog here: the client header pins with its
+   own stacking context, so a dialog rendered inside it would sit under the top
+   bar no matter its z-index. */
+/* Proportionally sized dialog for working on one record without leaving the
+   page — add an allergy, read an assessment's answers, refill a medication.
+   sm 480 · md 720 · lg 1040. DS modal header (2086:547) + standard footer. */
+let _ovlId = 0;
+function Overlay({ title, subtitle, size = 'md', onClose, footer, children, bodyClassName }) {
+  const [id] = useState(() => 'ovl-' + (++_ovlId));
+  useEffect(() => {
+    const k = e => { if (e.key === 'Escape') { e.stopPropagation(); onClose(); } };
+    window.addEventListener('keydown', k);
+    return () => window.removeEventListener('keydown', k);
+  }, [onClose]);
+  return ReactDOM.createPortal(
+    <React.Fragment>
+      <div className="modal-scrim" onClick={onClose} />
+      <div className={'ovl ovl--' + size} role="dialog" aria-modal="true" aria-labelledby={id}>
+        <div className="intercept-head" data-node-id="2086:547">
+          <div className="modal-head-content">
+            <h2 className="intercept-title" id={id}>{title}</h2>
+            {subtitle && <div className="ovl-sub">{subtitle}</div>}
+          </div>
+          <div className="modal-head-actions">
+            <button className="icon-btn modal-dismiss" aria-label="Close" onClick={onClose} data-node-id="2048:586">
+              <Icon name="close" size={20} />
+            </button>
+          </div>
+        </div>
+        <div className={'ovl-body' + (bodyClassName ? ' ' + bodyClassName : '')}>{children}</div>
+        {footer && <div className="intercept-foot">{footer}</div>}
+      </div>
+    </React.Fragment>,
+  document.body);
 }
 function Checkbox({ checked, onChange, indeterminate, disabled, label, ariaLabel }) {
   const ref = useRef(null);
@@ -161,27 +279,91 @@ function Radio({ checked, onChange, label, name }) {
     </label>
   );
 }
-function Button({ variant = 'secondary', size, children, onClick, disabled, type = 'button', style, title }) {
+function Button({ variant = 'secondary', size, children, onClick, disabled, type = 'button', style, title, className }) {
   return <button type={type} title={title} disabled={disabled} onClick={onClick} style={style}
-    className={'btn btn-' + variant + (size === 'sm' ? ' sm' : '')}>{children}</button>;
+    className={'btn btn-' + variant + (size === 'sm' ? ' sm' : '') + (className ? ' ' + className : '')}>{children}</button>;
 }
-function Dropdown({ value, options, onChange, placeholder = 'Please select...', invalid, id }) {
+/* Menus for every dropdown render into <body> at fixed coordinates, so no
+   dialog, table cell or scroll container can clip them — they always sit above
+   the page, overlays included. They open below the trigger and flip above it
+   when there isn't room, and follow the trigger while anything scrolls. */
+function FloatMenu({ anchorRef, menuRef, className, minWidth = 0, maxHeight = 280, role, children, onClose }) {
+  const [pos, setPos] = useState(null);
+  const natural = useRef(null);
+  React.useLayoutEffect(() => {
+    const place = () => {
+      const a = anchorRef.current; if (!a) return;
+      const r = a.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight, gap = 4, edge = 8;
+      const width = Math.min(Math.max(r.width, minWidth), vw - edge * 2);
+      const left = Math.max(edge, Math.min(r.left, vw - edge - width));
+      const below = vh - r.bottom - gap - edge, above = r.top - gap - edge;
+      /* Flip only when the menu's real height doesn't fit below. Measured once,
+         on the hidden first render, before any max-height applies. */
+      if (natural.current == null && menuRef && menuRef.current) natural.current = menuRef.current.scrollHeight;
+      const need = Math.min(maxHeight, natural.current || maxHeight);
+      const up = below < need && above > below;
+      setPos(up ? { left, width, bottom: vh - r.top + gap, maxHeight: Math.min(maxHeight, above) }
+                : { left, width, top: r.bottom + gap, maxHeight: Math.min(maxHeight, below) });
+    };
+    place();
+    window.addEventListener('resize', place);
+    window.addEventListener('scroll', place, true);
+    /* Escape closes the menu, not the dialog it sits in. */
+    const k = e => { if (e.key === 'Escape') { e.stopPropagation(); onClose && onClose(); } };
+    window.addEventListener('keydown', k, true);
+    return () => { window.removeEventListener('resize', place); window.removeEventListener('scroll', place, true); window.removeEventListener('keydown', k, true); };
+  }, []);
+  return ReactDOM.createPortal(
+    <div ref={menuRef} className={'float-menu ' + className} role={role}
+      style={pos ? { position: 'fixed', top: pos.top == null ? 'auto' : pos.top, bottom: pos.bottom == null ? 'auto' : pos.bottom,
+        left: pos.left, width: pos.width, maxHeight: pos.maxHeight }
+        : { position: 'fixed', top: 0, left: 0, visibility: 'hidden', width: Math.max(minWidth, anchorRef.current ? anchorRef.current.offsetWidth : 0) }}>{children}</div>,
+    document.body);
+}
+/* Close on a press outside both the trigger and its (portalled) menu. */
+function useOutside(refs, onOut) {
+  useEffect(() => {
+    const c = e => { if (refs.every(r => !r.current || !r.current.contains(e.target))) onOut(); };
+    document.addEventListener('mousedown', c);
+    return () => document.removeEventListener('mousedown', c);
+  }, []);
+}
+/* Options are strings, or { value, label, sub, tags, disabled, reason } for a
+   richer list (pharmacies). `footer` is a fine-print line under the list. */
+function Dropdown({ value, options, onChange, placeholder = 'Please select...', invalid, id, menuMinWidth, footer, display }) {
   const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-  useEffect(() => { const c = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); }; document.addEventListener('mousedown', c); return () => document.removeEventListener('mousedown', c); }, []);
+  const ref = useRef(null), menuRef = useRef(null);
+  useOutside([ref, menuRef], () => setOpen(false));
+  const opts = options.map(o => (typeof o === 'string' ? { value: o, label: o } : o));
+  const cur = opts.find(o => o.value === value);
+  const shown = display || (cur ? cur.label : value);
   return (
     <div className="dd" ref={ref}>
       <button id={id} type="button" className={'dd-trigger' + (open ? ' open' : '') + (invalid ? ' invalid' : '')} onClick={() => setOpen(o => !o)} aria-haspopup="listbox" aria-expanded={open}>
-        <span className={value ? 'dd-value' : 'dd-placeholder'}>{value || placeholder}</span>
+        <span className={value ? 'dd-value' : 'dd-placeholder'}>{shown || placeholder}</span>
         <Icon name="chevronDown" size={16} />
       </button>
       {open && (
-        <div className="dd-menu" role="listbox">
-          {options.map(o => (
-            <button key={o} type="button" role="option" aria-selected={o === value} className={'dd-opt' + (o === value ? ' active' : '')}
-              onClick={() => { onChange(o); setOpen(false); }}>{o}{o === value && <Icon name="check" size={14} />}</button>
-          ))}
-        </div>
+        <FloatMenu anchorRef={ref} menuRef={menuRef} className="dd-menu" role="listbox" minWidth={menuMinWidth} maxHeight={footer ? 360 : 280} onClose={() => setOpen(false)}>
+          <div className="dd-list">
+            {opts.map(o => (
+              <button key={o.value} type="button" role="option" aria-selected={o.value === value} aria-disabled={o.disabled || undefined}
+                className={'dd-opt' + (o.value === value ? ' active' : '') + (o.sub || o.tags ? ' dd-opt--rich' : '') + (o.disabled ? ' is-disabled' : '')}
+                onClick={() => { if (o.disabled) return; onChange(o.value); setOpen(false); }}>
+                {o.sub || o.tags ? (
+                  <span className="dd-opt-main">
+                    <span className="dd-opt-label">{o.label}</span>
+                    {o.sub && <span className="dd-opt-sub">{o.sub}</span>}
+                    {!!(o.tags && o.tags.length) && <span className="dd-opt-tags">{o.tags.map(t => <span key={t.label} className={'dd-tag' + (t.tone ? ' dd-tag--' + t.tone : '')}>{t.label}</span>)}</span>}
+                    {o.disabled && o.reason && <span className="dd-opt-reason"><Icon name="info" size={12} /> {o.reason}</span>}
+                  </span>
+                ) : o.label}
+                {o.value === value && <Icon name="check" size={14} />}
+              </button>
+            ))}
+          </div>
+          {footer && <div className="dd-foot">{footer}</div>}
+        </FloatMenu>
       )}
     </div>
   );
@@ -196,14 +378,16 @@ function Dropdown({ value, options, onChange, placeholder = 'Please select...', 
 function MultiSelectDropdown({ id, options, selected, onToggle, placeholder = 'Select…', searchable = false, emptyText = 'No matches.' }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState('');
-  const ref = useRef(null);
+  const ref = useRef(null), menuRef = useRef(null);
   const searchRef = useRef(null);
+  useOutside([ref, menuRef], () => { setOpen(false); setQ(''); });
+  /* Next frame: the menu is invisible for one render while FloatMenu measures
+     it, and a hidden input can't take focus. */
   useEffect(() => {
-    const c = e => { if (ref.current && !ref.current.contains(e.target)) { setOpen(false); setQ(''); } };
-    document.addEventListener('mousedown', c);
-    return () => document.removeEventListener('mousedown', c);
-  }, []);
-  useEffect(() => { if (open && searchable && searchRef.current) searchRef.current.focus(); }, [open, searchable]);
+    if (!open || !searchable) return;
+    const f = requestAnimationFrame(() => searchRef.current && searchRef.current.focus());
+    return () => cancelAnimationFrame(f);
+  }, [open, searchable]);
 
   const s = q.trim().toLowerCase();
   const filtered = s ? options.filter(o => o.label.toLowerCase().indexOf(s) !== -1) : options;
@@ -219,7 +403,7 @@ function MultiSelectDropdown({ id, options, selected, onToggle, placeholder = 'S
         <Icon name="chevronDown" size={16} />
       </button>
       {open && (
-        <div className="msd-menu">
+        <FloatMenu anchorRef={ref} menuRef={menuRef} className="msd-menu" maxHeight={320} onClose={() => { setOpen(false); setQ(''); }}>
           {searchable && (
             <div className="msd-search">
               <Icon name="search" size={14} />
@@ -244,7 +428,7 @@ function MultiSelectDropdown({ id, options, selected, onToggle, placeholder = 'S
               );
             }) : <div className="msd-empty">{emptyText}</div>}
           </div>
-        </div>
+        </FloatMenu>
       )}
     </div>
   );

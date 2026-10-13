@@ -47,8 +47,8 @@ const NAV_SECTIONS = [
   {
     key: 'documents', label: 'Documents', icon: 'documents',
     categories: [
-      { label: 'Assessments', items: ['ACE', 'AIMS', 'ASAM', 'AUDIT', 'CALOCUS', 'CINA', 'CIWA', 'COWS', 'GAD-7', 'LOCUS', 'PC-PTSD', 'PCL5', 'PHQ', 'PRAPARE', 'SDOH', 'Suicide Risk Screening', 'WHO - Assist', 'Psychosocial Assessment Note', 'Psychiatric Evaluation'] },
-      { label: 'Notes', items: ['Progress Note', 'Group Note', 'Nurse Progress Note', 'Inpatient Note', 'Dynamic Progress Notes', 'Psychotherapy Progress Note', 'Encounter Entry'] },
+      { label: 'Assessments', items: ['ACE', 'AIMS', 'ASAM', 'AUDIT', 'CALOCUS', 'CANS', 'CINA', 'CIWA', 'COWS', 'GAD-7', 'LOCUS', 'PC-PTSD', 'PCL5', 'PHQ', 'PRAPARE', 'SDOH', 'Suicide Risk Screening', 'WHO - Assist', 'Psychosocial Assessment Note', 'Psychiatric Evaluation'] },
+      { label: 'Notes', items: ['Progress Note', 'Case Management Note', 'Care Coordination Note', 'Crisis Follow-Up Note', 'Engagement Session Note', 'Hospital Discharge Follow-Up', 'Peer Support Note', 'Residential Check-In', 'Therapy Note', 'Group Note', 'Nurse Progress Note', 'Inpatient Note', 'Dynamic Progress Notes', 'Psychotherapy Progress Note', 'Encounter Entry'] },
       { label: 'Plans', items: ['Service Plan', 'Dynamic Service Plan', 'Discharge Plan', 'Crisis Prevention Plan', 'Crisis Intervention Relapse Plan', 'Support & Safety Plan', 'WRAP Meeting'] },
     ],
     links: ['Clinical Forms Search', 'Other Forms', 'Scanned Documents'],
@@ -233,7 +233,7 @@ function TopNav({ onHamburger, navOpen, onPrefs }) {
         <GlobalSearch />
       </div>
       <div className="tn-right">
-        <a className="tn-link"><Icon name="bell" size={16} /> Notifications</a>
+        <NotifBell />
         <a className="tn-link"><Icon name="calendar" size={16} /> Calendar</a>
         <a className="tn-link"><Icon name="messages" size={16} /> Messages</a>
         <div className="menu-anchor" ref={menuRef}>
@@ -330,7 +330,7 @@ function AttributesOverlay({ client, selected, onClose, onSave }) {
     onSave([...sel].map(name => ({ name, icon: byName[name] || attrIcon(name) })));
   };
 
-  return (
+  return ReactDOM.createPortal(
     <React.Fragment>
       <div className="modal-scrim" onClick={onClose} />
       <div className="attrmodal" role="dialog" aria-modal="true" aria-labelledby="attrmodal-title">
@@ -406,8 +406,8 @@ function AttributesOverlay({ client, selected, onClose, onSave }) {
           <Button variant="primary" onClick={save}>Save Attributes</Button>
         </div>
       </div>
-    </React.Fragment>
-  );
+    </React.Fragment>,
+  document.body);
 }
 
 /* ---- Quick-view bodies -----------------------------------------
@@ -493,7 +493,10 @@ function TeamBox({ team }) {
   );
 }
 
-function QuickViewBody({ view, client, attrsShown, onEditAttrs }) {
+function QuickViewBody({ view, client, attrsShown, onEditAttrs, preview }) {
+  /* Clinical views (allergies, medications, vitals, immunizations,
+     injections, scored instruments) live in 32-quickviews.jsx. */
+  if (view && isClinicalQV(view.key)) return <ClinicalQuickView view={view} client={client} preview={preview} />;
   const o = (view && view.options) || {};
   const cid = client.client_id;
   /* `client.team` lets a caller supply the care team directly rather than
@@ -556,38 +559,6 @@ function QuickViewBody({ view, client, attrsShown, onEditAttrs }) {
                   meta={p.policy_type + ' · policy ' + (p.policy_number || '—') + ' · from ' + fmtDate(p.begin_date)}
                   tag={p.num_visits_authorized ? p.num_visits_authorized + ' visits auth.' : null} />
               )) : <div className="cph-qv-empty">No payor assignment on file.</div>}
-            </QvCol>
-          )}
-        </React.Fragment>
-      );
-    }
-
-    case 'medical': {
-      const meds = o.activeMedsOnly ? client.rx.filter(r => r.rx_type === 'Current') : client.rx;
-      const v = client.vitals;
-      return (
-        <React.Fragment>
-          <QvCol head={'Allergies (' + client.allergies.length + ')'}>
-            {client.allergies.length ? client.allergies.map(a => (
-              <QvItem key={a.allergy_id} name={a.allergen} meta={a.reaction + ' · ' + a.allergen_category}
-                tag={a.severity_flag} tone={a.severity_flag === 'High' ? 'is-warn' : null} />
-            )) : <div className="cph-qv-empty">No known allergies.</div>}
-          </QvCol>
-          <QvCol head={(o.activeMedsOnly ? 'Current medications (' : 'Medications (') + meds.length + ')'}>
-            {meds.length ? meds.map(r => (
-              <QvItem key={r.rx_id} name={r.medication_display} meta={r.sig} tag={r.rx_type === 'Current' ? null : r.rx_type} />
-            )) : <div className="cph-qv-empty">{o.activeMedsOnly ? 'No current medications.' : 'No medications recorded.'}</div>}
-          </QvCol>
-          {o.showVitals && (
-            <QvCol head="Latest vitals">
-              {v ? (
-                <React.Fragment>
-                  <QvRow k="Recorded" v={fmtDate(v.date_time)} />
-                  <QvRow k="BP / Pulse" v={v.bp_systolic + '/' + v.bp_diastolic + ' · ' + v.pulse_bpm + ' bpm'} />
-                  <QvRow k="Temp / O₂" v={v.temp_f + '°F · ' + v.o2_sat_pct + '%'} />
-                  <QvRow k="Weight / BMI" v={v.weight_lbs + ' lbs · ' + v.bmi} />
-                </React.Fragment>
-              ) : <div className="cph-qv-empty">No vitals recorded.</div>}
             </QvCol>
           )}
         </React.Fragment>
@@ -784,6 +755,100 @@ function QuickViewBody({ view, client, attrsShown, onEditAttrs }) {
   }
 }
 
+/* ---- Quick-view pill pager ----------------------------------------
+   The pills get a fixed share of the header: up to two rows. Past that they
+   page — previous/next arrows move between sets in the admin's order, so a
+   header can carry every quick view production offers without the header
+   growing. Pages are computed against a hidden mirror of every pill, so
+   nothing is painted mid-reflow; the page holding the active quick view is
+   always the one shown. */
+function PillPager({ views, active, onSelect }) {
+  const wrapRef = useRef(null), mirrorRef = useRef(null), arrowsRef = useRef(null);
+  const [pages, setPages] = useState([views.map((_, i) => i)]);
+  const [page, setPage] = useState(0);
+  const GAP = 8;                 /* .cph-tabs gap (spacing/xs) */
+  const keySig = views.map(v => v.key).join('|');
+
+  const measure = useCallback(() => {
+    const wrap = wrapRef.current, mirror = mirrorRef.current;
+    if (!wrap || !mirror) return;
+    const widths = Array.prototype.map.call(mirror.children, c => c.offsetWidth);
+    const paginate = budget => {
+      const out = []; let cur = [], row = 1, x = 0;
+      widths.forEach((w, i) => {
+        const need = cur.length && x ? x + GAP + w : w;
+        if (need <= budget || !cur.length) { cur.push(i); x = need; }
+        else if (row < 2) { row++; cur.push(i); x = w; }
+        else { out.push(cur); cur = [i]; row = 1; x = w; }
+      });
+      if (cur.length) out.push(cur);
+      return out;
+    };
+    const full = wrap.clientWidth;
+    let p = paginate(full);
+    if (p.length > 1) p = paginate(full - ((arrowsRef.current && arrowsRef.current.offsetWidth) || 104) - GAP);
+    setPages(p);
+  }, []);
+
+  useEffect(() => {
+    measure();
+    if (typeof ResizeObserver === 'undefined') { window.addEventListener('resize', measure); return () => window.removeEventListener('resize', measure); }
+    const ro = new ResizeObserver(measure);
+    if (wrapRef.current) ro.observe(wrapRef.current);
+    return () => ro.disconnect();
+  }, [measure, keySig]);
+
+  /* Keep the active pill on screen — after a resize, or when the admin's
+     order changes underneath it. */
+  useEffect(() => {
+    const at = views.findIndex(v => v.key === active);
+    const p = pages.findIndex(pg => pg.indexOf(at) !== -1);
+    if (p !== -1 && p !== page) setPage(p);
+    else if (page >= pages.length) setPage(0);
+  }, [active, pages]);
+
+  const shown = pages[Math.min(page, pages.length - 1)] || [];
+  const go = d => {
+    const next = Math.max(0, Math.min(pages.length - 1, page + d));
+    /* Paging browses; it doesn't change which quick view is open below. The
+       open one stays selected until the clinician picks another pill. */
+    setPage(next);
+  };
+  const label = qv => (QV_BY_KEY[qv.key] || { label: qv.key }).label;
+  return (
+    <div className="cph-pager" ref={wrapRef}>
+      <div className="cph-tabs cph-pager-mirror" ref={mirrorRef} aria-hidden="true">
+        {views.map(qv => <span key={qv.key} className="cph-pill">{label(qv)}</span>)}
+      </div>
+      <div className="cph-tabs cph-pager-rows" role="tablist">
+        {shown.map(i => {
+          const qv = views[i];
+          return (
+            <button key={qv.key} role="tab" aria-selected={active === qv.key}
+              className={'cph-pill' + (active === qv.key ? ' selected' : '')}
+              onClick={() => onSelect(qv.key)}>{label(qv)}</button>
+          );
+        })}
+      </div>
+      {pages.length > 1 && (
+        <div className="cph-pager-arrows" ref={arrowsRef}>
+          <Tooltip label="Previous quick views">
+            <button className="icon-btn" aria-label="Previous quick views" disabled={page === 0} onClick={() => go(-1)}>
+              <Icon name="chevronRight" size={18} style={{ transform: 'rotate(180deg)' }} />
+            </button>
+          </Tooltip>
+          <span className="cph-pager-count" aria-live="polite">{page + 1} of {pages.length}</span>
+          <Tooltip label="More quick views">
+            <button className="icon-btn" aria-label="More quick views" disabled={page >= pages.length - 1} onClick={() => go(1)}>
+              <Icon name="chevronRight" size={18} />
+            </button>
+          </Tooltip>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* `preset` overrides the resolved one — that is how the Admin configuration
    page previews a draft with the real component instead of a mock of it. */
 function ClientPageHeader({ client, preset, preview }) {
@@ -798,7 +863,11 @@ function ClientPageHeader({ client, preset, preview }) {
   const [tab, setTab] = useState(views[0].key);
   const [editing, setEditing] = useState(false);
   const [attrs, setAttrs] = useState(null);   // null = use the client's own
-  const v = client.vitals;
+  /* The strip reads the same records as the quick views, so a vitals reading
+     or allergy added from the header shows up here at once. */
+  useRecordsVersion();
+  const allVitals = getVitals(client);
+  const v = allVitals[0] || client.vitals;
   const shown = attrs || client.attrs.map(a => ({ name: a.name, icon: attrIcon(a.name) }));
 
   /* A new chart returns to the clinician's default and forgets any local
@@ -821,10 +890,10 @@ function ClientPageHeader({ client, preset, preview }) {
     { label: 'Height', value: v ? Math.floor(v.height_in / 12) + 'ft, ' + (v.height_in % 12) + 'in' : '—' },
     { label: 'BMI', value: v ? v.bmi : '—' },
     { label: 'Blood Pressure', value: v ? v.bp_systolic + '/' + v.bp_diastolic : '—' },
-    { count: 'Allergies (' + client.allergies.length + ')' },
-    { count: 'Vitals (' + client.vitalsAll.length + ')' },
+    { count: 'Allergies (' + getAllergies(client).filter(a => (a.status || 'Active') === 'Active').length + ')' },
+    { count: 'Vitals (' + allVitals.length + ')' },
     { count: 'Problems List (' + client.problems.length + ')' },
-    { count: 'Current Meds (' + client.rx.length + ')' },
+    { count: 'Current Meds (' + getMeds(client).filter(m => m.status === 'Active').length + ')' },
     /* The DS frame labels this "Biological Sex" and its value is the one item
        in the row rendered Regular rather than Medium. */
     { label: 'Biological Sex', value: client.gender, regularValue: true },
@@ -847,43 +916,36 @@ function ClientPageHeader({ client, preset, preview }) {
           </div>
         </div>
 
-        <div className={'cph-nav' + (header.showActions ? '' : ' cph-nav--noactions')}>
-          {/* The whole action row is agency configuration. Roles that cannot
-              message or prescribe should not be shown six controls they will
-              never press. */}
-          {header.showActions && (
-            <div className="cph-actions">
-              {QUICK_ACTIONS_CATALOG.filter(a => (header.actions || DEFAULT_ACTIONS).indexOf(a.key) !== -1).map(a => (
-                <button key={a.key} className="cph-icon-btn" aria-label={a.label} title={a.label}>
-                  <Icon name={a.icon} size={20} />
+        <div className="cph-nav">
+          <div className="cph-actions">
+            {/* Client Notes is always here, ahead of the configurable actions —
+                a care-team note nobody sees is a care risk, not a layout
+                preference, so no header configuration can remove it. */}
+            <ClientNotesButton client={client} preview={preview} />
+            {header.showActions && (
+              <React.Fragment>
+                <span className="cph-divider" aria-hidden="true" />
+                {QUICK_ACTIONS_CATALOG.filter(a => (header.actions || DEFAULT_ACTIONS).indexOf(a.key) !== -1).map(a => (
+                  <Tooltip key={a.key} label={a.label}>
+                    <button className="cph-icon-btn" aria-label={a.label}><Icon name={a.icon} size={20} /></button>
+                  </Tooltip>
+                ))}
+                <span className="cph-divider" aria-hidden="true" />
+                <Tooltip label="More Actions">
+                  <button className="cph-icon-btn cph-icon-btn--sq" aria-label="More Actions"><Icon name="dsUtil6" size={20} /></button>
+                </Tooltip>
+                <span className="cph-divider" aria-hidden="true" />
+                <button className="cph-chat">
+                  <Icon name="dsSparkle" size={20} />
+                  <span>Chat With Chart</span>
                 </button>
-              ))}
-              <span className="cph-divider" aria-hidden="true" />
-              <button className="cph-icon-btn cph-icon-btn--sq" aria-label="More Actions" title="More Actions">
-                <Icon name="dsUtil6" size={20} />
-              </button>
-              <span className="cph-divider" aria-hidden="true" />
-              <button className="cph-chat">
-                <Icon name="dsSparkle" size={20} />
-                <span>Chat With Chart</span>
-              </button>
-            </div>
-          )}
+              </React.Fragment>
+            )}
+          </div>
 
           <div className="cph-navrow">
             {/* Pills are an expanded-state affordance only. */}
-            {expanded ? (
-              <div className="cph-tabs" role="tablist">
-                {views.map(qv => {
-                  const def = QV_BY_KEY[qv.key] || { label: qv.key };
-                  return (
-                    <button key={qv.key} role="tab" aria-selected={tab === qv.key}
-                      className={'cph-pill' + (tab === qv.key ? ' selected' : '')}
-                      onClick={() => setTab(qv.key)}>{def.label}</button>
-                  );
-                })}
-              </div>
-            ) : <span className="spacer" />}
+            {expanded ? <PillPager views={views} active={tab} onSelect={setTab} /> : <span className="spacer" />}
             <button className="cph-toggle" aria-expanded={expanded} onClick={() => setExpanded(x => !x)}>
               <span>{expanded ? 'Collapse Details' : 'Expand Details'}</span>
               <Icon name={expanded ? 'dsChevUp' : 'dsChevDown'} size={20} />
@@ -895,7 +957,7 @@ function ClientPageHeader({ client, preset, preview }) {
       {expanded && (
         <div className="cph-detail">
           <div className="cph-detail-inner">
-            <QuickViewBody view={activeView} client={client} attrsShown={shown}
+            <QuickViewBody view={activeView} client={client} attrsShown={shown} preview={preview}
               onEditAttrs={() => setEditing(true)} />
           </div>
         </div>
@@ -936,7 +998,18 @@ function ClientPageHeader({ client, preset, preview }) {
    the last is the current page and is deliberately not a link. */
 function Breadcrumbs({ items }) {
   const guard = useGuard();
-  const go = it => { if (it.to) guard.go(it.to, it.client !== undefined ? { client: it.client } : undefined); };
+  const path = usePath();
+  const go = it => {
+    if (!it.to) return;
+    const opts = it.client !== undefined ? { client: it.client } : {};
+    if (it.to !== path) return guard.go(it.to, opts);
+    /* Already here. A chart crumb means "this client's summary": on another
+       tab, go back to it; on the summary, reload it. Either way it runs
+       through the guard, so unsaved work is still intercepted. */
+    if (it.chartHome && guard.chartTab && guard.chartTab !== CHART_HOME_TAB)
+      return window.dispatchEvent(new Event('axiom-chart-home'));
+    guard.request({ to: it.to, ...opts, onCommit: requestPageReload });
+  };
   return (
     <nav className="breadcrumbs" aria-label="Breadcrumb">
       {items.map((it, i) => {
@@ -946,8 +1019,7 @@ function Breadcrumbs({ items }) {
             {i > 0 && <span className="sep"><Icon name="chevronRight" size={13} /></span>}
             {last || !it.to
               ? <span className={last ? 'current' : ''} aria-current={last ? 'page' : undefined}>{it.label}</span>
-              : <a role="link" tabIndex={0} onClick={() => go(it)}
-                  onKeyDown={e => { if (e.key === 'Enter') go(it); }}>{it.label}</a>}
+              : <button type="button" className="crumb-link" onClick={() => go(it)}>{it.label}</button>}
           </React.Fragment>
         );
       })}
@@ -973,7 +1045,7 @@ function ChartChrome() {
           sibling destination, not an ancestor of this chart. */}
       <Breadcrumbs items={[
         { label: 'Clients', to: '/clients' },
-        { label: c.name, to: '/chart/' + c.client_id, client: c.client_id },
+        { label: c.name, to: '/chart/' + c.client_id, client: c.client_id, chartHome: true },
         { label: guard.chartTab || CHART_HOME_TAB },
       ]} />
       <ClientPageHeader client={c} />
@@ -1103,6 +1175,7 @@ function LeftNav({ open, navRef }) {
    without the resync effect a second open would show whatever was drafted and
    abandoned the first time, not the app's actual current settings. */
 function PreferencesFlyout({ open, onClose }) {
+  const guardP = useGuard();
   const themeCtx = useTheme();
   const ui = useUIConfig();
   const draftOf = () => ({
@@ -1179,6 +1252,12 @@ function PreferencesFlyout({ open, onClose }) {
                 style={{ background: t.swatch }} onClick={() => patch({ theme: t.slug })} />
             ))}
           </div>
+
+          <div className="pref-label">Notifications</div>
+          <button className="lnk pref-link" onClick={() => { onClose(); guardP.go('/notifications/preferences'); }}>
+            Delivery preferences <Icon name="chevronRight" size={14} />
+          </button>
+          <div className="pref-note pref-note--tight">What reaches you in AxiomEHR, the mobile app, email and text.</div>
         </div>
         <footer className="foot">
           <Button variant="secondary" onClick={onClose}>Cancel</Button>
@@ -1191,6 +1270,7 @@ function PreferencesFlyout({ open, onClose }) {
 
 function AppShell({ children }) {
   const [navOpen, setNavOpen] = useState(false);
+  const reload = usePageReload();
   const [prefsOpen, setPrefsOpen] = useState(false);
   const navRef = useRef(null);
 
@@ -1214,7 +1294,12 @@ function AppShell({ children }) {
           they frame the page rather than sitting inside it. */}
       <ChartChrome />
       <div className="app-body">
-        <div className="main"><main className="content">{children}</main></div>
+        <div className="main">
+          <main className={'content' + (reload.busy ? ' is-reloading' : '')} aria-busy={reload.busy || undefined}>
+            {reload.busy && <div className="page-reload"><Spinner label="Refreshing…" /></div>}
+            <React.Fragment key={reload.key}>{children}</React.Fragment>
+          </main>
+        </div>
       </div>
       <LeftNav open={navOpen} navRef={navRef} />
       <PreferencesFlyout open={prefsOpen} onClose={() => setPrefsOpen(false)} />

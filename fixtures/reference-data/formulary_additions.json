@@ -1,0 +1,133 @@
+{
+  "_meta": {
+    "description": "Formulary rows added to medications.json for the medication quick view, plus a controlled-substance schedule for every formulary row that has one (null = not controlled).",
+    "fictional": true,
+    "fields": [
+      "medication_id",
+      "name",
+      "strengths",
+      "class",
+      "common_use",
+      "schedule"
+    ]
+  },
+  "records": [
+    {
+      "medication_id": "MED-011",
+      "name": "Buprenorphine/Naloxone (Suboxone)",
+      "strengths": [
+        "2 mg/0.5 mg",
+        "8 mg/2 mg"
+      ],
+      "class": "Partial Opioid Agonist",
+      "common_use": "Opioid use disorder",
+      "schedule": "C-III"
+    },
+    {
+      "medication_id": "MED-012",
+      "name": "Lorazepam (Ativan)",
+      "strengths": [
+        "0.5 mg",
+        "1 mg"
+      ],
+      "class": "Benzodiazepine",
+      "common_use": "Acute anxiety",
+      "schedule": "C-IV"
+    },
+    {
+      "medication_id": "MED-013",
+      "name": "Methylphenidate (Ritalin)",
+      "strengths": [
+        "10 mg",
+        "20 mg"
+      ],
+      "class": "Stimulant",
+      "common_use": "ADHD",
+      "schedule": "C-II"
+    },
+    {
+      "medication_id": "MED-014",
+      "name": "Prazosin",
+      "strengths": [
+        "1 mg",
+        "2 mg"
+      ],
+      "class": "Alpha-1 Blocker",
+      "common_use": "Trauma-related nightmares",
+      "schedule": null
+    },
+    {
+      "medication_id": "MED-015",
+      "name": "Hydroxyzine",
+      "strengths": [
+        "25 mg",
+        "50 mg"
+      ],
+      "class": "Antihistamine",
+      "common_use": "Anxiety / sleep",
+      "schedule": null
+    },
+    {
+      "medication_id": "MED-016",
+      "name": "Clonidine",
+      "strengths": [
+        "0.1 mg",
+        "0.2 mg"
+      ],
+      "class": "Alpha-2 Agonist",
+      "common_use": "Withdrawal symptoms / ADHD",
+      "schedule": null
+    },
+    {
+      "medication_id": "MED-017",
+      "name": "Gabapentin",
+      "strengths": [
+        "100 mg",
+        "300 mg"
+      ],
+      "class": "Anticonvulsant",
+      "common_use": "Anxiety / neuropathic pain",
+      "schedule": null
+    },
+    {
+      "medication_id": "MED-001",
+      "schedule": "C-II"
+    },
+    {
+      "medication_id": "MED-002",
+      "schedule": null
+    },
+    {
+      "medication_id": "MED-003",
+      "schedule": null
+    },
+    {
+      "medication_id": "MED-004",
+      "schedule": null
+    },
+    {
+      "medication_id": "MED-005",
+      "schedule": null
+    },
+    {
+      "medication_id": "MED-006",
+      "schedule": null
+    },
+    {
+      "medication_id": "MED-007",
+      "schedule": null
+    },
+    {
+      "medication_id": "MED-008",
+      "schedule": null
+    },
+    {
+      "medication_id": "MED-009",
+      "schedule": null
+    },
+    {
+      "medication_id": "MED-010",
+      "schedule": null
+    }
+  ]
+}

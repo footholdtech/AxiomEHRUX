@@ -43,7 +43,7 @@ story-writing:
 | Prevents | losing unsaved work; documenting into the wrong chart | discharge silently changing clinical status |
 | Failure it blocks | data loss, cross-client contamination | cross-*domain* contamination (enrollment → clinical) |
 | Frequency | many times a session | once per discharge note |
-| Prototype file | `src/20-context.jsx` → `GuardProvider`, `NavIntercept` | `src/60-summary.jsx` → `DiagnosisSelectionIntercept` |
+| Prototype file | `src/20-context.jsx` → `GuardProvider`, `NavIntercept` | **Removed 2026-09-28** — see §6 |
 
 ---
 
@@ -289,6 +289,12 @@ No modal. Signing out of Home is not an event.
 ---
 
 ## 6. Intercept B — Diagnosis Selection at discharge
+
+> **Superseded 2026-09-28.** After review with the customer, the selection step
+> was removed: saving a Discharge Plan now goes straight to the summary, which
+> prints every diagnosis and problem with an active status (Active, In
+> Remission, Provisional). The rest of this section describes the removed
+> modal and is kept only as history — don't build it.
 
 Fires once, when the clinician presses **Save as Complete** (or **Pend to Manager**, per
 agency configuration) on a valid Discharge Plan. Required-field validation runs first; a

@@ -170,7 +170,7 @@ function NavIntercept({ intercept, dirty, onCancel, onCommit, currentClient }) {
         confirm: kind === 'switch' ? 'Yes, Switch Clients' : kind === 'signout' ? 'Yes, Sign Out' : 'Yes, Leave',
       };
 
-  return (
+  return ReactDOM.createPortal(
     <React.Fragment>
       <div className="modal-scrim" onClick={onCancel} />
       <div className="intercept" role="alertdialog" aria-modal="true" aria-labelledby="intercept-title">
@@ -219,6 +219,6 @@ function NavIntercept({ intercept, dirty, onCancel, onCommit, currentClient }) {
           <Button variant="primary" onClick={() => onCommit(req)}>{COPY.confirm}</Button>
         </div>
       </div>
-    </React.Fragment>
-  );
+    </React.Fragment>,
+  document.body);
 }

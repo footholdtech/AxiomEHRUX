@@ -389,7 +389,7 @@ function Home() {
       {/* Two-column grid; three modules span both, per the artboard. */}
       <div className="home-grid">
         <div className="home-span2"><MyClientsModule /></div>
-        <PendingNotificationsModule />
+        <ApprovalsTasksModule />
         <CriticalInfoModule />
         <div className="home-span2"><MyTeamModule /></div>
         <MessengerModule />
