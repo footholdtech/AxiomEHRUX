@@ -890,12 +890,16 @@ function ChartPage({ id, module, config }) {
           per artboard 4433:94068. The hand-rolled `.clinical-strip` that used
           to sit here is gone: the header carries the DS one. */}
       {/* Never wraps: overflow goes to a More menu, per the DS tabs docs. */}
-      <TabStrip className="chart-tabs" tabs={CHART_TABS} active={tab} onSelect={switchTab} />
+      {/* A document opened from a notification or the nav joins the strip as
+          its own tab, so the strip always shows where you are. */}
+      <TabStrip className="chart-tabs" tabs={CHART_TABS.indexOf(tab) === -1 ? CHART_TABS.concat([tab]) : CHART_TABS} active={tab} onSelect={switchTab} />
 
       {tab === CHART_HOME_TAB
         ? <ClientSummary client={client} onOpenTab={switchTab} />
         : tab === 'Discharge Plan'
         ? <DischargePlan client={client} config={config} onOpenModule={switchTab} />
+        : START_NOTE_TYPES.indexOf(tab) !== -1 || getNoteCtx(id, tab)
+        ? <NotePage key={id + tab} client={client} doc={tab} />
         : <Panel title={tab}>
             <div className="stub"><Icon name="info" size={20} />
               <div>{tab} is out of scope for this prototype. It is here so you can try switching notes with unsaved work in the Discharge Plan.</div>

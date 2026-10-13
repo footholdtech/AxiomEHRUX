@@ -254,7 +254,15 @@ function NotifActions({ n, client, variant, onNavigate, openChart }) {
   const [mode, setMode] = useState(null);
   const close = () => setMode(null);
   const done = (action, title, detail, extra) => { resolveNotif(n.notification_id, action, extra); guard.setToast({ icon: 'check', title, detail }); close(); };
-  const openModule = () => { onNavigate && onNavigate(); guard.go('/chart/' + n.client_id + (n.link ? '/' + slugify(n.link) : ''), { client: n.client_id }); };
+  /* Open a document on this client's chart. `ctx` links it back to this
+     notification (review / draft / new), set only once the navigation
+     actually commits — a cancelled client switch leaves nothing behind. */
+  const openDoc = (doc, ctx) => {
+    onNavigate && onNavigate();
+    guard.go('/chart/' + n.client_id + (doc ? '/' + slugify(doc) : ''), { client: n.client_id,
+      onCommit: ctx ? () => setNoteCtx(n.client_id, doc, { id: n.notification_id, mode: ctx }) : undefined });
+  };
+  const openModule = () => openDoc(n.link);
 
   let primary = null; const more = [];
   const chartItem = client && variant !== 'chart' ? { label: 'Open ' + client.name.split(' ')[0] + '’s Chart', onClick: openChart } : null;
@@ -262,7 +270,7 @@ function NotifActions({ n, client, variant, onNavigate, openChart }) {
 
   if (n.category === 'task') {
     const A = TASK_ACTIONS[n.kind] || {};
-    primary = { label: A.primary, onClick: () => (n.kind === 'incomplete' ? openModule() : n.kind === 'appt-request' ? done('accepted', 'Appointment accepted', n.slot + ' · added to the schedule')
+    primary = { label: A.primary, onClick: () => (A.opens ? openDoc(n.link, 'review') : n.kind === 'incomplete' ? openDoc(n.link, 'draft') : n.kind === 'appt-request' ? done('accepted', 'Appointment accepted', n.slot + ' · added to the schedule')
       : n.kind === 'shift-change' ? done('approved', 'On-call swap approved', 'Both calendars are updated.') : setMode(n.kind === 'message' ? 'reply' : n.kind === 'referral' ? 'intake' : 'review')) };
     (A.more || []).forEach(k => {
       if (k === 'return') more.push({ label: 'Return for Edits…', onClick: () => setMode('return') });
@@ -275,17 +283,19 @@ function NotifActions({ n, client, variant, onNavigate, openChart }) {
     if (n.locked) more.push(lockedDismiss);
   } else if (n.category === 'alert') {
     if (n.urgent) {
-      primary = n.status === 'Action needed'
-        ? { label: 'Start Follow-Up', onClick: () => { setAlertStatus(n.notification_id, 'In progress'); guard.setToast({ icon: 'check', title: 'Follow-up started', detail: 'It stays open until the follow-up is documented.' }); } }
-        : { label: 'Document Follow-Up', onClick: () => setMode('followup') };
+      /* The follow-up is a note, and which note depends on the agency,
+         program and clinician — so ask (Start Note). Once one is started,
+         offer to continue it; signing it is what closes the alert. */
+      primary = n.draft ? { label: 'Continue Note', onClick: () => openDoc(n.draft, 'new') } : { start: true };
       if (chartItem) more.push(chartItem);
       more.push({ label: 'Delegate…', onClick: () => setMode('delegate') });
-      more.push({ label: 'Dismiss', disabled: true, reason: 'Urgent alerts close when the follow-up is documented.' });
+      more.push({ label: 'Dismiss', disabled: true, reason: 'Urgent alerts close when a follow-up note is signed.' });
     } else {
       /* Opening is not reading. A clinical alert is marked read only when the
          clinician says so — that's the audit record. */
       primary = n.kind === 'client-note' ? { label: 'Open Note', onClick: () => setMode('notes') }
         : n.kind === 'assignment' || n.kind === 'follow-up' ? (variant === 'chart' ? null : { label: 'Open Chart', onClick: openChart })
+        : n.start_note ? (n.draft ? { label: 'Continue Note', onClick: () => openDoc(n.draft, 'new') } : { start: true })
         : { label: 'Open', onClick: openModule };
       if (chartItem && (!primary || primary.label !== 'Open Chart')) more.push(chartItem);
       more.push({ label: 'Dismiss', onClick: () => done('dismissed', 'Dismissed', n.title) });
@@ -306,11 +316,12 @@ function NotifActions({ n, client, variant, onNavigate, openChart }) {
       <div className="nrow-acts-top">
         {/* Secondary everywhere: a column of primaries is a wall, and if
             everything is primary nothing is. */}
+        {primary && primary.start && <StartNoteButton n={n} onNavigate={onNavigate} />}
         {primary && primary.label && <Button size="sm" variant="secondary" onClick={primary.onClick}>{primary.label}</Button>}
         {!!more.length && <NMore items={more} label={'More actions for ' + n.title} />}
       </div>
       {hasRead && (
-        <Tooltip label={n.urgent && !n.read ? 'Marks it seen. It stays open until the follow-up is documented.' : null} placement="bottom">
+        <Tooltip label={n.urgent && !n.read ? 'Marks it seen. It stays open until a follow-up note is signed.' : null} placement="bottom">
           <Button size="sm" variant="ghost" className={'nread-btn' + (n.read ? ' is-read' : '')} onClick={() => setNotifRead(n.notification_id, !n.read)}>
             {n.read ? 'Mark as Unread' : <React.Fragment><Icon name="check" size={14} /> Mark as Read</React.Fragment>}
           </Button>
@@ -326,7 +337,6 @@ function NotifActions({ n, client, variant, onNavigate, openChart }) {
       {mode === 'propose' && <ProposeOverlay n={n} client={client} onClose={close} onDone={when => done('proposed', 'New time proposed', when + ' · sent to ' + sName(n.from_staff_id))} />}
       {mode === 'reply' && <ReplyOverlay n={n} client={client} onClose={close} onDone={() => done('replied', 'Reply sent', 'To ' + sName(n.from_staff_id) + '.')} />}
       {mode === 'intake' && <IntakeDateOverlay n={n} client={client} onClose={close} onDone={d => done('confirmed', 'Intake date confirmed', fmtDate(d) + ' · Hope Street Housing notified')} />}
-      {mode === 'followup' && <FollowUpOverlay n={n} client={client} onClose={close} onDone={note => { setAlertStatus(n.notification_id, 'Follow-up documented'); done('followed-up', 'Follow-up documented', note ? 'A progress note draft was added to the chart.' : 'Alert closed.'); }} />}
       {mode === 'notes' && client && <ClientNotesOverlay client={client} onClose={close} />}
     </div>
   );
@@ -352,6 +362,36 @@ function NMore({ items, label }) {
               </button>
             ))}
           </div>
+        </FloatMenu>
+      )}
+    </span>
+  );
+}
+
+/* Combo dropdown button. Which note a follow-up needs depends on the
+   agency's templates for the program, client and clinician, so the app asks
+   rather than guesses: nothing starts until a note type is chosen. */
+function StartNoteButton({ n, onNavigate }) {
+  const guard = useGuard();
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null), menuRef = useRef(null);
+  useOutside([ref, menuRef], () => setOpen(false));
+  const choose = doc => {
+    setOpen(false);
+    onNavigate && onNavigate();
+    guard.go('/chart/' + n.client_id + '/' + slugify(doc), { client: n.client_id, onCommit: () => startNoteFrom(n, doc) });
+  };
+  return (
+    <span ref={ref} className="nstart">
+      <button type="button" className={'btn btn-secondary sm nstart-btn' + (open ? ' open' : '')} aria-haspopup="listbox" aria-expanded={open}
+        onClick={() => setOpen(o => !o)}>Start Note <Icon name="chevronDown" size={14} /></button>
+      {open && (
+        <FloatMenu anchorRef={ref} menuRef={menuRef} className="dd-menu" role="listbox" minWidth={280} maxHeight={380} onClose={() => setOpen(false)}>
+          <div className="dd-head">Choose a note type</div>
+          <div className="dd-list">
+            {START_NOTE_TYPES.map(t => <button key={t} type="button" role="option" className="dd-opt" onClick={() => choose(t)}>{t}</button>)}
+          </div>
+          <div className="dd-foot">From your agency’s note templates. Signing the note closes this alert.</div>
         </FloatMenu>
       )}
     </span>
@@ -468,30 +508,6 @@ function IntakeDateOverlay({ n, client, onClose, onDone }) {
       footer={<React.Fragment><Button variant="secondary" onClick={onClose}>Cancel</Button><Button variant="primary" disabled={!date} onClick={() => onDone(date)}>Confirm</Button></React.Fragment>}>
       <div className="ovl-grid ovl-grid--2"><DateField label="Intake date" required value={date} onChange={setDate} /></div>
       <div className="ovl-hint">Confirm with the client first. The provider is notified when you save.</div>
-    </Overlay>
-  );
-}
-
-/* Closed loop on a clinical event: the alert only clears when the follow-up is
-   documented, and documenting it drafts a progress note — so a supervisor can
-   see it happened without a spreadsheet. */
-function FollowUpOverlay({ n, client, onClose, onDone }) {
-  const [how, setHow] = useState('');
-  const [outcome, setOutcome] = useState('');
-  const [note, setNote] = useState(true);
-  const [tried, setTried] = useState(false);
-  const go = () => { setTried(true); if (!how || !outcome.trim()) return; onDone(note); };
-  return (
-    <Overlay size="md" title="Document Follow-Up" subtitle={(client ? client.name + ' · ' : '') + n.title} onClose={onClose}
-      footer={<React.Fragment><Button variant="secondary" onClick={onClose}>Cancel</Button><Button variant="primary" onClick={go}>Save Follow-Up</Button></React.Fragment>}>
-      <NotifFacts n={n} client={client} />
-      <Field label="How did you follow up?" required error={tried && !how ? 'Choose how you followed up.' : null}>
-        <RadioGroup name={'fu-' + n.notification_id} options={['Phone', 'In person', 'Video', 'Coordinated with facility', 'Unable to reach']} value={how} onChange={setHow} invalid={tried && !how} />
-      </Field>
-      <Field label="Outcome and next steps" required error={tried && !outcome.trim() ? 'Describe the outcome.' : null} wide>
-        <TextArea value={outcome} onChange={setOutcome} rows={3} invalid={tried && !outcome.trim()} />
-      </Field>
-      <Checkbox checked={note} onChange={setNote} label="Draft a progress note from this follow-up" />
     </Overlay>
   );
 }

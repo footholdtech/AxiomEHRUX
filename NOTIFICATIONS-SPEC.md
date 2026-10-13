@@ -15,7 +15,7 @@ Three groups. The UI never calls them "tiers"; users see the group names.
 | Group | What's in it | Counts in the bell? | How it leaves |
 |---|---|---|---|
 | **Approvals & Tasks** | Assigned to me and waiting on me: signatures, co-signs, approvals, orders, lab results to review, admission appointment requests, shift swaps, direct messages, referral responses, my own incomplete notes | **Always**, read or not | Only when actioned: signed, approved, returned, delegated, declined, replied or marked done. Org-locked items can't be dismissed. |
-| **Client Alerts — urgent** | Hospitalization, ED visit, incarceration, crisis-line call, urgent appointment request | **Until marked read** | Stays open with a follow-up window until **Document Follow-Up** is saved. Can't be dismissed. |
+| **Client Alerts — urgent** | Hospitalization, ED visit, incarceration, crisis-line call, urgent appointment request | **Until marked read** | Stays open with a follow-up window until a follow-up **note is signed** (Start Note). Can't be dismissed. |
 | **Client Alerts — due & updates** | Assessments due or expired (CANS, PHQ-9), consents needed or expiring, plan reviews, note gaps, unrecorded outcomes, new assignments | No: theme **dot** when unread | Mark as read (page only), open, or dismiss. |
 | **Client Alerts — care-team notes** | **One row per note** about my clients (last 14 days), *Important* first | **Important notes: yes, until read** (red dot). Others: no (theme dot). | Read state is the note's own, shared with the Client Notes thread and the client header badge. |
 | **General & System** | Reports ready or failed, announcements, maintenance, own credential reminders | **Never**: theme **dot** when unread | Mark as read or unread, dismiss, or bulk dismiss. |
@@ -38,7 +38,7 @@ Red is never a dot on anything uncounted. The bell shows the red number, or a do
   - Opening an alert, opening a note, or starting a follow-up never marks it read.
   - In the flyout, client alerts have no Mark as Read. The user opens them in place, and marks them read on the All Notifications page or inside the note itself.
   - On the page, **Mark as Read** sits in the same right-hand spot on every row, and **Mark All as Read** is on the group. Bulk mark-read stays for now; user testing will show whether clinicians expect it.
-- On an urgent alert, *Mark as Read* means "I've seen it". It drops the alert from the count, but the alert stays open until the follow-up is documented. A tooltip says so.
+- On an urgent alert, *Mark as Read* means "I've seen it". It drops the alert from the count, but the alert stays open until a follow-up note is signed. A tooltip says so.
 - **General & System is lenient:** Mark as Read is available everywhere, including the flyout, and View Report marks the item read.
 
 ### Sort
@@ -118,15 +118,16 @@ Tags, shown only when they change the next step:
 
 | Kind | Primary | More |
 |---|---|---|
-| Co-sign / sign | Review & (Co-)sign: review dialog, attestation required | Return for Edits (reason required) · Delegate · Open chart · Dismiss *(locked)* |
+| Co-sign / sign | Review & (Co-)sign: **opens the document on the chart** in review mode, attestation required | Return for Edits (reason required) · Delegate · Open chart · Dismiss *(locked)* |
 | Approval / order | Review & Approve / Review Order | Return for Edits · Delegate · Open chart · Dismiss *(locked)* |
-| Lab result | Review Result: Acknowledge | Delegate · Open chart · Dismiss *(locked)* |
+| Lab result | Review Result: opens the Laboratory result on the chart; Acknowledge Result | Delegate · Open chart · Dismiss *(locked)* |
 | Admission appointment request | Accept | Propose Another Time · Decline (reason) · Delegate · Open chart |
 | Shift swap | Approve | Decline (reason) |
 | Direct message | Reply | Mark Done · Open chart |
 | Referral response | Confirm Intake Date | Mark Done · Open chart |
-| My incomplete note | Continue Note (opens the module) | — |
-| Urgent alert | Start Follow-Up, then **Document Follow-Up** (contact method + outcome required; optional progress-note draft) | Open chart · Delegate · Dismiss *(locked)* |
+| My incomplete note | Continue Note: opens the draft on the chart; signing clears the task | — |
+| Urgent alert | **Start Note ▾**: combo dropdown; the user must pick a note type before anything starts. Then **Continue Note**. Signing the note closes the alert. | Open chart · Delegate · Dismiss *(locked)* |
+| Documentation gap | **Start Note ▾**, same as urgent | Open chart · Dismiss |
 | Due & updates | Open / Open Chart | Open chart · Dismiss |
 | Care-team note | Open Note (the Client Notes thread, in place; doesn't mark read) | Open chart · Dismiss |
 | Report | View Report / Try Again | Dismiss |
@@ -172,6 +173,27 @@ The client's slice of the notification center, shown where the work happens. Act
 - **Header:** a plain title, with no count and no link. The work stays in this client's context, and the bell in the top bar is the way out to everything.
 - **Mark as Read is available here,** as on the page. This is a full review surface, not the flyout's quick look.
 
+### 4.7 Notes and documents opened from notifications
+
+AxiomEHR agencies configure their own note templates per program, client and clinician, so a notification can't know which note a follow-up needs.
+
+- **Start Note ▾** is a combo dropdown button. It lists the agency's note types, and nothing starts until one is chosen. Prototype list:
+  - Case Management Note
+  - Care Coordination Note
+  - Crisis Follow-Up Note
+  - Engagement Session Note
+  - Hospital Discharge Follow-Up
+  - Peer Support Note
+  - Progress Note
+  - Residential Check-In
+  - Therapy Note
+- **Where the note opens:** on the client's chart, as its own tab, under the client-switch and unsaved-work guards.
+  - A banner links the note to the notification ("Started from a notification: Called the 988 crisis line · 15 h left. Signing this note documents the follow-up and closes the alert.").
+  - Each note type has its own template checklist, for example the Crisis Follow-Up safety-plan items.
+- **Saving vs. signing:** Save Draft keeps the alert open, and the row then offers **Continue Note**. **Sign Note** closes the alert, or clears the task, and returns to the Client Summary.
+- **Review items open the document itself** in review mode: co-sign, sign, approve and lab results. The page shows the author, date, program and status, then the document, the attestation, and Return for Edits or the decision.
+- **The left nav** lists the new note types under Documents › Notes. Opened from there, a note has no notification link.
+
 ## 5. Why each rule (research → design)
 
 | Finding | Design response |
@@ -179,7 +201,7 @@ The client's slice of the notification center, shown where the work happens. Act
 | No tiering, so everything lands in one pile | Three urgency groups; the bell counts only what needs you |
 | Approval queues flood with already-approved items | *Waiting on others* section, uncounted |
 | Wrong default surface | Flyout and page open on Approvals & Tasks |
-| No proof of follow-up on clinical events | Urgent alerts close only through Document Follow-Up, which drafts a note |
+| No proof of follow-up on clinical events | Urgent alerts close only when a follow-up note started from the alert is signed, so the chart holds the proof |
 | Staff can mute critical items | Org-locked dismissal on tasks and urgent alerts |
 | Priority invisible at the surface | Urgent first by time left; overdue tags; age on every row |
 | No delegation pattern | Delegate on every task; out-of-office coverage in preferences; "Covering for" tag |
@@ -188,11 +210,12 @@ The client's slice of the notification center, shown where the work happens. Act
 
 ## 6. Open questions
 
-1. **Urgent "read" vs. resolved.** The prototype drops an urgent alert from the count when it's marked read, but keeps it open until the follow-up is documented. Should the count instead hold until follow-up *starts*?
+1. **Urgent "read" vs. resolved.** The prototype drops an urgent alert from the count when it's marked read, but keeps it open until a follow-up note is signed. Should the count instead hold until follow-up *starts*?
 2. ~~Care-team notes — should *Important* count?~~ **Decided: yes.** An unread Important note counts in the bell for everyone on the care team until they read it, so teams can flag something to each other without buying the full internal messaging package. The note composer has an info tooltip explaining this, so staff don't overuse *Important*.
-8. **Bulk mark-read on client alerts.** Kept on the page for now. Validate in user testing whether clinicians expect it, or whether it undermines deliberate review.
 3. **Supervisor view.** The research asks for team-level completion (CEN response rate, overdue by team member). This page is the individual queue; the team view is a separate story.
 4. **In-chart surfacing.** Built on the Client Summary (§4.6). Open: should urgent alerts also show in the client header itself, so they're visible on every tab of the chart?
 5. **Who sets locks.** Which admin role sets which kinds are locked, and per program or agency-wide?
 6. **Feeds.** Which sources (health information exchange, health plans, crisis line partner, jail liaison) are live per customer, and how are duplicates from two feeds merged?
 7. **Email "if unread after 2 hours".** Is a fixed interval right for tasks, or should each customer configure it?
+8. **Bulk mark-read on client alerts.** Kept on the page for now. Validate in user testing whether clinicians expect it, or whether it undermines deliberate review.
+9. **Which note types per alert.** The prototype lists every template. Production should list the templates the agency enables for this program, client and the clinician's role, and could pin a suggested one if the agency configures it.

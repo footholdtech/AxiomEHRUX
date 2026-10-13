@@ -48,11 +48,11 @@ def add(**r):
 add(category='task', kind='cosign', source='Pending Notifications › Pending Notifications',
     title='Co-sign progress note', detail='Case management progress note, 09/19 home visit.',
     client_id='CL-100235', from_staff_id='ST-2004', created=ago(days=2, hours=3), due=ago(days=-1),
-    status='open', locked=True, link='Dynamic Progress Notes')
+    status='open', locked=True, link='Case Management Note')
 add(category='task', kind='signature', source='Pending Notifications › Pending Notifications',
     title='Sign treatment plan review', detail='Quarterly review — needs clinician sign-off before billing.',
     client_id='CL-100236', from_staff_id='ST-2006', created=ago(days=5, hours=1), due=ago(days=2),
-    status='open', locked=True, link='Treatment Plan')
+    status='open', locked=True, link='Service Plan')
 add(category='task', kind='approval', source='Pending Notifications › Pending Notifications',
     title='Approve crisis prevention plan', detail='Updated safety plan after weekend incident.',
     client_id='CL-100241', from_staff_id='ST-2004', created=ago(hours=20), due=ahead(days=1),
@@ -69,7 +69,7 @@ add(category='task', kind='shift-change', source='Staff scheduling (new)',
     from_staff_id='ST-2008', created=ago(hours=26), due=ahead(days=2), status='open', locked=True)
 add(category='task', kind='lab', source='Pending Notifications › Pending Labs',
     title='Review drug screen result', detail='Urine drug screen collected 09/20 — result ready for review.',
-    client_id='CL-100235', from_staff_id='ST-2008', created=ago(hours=6), status='open', locked=True, link='Labs')
+    client_id='CL-100235', from_staff_id='ST-2008', created=ago(hours=6), status='open', locked=True, link='Laboratory')
 add(category='task', kind='referral', source='Pending Notifications › Specialist Referral',
     title='Housing referral accepted', detail='Hope Street Housing accepted the referral — confirm the intake date with the client.',
     client_id='CL-100242', from_staff_id='ST-2005', created=ago(days=1, hours=2), status='open', locked=False)
@@ -78,7 +78,7 @@ add(category='task', kind='order', source='Pending Notifications › Internal Or
     client_id='CL-100238', from_staff_id='ST-2004', created=ago(days=3), due=ago(days=1), status='open', locked=True)
 add(category='task', kind='incomplete', source='Critical Info › Incomplete',
     title='Finish your progress note', detail='Draft started 09/18 — not yet signed.',
-    client_id='CL-100234', created=ago(days=4), due=ago(days=1), status='open', locked=True, link='Dynamic Progress Notes')
+    client_id='CL-100234', created=ago(days=4), due=ago(days=1), status='open', locked=True, link='Progress Note')
 add(category='task', kind='cosign', source='Pending Notifications › Pending Notifications',
     title='Co-sign psychiatric evaluation', detail='Initial evaluation, routed to Sandra Kim — you’re covering.',
     client_id='CL-100244', from_staff_id='ST-2002', created=ago(days=1, hours=5), due=ahead(days=1),
@@ -115,19 +115,19 @@ add(category='alert', kind='assessment-due', source='Critical Info › Upcoming 
     client_id='CL-100242', created=ago(hours=5), due=ahead(days=28), link='CANS')
 add(category='alert', kind='assessment-expired', source='Critical Info › Overdue Items',
     title='PHQ-9 expired', detail='Last completed 07/09. Due every 60 days for this program.',
-    client_id='CL-100235', created=ago(days=1), due=ago(days=15), link='PHQ-9')
+    client_id='CL-100235', created=ago(days=1), due=ago(days=15), link='PHQ')
 add(category='alert', kind='consent-needed', source='Critical Info › Additional Items',
     title='Consent for AI recording needed', detail='Required before an ambient-recorded session.',
-    client_id='CL-100240', created=ago(hours=3), link='Consents')
+    client_id='CL-100240', created=ago(hours=3), link='Informed Consent')
 add(category='alert', kind='consent-expiring', source='Critical Info › Upcoming Items',
     title='Release of information expires 10/01', detail='Shared with Riverside General. Renew if coordination continues.',
-    client_id='CL-100239', created=ago(days=1, hours=3), due=ahead(days=9), read=True, link='Consents')
+    client_id='CL-100239', created=ago(days=1, hours=3), due=ahead(days=9), read=True, link='Informed Consent')
 add(category='alert', kind='plan-review', source='Critical Info › Upcoming Items',
     title='Treatment plan review due in 6 days', detail='90-day review window closes 09/28.',
-    client_id='CL-100244', created=ago(days=2), due=ahead(days=6), link='Treatment Plan')
+    client_id='CL-100244', created=ago(days=2), due=ahead(days=6), link='Service Plan')
 add(category='alert', kind='note-gap', source='Critical Info › Overdue Items',
     title='No progress note in 31 days', detail='Last note 08/22. Program standard is one contact every 30 days.',
-    client_id='CL-100243', created=ago(days=1, hours=6), due=ago(days=1), link='Dynamic Progress Notes')
+    client_id='CL-100243', created=ago(days=1, hours=6), due=ago(days=1), link='Progress Note', start_note=True)
 add(category='alert', kind='follow-up', source='Critical Info › Follow Up Items',
     title='Appointment outcome not recorded', detail='09/19 appointment still shows “Scheduled”. Record whether it was kept.',
     client_id='CL-100238', created=ago(days=3), read=True)
@@ -164,7 +164,7 @@ doc = {
         'now': NOW.strftime('%Y-%m-%dT%H:%M:00'),
         'fields': ['notification_id', 'category', 'kind', 'urgent', 'source', 'title', 'detail', 'client_id',
                    'from_staff_id', 'created', 'due', 'window_hours', 'status', 'read', 'locked',
-                   'delegated_from', 'waiting_on', 'link', 'feed', 'slot', 'notes_count'],
+                   'delegated_from', 'waiting_on', 'link', 'feed', 'slot', 'start_note'],
     },
     'records': rows,
 }

@@ -421,6 +421,13 @@ Behaviour and bug fixes completed and verified in-browser:
   The composer explains this in an info tooltip (`IMPORTANT_NOTE_TIP`,
   `Tooltip wide`). Testing tooltips by `.focus()` fails silently when the
   preview window itself isn't focused (`document.hasFocus()` false) — use hover.
+- **Notes open from notifications** (`36-notes.jsx`). "Start Note" is a combo
+  dropdown (`StartNoteButton`) — no note starts until a type is chosen. The
+  link back to the notification is `NOTE_CTX` (set in `onCommit`, so a
+  cancelled client switch leaves nothing). Review items (co-sign, sign,
+  approve, lab) open the document in review mode; signing/deciding resolves
+  the notification and raw-navigates back to the summary after
+  `clearDirty()`. New note types are in `CLIENT_MODULE_NAMES` and the nav.
 - **Notification rows are deliberately quiet** (Lisa, 2026-10-13): no
   Urgent/status labels, time on the title line, sender/feed on the page only,
   no icons in the chart, no all-caps headings, no red fills (errors only), and

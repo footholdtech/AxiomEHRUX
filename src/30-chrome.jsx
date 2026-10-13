@@ -47,8 +47,8 @@ const NAV_SECTIONS = [
   {
     key: 'documents', label: 'Documents', icon: 'documents',
     categories: [
-      { label: 'Assessments', items: ['ACE', 'AIMS', 'ASAM', 'AUDIT', 'CALOCUS', 'CINA', 'CIWA', 'COWS', 'GAD-7', 'LOCUS', 'PC-PTSD', 'PCL5', 'PHQ', 'PRAPARE', 'SDOH', 'Suicide Risk Screening', 'WHO - Assist', 'Psychosocial Assessment Note', 'Psychiatric Evaluation'] },
-      { label: 'Notes', items: ['Progress Note', 'Group Note', 'Nurse Progress Note', 'Inpatient Note', 'Dynamic Progress Notes', 'Psychotherapy Progress Note', 'Encounter Entry'] },
+      { label: 'Assessments', items: ['ACE', 'AIMS', 'ASAM', 'AUDIT', 'CALOCUS', 'CANS', 'CINA', 'CIWA', 'COWS', 'GAD-7', 'LOCUS', 'PC-PTSD', 'PCL5', 'PHQ', 'PRAPARE', 'SDOH', 'Suicide Risk Screening', 'WHO - Assist', 'Psychosocial Assessment Note', 'Psychiatric Evaluation'] },
+      { label: 'Notes', items: ['Progress Note', 'Case Management Note', 'Care Coordination Note', 'Crisis Follow-Up Note', 'Engagement Session Note', 'Hospital Discharge Follow-Up', 'Peer Support Note', 'Residential Check-In', 'Therapy Note', 'Group Note', 'Nurse Progress Note', 'Inpatient Note', 'Dynamic Progress Notes', 'Psychotherapy Progress Note', 'Encounter Entry'] },
       { label: 'Plans', items: ['Service Plan', 'Dynamic Service Plan', 'Discharge Plan', 'Crisis Prevention Plan', 'Crisis Intervention Relapse Plan', 'Support & Safety Plan', 'WRAP Meeting'] },
     ],
     links: ['Clinical Forms Search', 'Other Forms', 'Scanned Documents'],

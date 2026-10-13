@@ -25,6 +25,7 @@ const NSESSION = {
   status: {},      // id -> alert follow-up status
   done: {},        // id -> { action, at, to?, note? } — task actioned / item dismissed
   nudged: {},      // id -> true (reminder sent on a waiting item)
+  draft: {},       // id -> note type started from this notification
 };
 const touchNotifs = () => window.dispatchEvent(new Event(NOTIF_EVT));
 /* Also listens for record changes: care-team notes live in the records store,
@@ -71,6 +72,7 @@ function notifAll() {
     status: NSESSION.status[n.notification_id] || n.status,
     done: NSESSION.done[n.notification_id] || null,
     nudged: !!NSESSION.nudged[n.notification_id],
+    draft: NSESSION.draft[n.notification_id] || null,
   })).concat(noteNotifs());
 }
 const _ts = iso => new Date(iso).getTime();
@@ -144,16 +146,60 @@ function resolveNotif(id, action, extra) {
 }
 function nudgeNotif(id) { NSESSION.nudged[id] = true; touchNotifs(); }
 
+/* ---- Notes started from, or opened by, a notification ------------------
+   AxiomEHR agencies configure their own note templates per program, client
+   and clinician, so a notification can't know which note a follow-up needs.
+   "Start Note" asks; the chosen note opens on the chart with a link back to
+   the notification, and signing it is what closes the loop. Review items
+   (co-sign, sign, approve, lab) open the actual document instead of a dialog.
+
+   `NOTE_CTX` is that link, keyed by client + document. Session-only. */
+const START_NOTE_TYPES = ['Case Management Note', 'Care Coordination Note', 'Crisis Follow-Up Note', 'Engagement Session Note',
+  'Hospital Discharge Follow-Up', 'Peer Support Note', 'Progress Note', 'Residential Check-In', 'Therapy Note'];
+/* The agency template's checklist for each type — fictional, to show that
+   every note asks for something different. */
+const NOTE_TEMPLATES = {
+  'Case Management Note': ['Benefits and entitlements', 'Housing', 'Transportation', 'Referrals made or updated'],
+  'Care Coordination Note': ['Spoke with an outside provider', 'Release of information on file', 'Shared plan updated'],
+  'Crisis Follow-Up Note': ['Safety plan reviewed with the client', 'Access to lethal means discussed', 'Crisis and after-hours numbers confirmed', 'Next appointment scheduled'],
+  'Engagement Session Note': ['Goals reviewed', 'Barriers to engagement discussed', 'Next contact scheduled'],
+  'Hospital Discharge Follow-Up': ['Discharge summary received', 'Medications reconciled', 'Follow-up appointment within 7 days', 'Transportation arranged'],
+  'Peer Support Note': ['Recovery goals discussed', 'Community resources shared'],
+  'Progress Note': ['Goals addressed', 'Interventions delivered', 'Response to interventions'],
+  'Residential Check-In': ['Room and safety check', 'Medication pass observed', 'House meeting attended', 'Curfew and visitors reviewed'],
+  'Therapy Note': ['Symptoms reviewed', 'Intervention delivered', 'Between-session practice assigned'],
+};
+const NOTE_CTX = {};
+const noteCtxKey = (cid, doc) => cid + '|' + doc;
+function setNoteCtx(cid, doc, ctx) { NOTE_CTX[noteCtxKey(cid, doc)] = ctx; }
+function getNoteCtx(cid, doc) {
+  const c = NOTE_CTX[noteCtxKey(cid, doc)];
+  if (!c) return null;
+  const n = notifAll().find(x => x.notification_id === c.id);
+  return n && !n.done ? { ...c, n } : null;
+}
+function clearNoteCtx(cid, doc) { delete NOTE_CTX[noteCtxKey(cid, doc)]; }
+/* Starting a note marks the alert In progress and remembers which note, so
+   the row can offer "Continue" instead of asking again. */
+function startNoteFrom(n, doc) {
+  setNoteCtx(n.client_id, doc, { id: n.notification_id, mode: 'new' });
+  NSESSION.draft[n.notification_id] = doc;
+  if (n.urgent) NSESSION.status[n.notification_id] = 'In progress';
+  touchNotifs();
+}
+
 /* ---- What each kind of item lets you do --------------------------------
    `primary` is the one obvious next step; `more` is the rest. A locked item
    (org policy) can't be dismissed without being actioned — the research's
    "staff mute it out of fatigue" failure. */
+/* `opens`: the action opens the linked document on the chart (in review
+   mode) rather than a dialog — that's where the reviewing happens. */
 const TASK_ACTIONS = {
-  cosign: { primary: 'Review & Co-sign', verb: 'Co-signed', more: ['return', 'delegate', 'chart'] },
-  signature: { primary: 'Review & Sign', verb: 'Signed', more: ['return', 'delegate', 'chart'] },
-  approval: { primary: 'Review & Approve', verb: 'Approved', more: ['return', 'delegate', 'chart'] },
+  cosign: { primary: 'Review & Co-sign', verb: 'Co-signed', opens: true, more: ['return', 'delegate', 'chart'] },
+  signature: { primary: 'Review & Sign', verb: 'Signed', opens: true, more: ['return', 'delegate', 'chart'] },
+  approval: { primary: 'Review & Approve', verb: 'Approved', opens: true, more: ['return', 'delegate', 'chart'] },
   order: { primary: 'Review Order', verb: 'Approved', more: ['return', 'delegate', 'chart'] },
-  lab: { primary: 'Review Result', verb: 'Result acknowledged', more: ['delegate', 'chart'] },
+  lab: { primary: 'Review Result', verb: 'Result acknowledged', opens: true, more: ['delegate', 'chart'] },
   'appt-request': { primary: 'Accept', verb: 'Accepted', more: ['propose', 'decline', 'delegate', 'chart'] },
   'shift-change': { primary: 'Approve', verb: 'Approved', more: ['decline'] },
   message: { primary: 'Reply', verb: 'Replied', more: ['done', 'chart'] },

@@ -1666,6 +1666,19 @@
 
 /* Client Summary › Needs Attention: one flat list of chart-variant rows. */
 .nrow--chart { grid-template-columns: 10px minmax(0, 1fr) auto; }
+/* Start Note combo button and the notes it opens. */
+.nstart { display: inline-flex; }
+.nstart-btn { gap: 4px; }
+.nstart-btn.open { border-color: var(--background-interactive-primary-default); }
+.dd-head { flex: none; padding: var(--sp-xs) var(--sp-md) 2px; font-size: 12px; font-weight: 600; color: var(--foreground-secondary); }
+.note-page { display: flex; flex-direction: column; gap: var(--sp-md); }
+.note-page > .ff { margin-bottom: 0; }
+.note-link { margin-bottom: 0; }
+.note-foot { display: flex; align-items: center; gap: var(--sp-xs); padding-top: var(--sp-md); border-top: 1px solid var(--divider-primary); }
+.doc-body { padding: var(--sp-md) var(--sp-lg); border-radius: var(--radius-md); background: var(--background-surface-secondary); }
+.doc-sec + .doc-sec { margin-top: var(--sp-md); }
+.doc-sec h3 { margin: 0 0 4px; font-size: 13px; font-weight: 600; color: var(--foreground-primary); }
+.doc-sec p { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--foreground-primary); }
 /* Preferences page. */
 .npref-link { display: inline-flex; align-items: center; gap: var(--sp-2xs); align-self: center; }
 .pref-link { display: inline-flex; align-items: center; gap: 2px; font-weight: 500; }

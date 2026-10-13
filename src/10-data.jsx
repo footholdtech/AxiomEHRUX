@@ -168,6 +168,11 @@ const CLIENT_MODULE_NAMES = [
   'Psychiatric Evaluation', 'Psychosocial Assessment Note', 'Psychotherapy Progress Note',
   'Scanned Documents', 'SDOH', 'Service Plan', 'Suicide Risk Screening',
   'Support & Safety Plan', 'Vitals', 'WHO - Assist', 'WRAP Meeting',
+  /* Agency note templates. In production these are configured per agency,
+     program and role, so the app can't guess which one a clinician needs —
+     see START_NOTE_TYPES and the "Start Note" chooser. */
+  'CANS', 'Case Management Note', 'Care Coordination Note', 'Crisis Follow-Up Note', 'Engagement Session Note',
+  'Hospital Discharge Follow-Up', 'Peer Support Note', 'Residential Check-In', 'Therapy Note',
 ];
 const CLIENT_MODULES = Object.fromEntries(CLIENT_MODULE_NAMES.map(n => [slugify(n), n]));
 const isClientModule = name => CLIENT_MODULE_NAMES.indexOf(name) !== -1;
