@@ -30,7 +30,7 @@ function SummaryPreview({ client, form, selection, config, filed, onClose }) {
   useEffect(() => { const k = e => { if (e.key === 'Escape') onClose(false); }; window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k); }, [onClose]);
   const team = careTeam(client.client_id);
   const docNo = 'DS-' + client.client_id.replace('CL-', '') + '-' + isoOf(TODAY).replace(/-/g, '');
-  return (
+  return ReactDOM.createPortal(
     <React.Fragment>
       <div className="modal-scrim pdf-scrim" onClick={() => onClose(false)} />
       <div className="pdf-shell" role="dialog" aria-modal="true" aria-label="Discharge summary preview">
@@ -146,6 +146,6 @@ function SummaryPreview({ client, form, selection, config, filed, onClose }) {
           </article>
         </div>
       </div>
-    </React.Fragment>
-  );
+    </React.Fragment>,
+  document.body);
 }

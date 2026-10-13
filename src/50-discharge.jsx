@@ -553,22 +553,28 @@ function useClientSummaryData(client) {
     /* 1. Work that needs doing ------------------------------------ */
     /* `assessments` is an object, not an array: {_meta, instruments,
        sample_results}. Reading it as a list silently produced no due dates. */
-    const cat = ((RD.assessments || {}).instruments) || [];
+    /* Age-appropriate instruments only: CANS/Vanderbilt for youth (through
+       21, the usual CANS ceiling), ANSA for adults. */
+    const youth = client.age !== '' && client.age <= 21;
+    const cat = (((RD.assessments || {}).instruments) || [])
+      .filter(a => (/youth/i.test(a.domain) ? youth : /adult/i.test(a.domain) ? !youth : true));
     const results = ((RD.assessments || {}).sample_results) || [];
     const dueAssessments = pick(cat, cid + 'due', Math.min(3, cat.length)).map(a => {
       const every = cadenceDays(a.typical_cadence) || 180;
       const last = addDays(today, -(every - (seed(cid + a.assessment_id) % 40) + 20));
       const next = addDays(last, every);
       const days = Math.round((next - today) / 86400000);
-      return { kind: 'Assessment', name: a.name, last, next, days };
+      return { kind: 'Assessment', name: a.name, code: a.assessment_id, last, next, days };
     });
     const consents = CONSENTS.map(c => {
       const r = seed(cid + c.name) % 5;
-      return { kind: 'Consent', name: c.name, signed: r > 1, expires: r === 1 ? addDays(today, 9) : null, required: c.required };
+      /* An expiring consent is a signed one — r === 1 used to read as both
+         "not signed" and "expires", listing the same consent twice. */
+      return { kind: 'Consent', name: c.name, signed: r > 0, expires: r === 1 ? addDays(today, 9) : null, required: c.required };
     });
     const attention = dueAssessments
       .filter(a => a.days < 45)
-      .map(a => ({ label: a.name, detail: a.days < 0 ? Math.abs(a.days) + ' days overdue' : 'due in ' + a.days + ' days', overdue: a.days < 0, when: a.next }))
+      .map(a => ({ label: a.name, code: a.code, detail: a.days < 0 ? Math.abs(a.days) + ' days overdue' : 'due in ' + a.days + ' days', overdue: a.days < 0, when: a.next }))
       .concat(consents.filter(c => !c.signed && c.required).map(c => ({ label: c.name, detail: 'not signed', overdue: true, when: null })))
       .concat(consents.filter(c => c.expires).map(c => ({ label: c.name, detail: 'expires ' + fmtDate(c.expires), overdue: false, when: c.expires })));
 
@@ -709,20 +715,10 @@ function ClientSummary({ client, onOpenTab }) {
   return (
     <div className="cs">
       <div className="cs-main">
-        {/* 1. What needs doing. Hidden entirely when there is nothing — an
-            empty "all clear" card is just another thing to read past. */}
-        {d.attention.length > 0 && (
-          <Panel title={`Needs Attention (${d.attention.length})`}>
-            <ul className="cs-attn">
-              {d.attention.map((a, i) => (
-                <li key={i} className={a.overdue ? 'is-overdue' : ''}>
-                  <span className="cs-attn-label">{a.label}</span>
-                  <span className="cs-attn-detail">{a.detail}</span>
-                </li>
-              ))}
-            </ul>
-          </Panel>
-        )}
+        {/* 1. What needs doing — this client's slice of the notification
+            center (urgent alerts, tasks waiting on me, Important notes) plus
+            due and expiring work. Hidden entirely when there is nothing. */}
+        <ClientAttentionPanel client={client} derived={d.attention} />
 
         {/* Care-team notes about this client — the same thread as the header's
             Client Notes overlay, so read state is shared. */}
@@ -836,11 +832,12 @@ function ChartPage({ id, module, config }) {
   const client = CLIENT_BY_ID[id];
   /* The URL names the module, so a chart reached from the left nav opens on it
      rather than always on the overview. */
-  useEffect(() => { if (module && CLIENT_MODULES[module]) setTab(CLIENT_MODULES[module]); }, [module]);
   /* A different client is a fresh chart. Carrying the previous tab across
      would land you in someone else's Discharge Plan because that is where you
-     happened to be standing — so every switch resets to the overview. */
-  useEffect(() => { setTab((module && CLIENT_MODULES[module]) || CHART_HOME_TAB); }, [id]);
+     happened to be standing — so every switch resets to the overview. The
+     same goes for leaving a module URL for the bare chart URL (the client
+     breadcrumb): that means the summary. */
+  useEffect(() => { setTab((module && CLIENT_MODULES[module]) || CHART_HOME_TAB); }, [id, module]);
   /* Publish the active tab so the breadcrumb in the app shell can name it, and
      clear it on the way out so a stale tab never trails a different page. */
   const { setChartTab } = guard;
@@ -862,6 +859,15 @@ function ChartPage({ id, module, config }) {
     else guard.request({ to: '/chart/' + id, client: id, onCancel: () => guard.go('/chart/' + guard.clientId, { client: guard.clientId }) });
   }, [id, client, guard.clientId]);
 
+  /* The client breadcrumb, pressed while on another tab of this chart. A ref,
+     because the handler needs the latest tab and the guard. */
+  const toHome = useRef(null);
+  useEffect(() => {
+    const f = () => toHome.current && toHome.current();
+    window.addEventListener('axiom-chart-home', f);
+    return () => window.removeEventListener('axiom-chart-home', f);
+  }, []);
+
   if (!client) return (
     <div className="page"><h1 className="page-title">Chart not found</h1>
       <p className="page-sub">No client matches <code>{id}</code>.</p>
@@ -875,6 +881,7 @@ function ChartPage({ id, module, config }) {
        the same guard, so unsaved work is intercepted. */
     guard.request({ client: id, onCommit: () => setTab(t) });
   };
+  toHome.current = () => switchTab(CHART_HOME_TAB);
 
   return (
     <div className="page">

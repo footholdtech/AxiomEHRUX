@@ -233,7 +233,7 @@ function TopNav({ onHamburger, navOpen, onPrefs }) {
         <GlobalSearch />
       </div>
       <div className="tn-right">
-        <a className="tn-link"><Icon name="bell" size={16} /> Notifications</a>
+        <NotifBell />
         <a className="tn-link"><Icon name="calendar" size={16} /> Calendar</a>
         <a className="tn-link"><Icon name="messages" size={16} /> Messages</a>
         <div className="menu-anchor" ref={menuRef}>
@@ -330,7 +330,7 @@ function AttributesOverlay({ client, selected, onClose, onSave }) {
     onSave([...sel].map(name => ({ name, icon: byName[name] || attrIcon(name) })));
   };
 
-  return (
+  return ReactDOM.createPortal(
     <React.Fragment>
       <div className="modal-scrim" onClick={onClose} />
       <div className="attrmodal" role="dialog" aria-modal="true" aria-labelledby="attrmodal-title">
@@ -406,8 +406,8 @@ function AttributesOverlay({ client, selected, onClose, onSave }) {
           <Button variant="primary" onClick={save}>Save Attributes</Button>
         </div>
       </div>
-    </React.Fragment>
-  );
+    </React.Fragment>,
+  document.body);
 }
 
 /* ---- Quick-view bodies -----------------------------------------
@@ -998,7 +998,18 @@ function ClientPageHeader({ client, preset, preview }) {
    the last is the current page and is deliberately not a link. */
 function Breadcrumbs({ items }) {
   const guard = useGuard();
-  const go = it => { if (it.to) guard.go(it.to, it.client !== undefined ? { client: it.client } : undefined); };
+  const path = usePath();
+  const go = it => {
+    if (!it.to) return;
+    const opts = it.client !== undefined ? { client: it.client } : {};
+    if (it.to !== path) return guard.go(it.to, opts);
+    /* Already here. A chart crumb means "this client's summary": on another
+       tab, go back to it; on the summary, reload it. Either way it runs
+       through the guard, so unsaved work is still intercepted. */
+    if (it.chartHome && guard.chartTab && guard.chartTab !== CHART_HOME_TAB)
+      return window.dispatchEvent(new Event('axiom-chart-home'));
+    guard.request({ to: it.to, ...opts, onCommit: requestPageReload });
+  };
   return (
     <nav className="breadcrumbs" aria-label="Breadcrumb">
       {items.map((it, i) => {
@@ -1008,8 +1019,7 @@ function Breadcrumbs({ items }) {
             {i > 0 && <span className="sep"><Icon name="chevronRight" size={13} /></span>}
             {last || !it.to
               ? <span className={last ? 'current' : ''} aria-current={last ? 'page' : undefined}>{it.label}</span>
-              : <a role="link" tabIndex={0} onClick={() => go(it)}
-                  onKeyDown={e => { if (e.key === 'Enter') go(it); }}>{it.label}</a>}
+              : <button type="button" className="crumb-link" onClick={() => go(it)}>{it.label}</button>}
           </React.Fragment>
         );
       })}
@@ -1035,7 +1045,7 @@ function ChartChrome() {
           sibling destination, not an ancestor of this chart. */}
       <Breadcrumbs items={[
         { label: 'Clients', to: '/clients' },
-        { label: c.name, to: '/chart/' + c.client_id, client: c.client_id },
+        { label: c.name, to: '/chart/' + c.client_id, client: c.client_id, chartHome: true },
         { label: guard.chartTab || CHART_HOME_TAB },
       ]} />
       <ClientPageHeader client={c} />
@@ -1165,6 +1175,7 @@ function LeftNav({ open, navRef }) {
    without the resync effect a second open would show whatever was drafted and
    abandoned the first time, not the app's actual current settings. */
 function PreferencesFlyout({ open, onClose }) {
+  const guardP = useGuard();
   const themeCtx = useTheme();
   const ui = useUIConfig();
   const draftOf = () => ({
@@ -1241,6 +1252,12 @@ function PreferencesFlyout({ open, onClose }) {
                 style={{ background: t.swatch }} onClick={() => patch({ theme: t.slug })} />
             ))}
           </div>
+
+          <div className="pref-label">Notifications</div>
+          <button className="lnk pref-link" onClick={() => { onClose(); guardP.go('/notifications/preferences'); }}>
+            Delivery preferences <Icon name="chevronRight" size={14} />
+          </button>
+          <div className="pref-note pref-note--tight">What reaches you in AxiomEHR, the mobile app, email and text.</div>
         </div>
         <footer className="foot">
           <Button variant="secondary" onClick={onClose}>Cancel</Button>
@@ -1253,6 +1270,7 @@ function PreferencesFlyout({ open, onClose }) {
 
 function AppShell({ children }) {
   const [navOpen, setNavOpen] = useState(false);
+  const reload = usePageReload();
   const [prefsOpen, setPrefsOpen] = useState(false);
   const navRef = useRef(null);
 
@@ -1276,7 +1294,12 @@ function AppShell({ children }) {
           they frame the page rather than sitting inside it. */}
       <ChartChrome />
       <div className="app-body">
-        <div className="main"><main className="content">{children}</main></div>
+        <div className="main">
+          <main className={'content' + (reload.busy ? ' is-reloading' : '')} aria-busy={reload.busy || undefined}>
+            {reload.busy && <div className="page-reload"><Spinner label="Refreshing…" /></div>}
+            <React.Fragment key={reload.key}>{children}</React.Fragment>
+          </main>
+        </div>
       </div>
       <LeftNav open={navOpen} navRef={navRef} />
       <PreferencesFlyout open={prefsOpen} onClose={() => setPrefsOpen(false)} />

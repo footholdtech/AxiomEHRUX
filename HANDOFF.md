@@ -402,6 +402,54 @@ Behaviour and bug fixes completed and verified in-browser:
 - **Note icon** is `clientNote` in `ICONS20` (00-core): filled outlines on the
   DS 20px grid. The earlier 24px stroke icon rendered soft at 20px.
 
+### Notifications, dialogs, breadcrumbs, loading (2026-10-10)
+
+- **Notification center** — see `NOTIFICATIONS-SPEC.md`. Three urgency groups
+  (Approvals & Tasks · Client Alerts · General & System), bell in the top bar
+  (`NotifBell`), right flyout (half viewport, full on tablet), and the
+  client-agnostic page `/notifications/:group` with filters, bulk actions,
+  "Waiting on others" and Delivery Preferences. Store and counting rules in
+  `17-notifications.jsx`; UI in `34-notifications.jsx`. The dashboard's
+  Pending Notifications panel is now `ApprovalsTasksModule`.
+- **Clinical read is deliberate.** Client Alerts (incl. care-team notes) are
+  never marked read by opening them or starting a follow-up, and the flyout has
+  no Mark as Read for them — only the page row (and the note's own thread).
+  General & System stays lenient. Care-team notes are one alert per note,
+  derived at runtime from the records store (`noteNotifs`), so read state is
+  shared with Client Notes.
+- **Important care-team notes count in the bell** until read (`notifCounted`).
+  The composer explains this in an info tooltip (`IMPORTANT_NOTE_TIP`,
+  `Tooltip wide`). Testing tooltips by `.focus()` fails silently when the
+  preview window itself isn't focused (`document.hasFocus()` false) — use hover.
+- **Notification rows are deliberately quiet** (Lisa, 2026-10-13): no
+  Urgent/status labels, time on the title line, sender/feed on the page only,
+  no icons in the chart, no all-caps headings, no red fills (errors only), and
+  Needs Attention is one ordered list without categories.
+- **Needs Attention on the Client Summary is the notification store's
+  in-chart view** (`ClientAttentionPanel`, `NotifRow variant="chart"`), plus
+  the summary's derived due dates, de-duplicated by instrument code / consent
+  name. Fixed in passing: derived assessments are now age-appropriate (no CANS
+  for adults, no ANSA for youth), and an expiring consent no longer also reads
+  as "not signed".
+- **Delivery Preferences is its own page** (`/notifications/preferences`,
+  `NotifPreferencesPage`), linked from the page header, the flyout gear and
+  the account Preferences flyout. Prefs key `axiom-notif-prefs-v2`.
+- **`.switch` must be `inline-block`.** Its root is a `<label>`; outside a flex
+  row (e.g. a table cell) it collapsed and the track rendered as a sliver.
+- **Loader flattens fixtures to arrays.** `RD.<table>` is the `records` array —
+  there is no `_meta` at runtime (hit once: `RD.notifCenter.records` crashed).
+- **Every dialog is portalled to `<body>`.** `.chart-chrome` is sticky with its
+  own stacking context (z 26), so a dialog rendered inside the client header
+  sat under the top bar (z 47) whatever its z-index.
+- **Avatar is an image** (`.avatar`, `role="img"`, hidden from assistive tech
+  because the name sits beside it). Link styles that target text spans must
+  exclude it (`span:not(.avatar)`).
+- **Breadcrumbs are buttons.** The client crumb goes to that client's summary;
+  pressed while already there it soft-reloads (`requestPageReload` /
+  `usePageReload`): local spinner, content dimmed not blocked, remount.
+- **Staggered entry** on the dashboard and Client Summary: 240ms fade + 6px
+  rise, 55ms apart. Opacity and a small offset only, per the trap below.
+
 ## 4. Outstanding — needs the artboards
 
 Lisa's list, in her words, with what is blocking each:
@@ -443,6 +491,7 @@ Also outstanding from the "next set" Lisa mentioned but has not sent yet.
 ```bash
 python3 tools/build-clinical-fixtures.py   # per-client diagnosis + problem tables
 python3 tools/build-header-fixtures.py     # header quick-view tables (run before build-refdata)
+python3 tools/build-notification-fixtures.py  # notification center (run before build-refdata)
 python3 tools/build-refdata.py             # fixtures -> assets/refdata.js
 python3 tools/build.py                     # -> index.html + AxiomEHR-Discharge-Plan.html
 python3 tools/serve.py                     # dev server, sends no-store

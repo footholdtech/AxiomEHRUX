@@ -54,6 +54,38 @@ function match(pattern, path) {
   return params;
 }
 
+/* ===== Soft page reload =====
+   Choosing the page you are already on (e.g. the client crumb while standing
+   on that client's summary) reloads it in place: a small local spinner, the
+   old content dimmed but not blocked, then the page remounts and its sections
+   fade in again one by one. The delay stands in for real fetch latency so the
+   prototype shows honest loading behaviour rather than instant swaps. */
+const PAGE_RELOAD_EVT = 'axiom-page-reload';
+const requestPageReload = () => window.dispatchEvent(new Event(PAGE_RELOAD_EVT));
+function usePageReload(ms = 650) {
+  const [st, setSt] = useState({ key: 0, busy: false });
+  useEffect(() => {
+    let t;
+    const f = () => {
+      setSt(x => ({ ...x, busy: true }));
+      window.scrollTo({ top: 0 });
+      clearTimeout(t);
+      t = setTimeout(() => setSt(x => ({ key: x.key + 1, busy: false })), ms);
+    };
+    window.addEventListener(PAGE_RELOAD_EVT, f);
+    return () => { window.removeEventListener(PAGE_RELOAD_EVT, f); clearTimeout(t); };
+  }, [ms]);
+  return st;
+}
+function Spinner({ size = 16, label }) {
+  return (
+    <span className="spinner-wrap" role="status">
+      <span className="spinner" style={{ width: size, height: size }} aria-hidden="true" />
+      {label && <span className="spinner-label">{label}</span>}
+    </span>
+  );
+}
+
 /* ===== Icons — Microsoft Fluent System Icons (window.FLUENT), with a small
    stroke-path fallback for glyphs the bundled set doesn't carry. ===== */
 const ICONS = {
@@ -154,14 +186,18 @@ const AV_FONT = { XS: 10, S: 11, M: 12, L: 16, XL: 22 };
 const hashStr = (s = '') => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; };
 const inits = (n = '') => n.replace(/[,"“”]/g, '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
 const avatarColor = (name) => AV_COLORS[hashStr(name) % AV_COLORS.length];
+/* An image, not text: it sits beside the person's name, so it is hidden from
+   assistive tech (the name already says who) and carries its own class so
+   link styles that target text spans can exclude it. As an inline-grid box it
+   is also an atomic inline, which a parent link's underline doesn't reach. */
 function Avatar({ name = '', size = 'S', color, stroke = true, style }) {
   const S = AV_SIZE[size] || 28, F = AV_FONT[size] || 12, c = color || avatarColor(name);
   return (
-    <span data-node-id="1308:4204" style={{
+    <span className="avatar" role="img" aria-hidden="true" data-node-id="1308:4204" style={{
       width: S, height: S, borderRadius: '9999px', flex: 'none', display: 'inline-grid', placeItems: 'center',
       overflow: 'hidden', userSelect: 'none', background: c.bg, color: '#36435c',
       border: stroke ? '1px solid ' + c.border : 'none', fontFamily: 'var(--font-sans)',
-      fontWeight: 600, fontSize: F, lineHeight: 1, ...style,
+      fontWeight: 600, fontSize: F, lineHeight: 1, textDecoration: 'none', cursor: 'inherit', ...style,
     }}>{inits(name)}</span>
   );
 }
@@ -174,18 +210,23 @@ function Toggle({ checked, onChange, id, disabled }) {
 /* Short label shown above its anchor on hover or keyboard focus. Never holds
    anything needed to finish a task — the anchor's own accessible name still
    says what it does; this is the sighted-mouse equivalent of that name. */
-function Tooltip({ label, children, placement = 'top' }) {
+/* `wide` wraps the label to a short paragraph, for the few tips that explain
+   behaviour rather than name a control. */
+function Tooltip({ label, children, placement = 'top', wide }) {
   const [show, setShow] = useState(false);
   if (!label) return children;
   return (
     <span className="tip-anchor" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}
       onFocus={() => setShow(true)} onBlur={() => setShow(false)}>
       {children}
-      {show && <span className={'tip tip--' + placement} role="tooltip">{label}</span>}
+      {show && <span className={'tip tip--' + placement + (wide ? ' tip--wide' : '')} role="tooltip">{label}</span>}
     </span>
   );
 }
 
+/* Portalled to <body> like every dialog here: the client header pins with its
+   own stacking context, so a dialog rendered inside it would sit under the top
+   bar no matter its z-index. */
 /* Proportionally sized dialog for working on one record without leaving the
    page — add an allergy, read an assessment's answers, refill a medication.
    sm 480 · md 720 · lg 1040. DS modal header (2086:547) + standard footer. */
@@ -197,7 +238,7 @@ function Overlay({ title, subtitle, size = 'md', onClose, footer, children, body
     window.addEventListener('keydown', k);
     return () => window.removeEventListener('keydown', k);
   }, [onClose]);
-  return (
+  return ReactDOM.createPortal(
     <React.Fragment>
       <div className="modal-scrim" onClick={onClose} />
       <div className={'ovl ovl--' + size} role="dialog" aria-modal="true" aria-labelledby={id}>
@@ -215,8 +256,8 @@ function Overlay({ title, subtitle, size = 'md', onClose, footer, children, body
         <div className={'ovl-body' + (bodyClassName ? ' ' + bodyClassName : '')}>{children}</div>
         {footer && <div className="intercept-foot">{footer}</div>}
       </div>
-    </React.Fragment>
-  );
+    </React.Fragment>,
+  document.body);
 }
 function Checkbox({ checked, onChange, indeterminate, disabled, label, ariaLabel }) {
   const ref = useRef(null);

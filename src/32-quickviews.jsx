@@ -944,6 +944,7 @@ function ClientNotesButton({ client, preview }) {
 const noteAgo = iso => { const d = Math.round((TODAY - _parse(iso)) / 86400000); return d <= 0 ? 'Today' : d === 1 ? 'Yesterday' : fmtDate(iso); };
 const noteTime = iso => { const [h, m] = iso.slice(11, 16).split(':').map(Number); return ((h + 11) % 12 + 1) + ':' + String(m).padStart(2, '0') + (h < 12 ? ' AM' : ' PM'); };
 const staffRole = id => (STAFF[id] ? roleName(STAFF[id].role_id) : '');
+const IMPORTANT_NOTE_TIP = 'Important notes add to the notification count of everyone on this client’s care team until each person reads them. Use it for something the team needs to know today — a missed dose, a safety concern, a change in plan. For an emergency, call as well.';
 const NotesTitle = ({ children }) => <React.Fragment>{children} <span className="cn-internal">(Internal)</span></React.Fragment>;
 
 function ClientNotesThread({ client, preview, className }) {
@@ -1008,7 +1009,8 @@ function ClientNotesThread({ client, preview, className }) {
                   ) : (
                     <div className="cn-bubble-row">
                       <div className="cn-bubble">
-                        {n.important && <span className="cph-qv-tag is-warn cn-imp"><Icon name="warn" size={11} /> Important</span>}
+                        {/* Same tag as Needs Attention and Notifications: text only. */}
+                        {n.important && <span className="cn-imp"><NTag tone="warn">Important</NTag></span>}
                         {n.subject && <b className="cn-subj">{n.subject}</b>}
                         <p>{n.body}</p>
                       </div>
@@ -1043,7 +1045,14 @@ function ClientNotesThread({ client, preview, className }) {
             onChange={e => setDraft(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); post(); } }} />
           <div className="cn-compose-foot">
-            <Checkbox checked={important} disabled={preview} onChange={setImportant} label="Mark as important" />
+            <span className="cn-imp-opt">
+              <Checkbox checked={important} disabled={preview} onChange={setImportant} label="Mark as important" />
+              {/* Important has a cost — it adds to every care-team member's
+                  notification count — so say so where the choice is made. */}
+              <Tooltip wide label={IMPORTANT_NOTE_TIP}>
+                <button type="button" className="icon-btn cn-imp-info" aria-label={'About important notes: ' + IMPORTANT_NOTE_TIP}><Icon name="info" size={15} /></button>
+              </Tooltip>
+            </span>
             <span className="ovl-hint">Visible to everyone on this client’s care team</span>
             <span className="spacer" />
             <Button size="sm" variant="primary" disabled={preview || !draft.trim()} onClick={post}>Post Note</Button>
@@ -1072,11 +1081,10 @@ function ClientNotesOverlay({ client, preview, onClose }) {
 
 /* Client Summary widget — the same thread, inline. */
 function ClientNotesPanel({ client }) {
-  useRecordsVersion();
-  const unread = getNotes(client).filter(n => !n.read).length;
+  /* No count and no Mark All as Read up here: the thread scrolls, so "all"
+     would include notes nobody has looked at. Read them one by one. */
   return (
-    <Panel title={<React.Fragment><NotesTitle>Client Notes</NotesTitle>{unread ? <span className="cn-unread-count"> · {unread} unread</span> : null}</React.Fragment>}
-      action={unread ? <button className="lnk" onClick={() => markAllNotesRead(client)}>Mark All as Read</button> : null}>
+    <Panel title={<NotesTitle>Client Notes</NotesTitle>}>
       <ClientNotesThread client={client} className="cn-wrap--panel" />
     </Panel>
   );

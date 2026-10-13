@@ -476,7 +476,7 @@ const PREVIEW_CLIENT = {
 
 function HeaderPreviewModal({ preset, onClose }) {
   useEffect(() => { const k = e => { if (e.key === 'Escape') onClose(); }; window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k); }, [onClose]);
-  return (
+  return ReactDOM.createPortal(
     <React.Fragment>
       <div className="modal-scrim" onClick={onClose} />
       <div className="chc-previewmodal" role="dialog" aria-modal="true" aria-label={'Preview — ' + preset.name}>
@@ -502,8 +502,8 @@ function HeaderPreviewModal({ preset, onClose }) {
           </div>
         </div>
       </div>
-    </React.Fragment>
-  );
+    </React.Fragment>,
+  document.body);
 }
 
 /* ---- Client header editor ------------------------------------------

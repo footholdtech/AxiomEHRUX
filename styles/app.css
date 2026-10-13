@@ -413,7 +413,9 @@ input { font-family: inherit; }
 .section-label { font-family: var(--font-display); font-size: 20px; color: var(--foreground-primary); }
 
 /* ================= Toggle switch ================= */
-.switch { position: relative; width: 36px; height: 20px; flex: none; }
+/* inline-block: the root is a <label>, which is inline and ignores its own
+   width/height outside a flex row — in a table cell it collapsed to nothing. */
+.switch { position: relative; display: inline-block; vertical-align: middle; width: 36px; height: 20px; flex: none; }
 .switch input { opacity: 0; width: 0; height: 0; }
 .switch .track { position: absolute; inset: 0; border-radius: var(--radius-full); background: var(--background-input-control-interactive-secondary-default, #8095a2); transition: background var(--dur) var(--ease); cursor: pointer; }
 .switch .track::before { content: ''; position: absolute; width: 16px; height: 16px; border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: transform var(--dur) var(--ease); box-shadow: var(--shadow-sm); }
