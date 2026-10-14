@@ -36,6 +36,7 @@ FILES = {
     "assessmentAdmins": "assessment_administrations.json",
     "clientNotes": "client_notes.json",
     "notifCenter": "notification_center.json",
+    "servicePlans": "service_plans.json",
 }
 
 data = {}

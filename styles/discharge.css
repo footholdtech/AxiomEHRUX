@@ -774,10 +774,13 @@
  */
 .tabstrip { position: relative; min-width: 0; }
 /* Measured, never painted. Off-flow so it cannot affect layout, and its width
-   must be unconstrained or the measurements would be of a squeezed row. */
+   must be unconstrained or the measurements would be of a squeezed row.
+   Parked off-screen to the LEFT: positioned at left:0 its full-width row
+   stuck out past the right edge and widened the page — on a phone that's a
+   sideways-scrolling, zoomed-out layout. Negative overflow never scrolls. */
 .tabstrip-mirror {
-  position: absolute; visibility: hidden; pointer-events: none;
-  top: 0; left: 0; width: max-content; border-bottom: none;
+  position: fixed; visibility: hidden; pointer-events: none;
+  top: 0; left: -10000px; width: max-content; border-bottom: none;
 }
 .tabstrip-row { min-width: 0; }
 .tabstrip-more-wrap { position: relative; display: flex; align-items: flex-end; }
@@ -1396,7 +1399,8 @@
  * them. The mirror measures every pill at its widest (selected) weight.
  */
 .cph-pager { position: relative; display: flex; align-items: center; gap: var(--sp-xs); flex: 1 0 0; min-width: 0; }
-.cph-pager-mirror { position: absolute; left: 0; top: 0; visibility: hidden; pointer-events: none; flex-wrap: nowrap; width: max-content; }
+/* Off-screen left for the same reason as .tabstrip-mirror. */
+.cph-pager-mirror { position: fixed; left: -10000px; top: 0; visibility: hidden; pointer-events: none; flex-wrap: nowrap; width: max-content; }
 /* flex: none — otherwise the nowrap mirror squeezes its pills to fit and the
    measured widths come out too small to ever trigger paging. */
 .cph-pager-mirror .cph-pill { font-weight: 600; flex: none; }
@@ -1451,8 +1455,11 @@
 .cn-msg.is-mine .cn-bubble { border-radius: var(--radius-md); border-top-right-radius: var(--radius-xs);
   background: var(--background-interactive-tertiary-selected); border-color: transparent; }
 .cn-bubble p { margin: 0; font-size: 13.5px; line-height: 1.5; white-space: pre-wrap; }
-.cn-subj { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 2px; }
-.cn-imp { display: block; margin-bottom: 4px; }
+.cn-bubble-top { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3xs) var(--sp-2xs); margin-bottom: 4px; }
+.cn-subj { font-size: 13.5px; font-weight: 600; margin-right: 2px; }
+.cn-compose-fields { display: grid; grid-template-columns: minmax(0, 200px) minmax(0, 1fr); gap: var(--sp-md); }
+.cn-compose .ff, .cn-add-body .ff { margin-bottom: 0; }
+.cn-add-body .cn-input { min-height: 110px; }
 /* Aligned with the bubble, not the name line. */
 .cn-msg-acts { display: flex; justify-content: flex-end; padding-top: 22px; }
 .cn-unread-btn { opacity: 0; transition: opacity var(--dur) var(--ease); }
@@ -1591,7 +1598,8 @@
   animation: nfly-in var(--dur) var(--ease);
 }
 @keyframes nfly-in { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
-@media (max-width: 1024px) { .nfly { width: 100vw; } }
+/* 100%, not 100vw: vw includes a classic scrollbar and some emulated viewports. */
+@media (max-width: 1024px) { .nfly { width: 100%; left: 0; } }
 @media (prefers-reduced-motion: reduce) { .nfly { animation: none; } }
 .nfly-head { display: flex; align-items: center; gap: var(--sp-2xs); padding: var(--sp-lg) var(--sp-xl) var(--sp-sm); flex: none; }
 .nfly-head h2 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 20px; color: var(--foreground-primary); }
@@ -1703,3 +1711,109 @@
 .nlocked { display: inline-flex; align-items: center; gap: var(--sp-2xs); color: var(--foreground-secondary); }
 .ncov-grid { margin-top: var(--sp-md); max-width: 640px; }
 .nprefs-foot { display: flex; justify-content: flex-end; gap: var(--sp-xs); margin-top: var(--sp-lg); }
+
+/* ================= Responsive: top navigation =================
+ * DS sizing: desktop > 1184 · tablet 850–1184 · mobile < 850, height 48–52.
+ * Tablet folds the utilities into More (which carries the notification
+ * badge); mobile also hides the agency name and wordmark and turns search
+ * into an icon that opens a full-width sheet under the bar.
+ */
+.tn-utils { display: flex; align-items: center; gap: var(--sp-md); }
+.tn-utils.is-folded { display: none; }
+.tn-more { position: relative; }
+.ncount--more { top: -4px; left: auto; right: -6px; }
+.tn-more .ndot--bell { top: 2px; right: 2px; }
+.topnav .tn-icon-btn.active { background: color-mix(in srgb, var(--theme-fg-interactive) 26%, transparent); }
+.topnav .menu-item .ncount { flex: none; }
+.topnav--mobile { gap: var(--sp-xs); padding: 0 var(--sp-sm); }
+.topnav--mobile .tn-right { gap: var(--sp-2xs); }
+.tn-search-sheet { position: absolute; top: 100%; left: 0; right: 0; z-index: 2;
+  padding: var(--sp-xs) var(--sp-sm) var(--sp-sm); background: var(--background-interactive-primary-default);
+  box-shadow: var(--shadow-md); animation: fade-in var(--dur) var(--ease); }
+.tn-search-sheet .gsearch { max-width: none; min-width: 0; width: 100%; }
+
+/* ================= Responsive: client header on phones (< 540) =================
+ * Same component, denser, so it doesn't eat half the screen even collapsed:
+ * M avatar (the size used across notes and the top bar), a smaller display
+ * name, 32px round buttons, Chat With Chart pinned top-right, the
+ * expand/collapse toggle on the DOB line with a short label, and one line of
+ * quick-view pills with their arrows. The class is set from useMedia(BP.compact).
+ */
+.cph { position: relative; }
+.cph--compact .cph-top { padding: var(--sp-md) var(--sp-md) var(--sp-sm); gap: var(--sp-sm); }
+.cph--compact .cph-identity { gap: var(--sp-xs); }
+.cph--compact .cph-demo { gap: 2px; }
+/* Leaves room for the pinned Chat With Chart button on the name line only. */
+.cph--compact .cph-nameline { gap: var(--sp-xs); padding-right: 136px; }
+.cph--compact .cph-name { font-size: 17px; line-height: 24px; }
+.cph--compact .cph-pronouns, .cph--compact .cph-dob { font-size: 13px; line-height: 18px; }
+.cph--compact .cph-dob { width: 100%; }
+.cph--compact .cph-dob .cph-toggle { padding: 0 var(--sp-2xs); min-width: 0; font-size: 13px; line-height: 18px; }
+.cph-chat--compact { position: absolute; top: var(--sp-md); right: var(--sp-md); z-index: 1;
+  min-width: 0; padding: 4px 10px; gap: 4px; font-size: 12px; line-height: 16px; }
+.cph--compact .cph-nav { gap: var(--sp-xs); }
+.cph--compact .cph-actions { justify-content: flex-start; flex-wrap: nowrap; gap: var(--sp-2xs); }
+/* 32px visual — still a comfortable target (WCAG 2.5.8 asks 24) — down from 34. */
+.cph--compact .cph-icon-btn { width: 32px; height: 32px; padding: 0; }
+.cph--compact .cph-icon-btn svg { width: 18px; height: 18px; }
+.cph--compact .cph-divider { height: 24px; }
+.cph--compact .cph-pager-rows { flex-wrap: nowrap; overflow: hidden; }
+.cph--compact .cph-pill { font-size: 13px; line-height: 18px; padding: 2px var(--sp-sm); }
+.cph--compact .cph-pager-arrows { width: auto; }
+.cph--compact .cph-pager-count { display: none; }
+.cph--compact .cph-detail-inner { padding: 0 var(--sp-md) var(--sp-sm); gap: var(--sp-md); }
+/* Clinical Info: one line that scrolls sideways instead of four that wrap. */
+.cph--compact .cph-clinical { padding: var(--sp-2xs) var(--sp-md); gap: var(--sp-xs); }
+.cph--compact .cph-clinical-items { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+.cph--compact .cph-clinical-items::-webkit-scrollbar { display: none; }
+.cph--compact .cph-pronouns { display: flex; align-items: center; gap: var(--sp-xs); }
+@media (max-width: 540px) {
+  .chart-chrome .breadcrumbs { padding: var(--sp-sm) var(--sp-md); }
+  /* Page body: tighter gutters so cards get the width. */
+  .content { padding: var(--sp-md); }
+  .acc-body { padding: var(--sp-md); }
+  /* Notification and Needs Attention rows: the action column drops under the
+     text instead of squeezing it into a narrow column. */
+  .nrow, .nrow--chart { grid-template-columns: 10px minmax(0, 1fr); }
+  .nrow:not(.nrow--chart) .nrow-lead { display: none; }
+  .nrow--page { grid-template-columns: auto 10px minmax(0, 1fr); }
+  .nrow-acts { grid-column: 2 / -1; flex-direction: row; align-items: center; justify-content: flex-start; flex-wrap: wrap; min-width: 0; gap: var(--sp-xs); }
+  .nrow--page .nrow-acts { grid-column: 3 / -1; }
+}
+
+/* ================= Service Plans quick view ================= */
+/* Wider cards than the other quick views; the View Plan button moves to the
+ * right of the summary when the card has room, and under it when not. */
+.sp-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr)); gap: var(--sp-sm); }
+.sp-card { flex-direction: row; flex-wrap: wrap; align-items: center; gap: var(--sp-xs) var(--sp-lg); }
+.sp-card-main { flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.sp-card-act { flex: none; margin-left: auto; }
+.sp-card-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-xs); }
+.sp-card-title { font-weight: 600; font-size: 14px; color: var(--foreground-primary); }
+.sp-prog .tip-anchor { display: block; }
+.sp-bar:focus-visible { outline: 2px solid var(--background-interactive-primary-default); outline-offset: 3px; }
+.sp-prog .tip { white-space: nowrap; }
+.sp-prog { display: flex; flex-direction: column; gap: 4px; margin: 2px 0; }
+.sp-prog-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-xs); font-size: 12.5px; color: var(--foreground-secondary); }
+.sp-prog-head b { color: var(--foreground-primary); font-weight: 600; }
+/* Fill = goal progress; the thin marker = today within the plan period. */
+.sp-bar { position: relative; height: 8px; border-radius: var(--radius-full); background: var(--background-surface-secondary); border: 1px solid var(--divider-primary); }
+.sp-bar-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: var(--radius-full); background: var(--background-interactive-primary-default); }
+.sp-bar-now { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--foreground-primary); }
+.sp-prog-dates { display: flex; justify-content: space-between; gap: var(--sp-xs); font-size: 11.5px; color: var(--foreground-secondary); }
+.sp-prog--lg .sp-bar { height: 10px; }
+.sp-prog--lg { margin: var(--sp-xs) 0 var(--sp-md); }
+/* Read-only, built to be selected and copied: real text, headings and lists. */
+.sp-doc { user-select: text; display: flex; flex-direction: column; gap: var(--sp-xs); }
+.sp-sec { padding-top: var(--sp-md); border-top: 1px solid var(--divider-primary); }
+.sp-sec h3 { display: flex; align-items: center; gap: var(--sp-xs); margin: 0 0 var(--sp-sm); font-size: 14px; font-weight: 600; color: var(--foreground-primary); }
+.sp-sec h3 span { font-weight: 400; color: var(--foreground-secondary); }
+.sp-dl { margin: 0; display: grid; grid-template-columns: minmax(180px, 34%) 1fr; gap: 6px var(--sp-md); }
+.sp-row { display: contents; }
+.sp-row dt { font-size: 13px; color: var(--foreground-secondary); }
+.sp-row dd { margin: 0; font-size: 13.5px; line-height: 1.45; color: var(--foreground-primary); }
+.sp-goal { padding: var(--sp-sm) var(--sp-md); border-radius: var(--radius-md); background: var(--background-surface-secondary); }
+.sp-goal + .sp-goal { margin-top: var(--sp-sm); }
+.sp-goal-head { display: flex; align-items: center; gap: var(--sp-xs); margin-bottom: var(--sp-xs); font-size: 13.5px; color: var(--foreground-primary); }
+.sp-ints { margin-top: var(--sp-sm); background: var(--background-surface-primary); }
+@media (max-width: 540px) { .sp-dl { grid-template-columns: 1fr; gap: 2px; } .sp-row dd { margin-bottom: var(--sp-xs); } }

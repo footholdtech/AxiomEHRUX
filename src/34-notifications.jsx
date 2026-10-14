@@ -25,6 +25,12 @@ const notifType = n => { const t = n.source.split('›').pop().trim(); return t 
 function NotifBell() {
   useNotifVersion();
   const [open, setOpen] = useState(false);
+  /* The top bar's More menu (tablet and mobile) opens the same flyout. */
+  useEffect(() => {
+    const f = () => setOpen(true);
+    window.addEventListener('axiom-open-notifs', f);
+    return () => window.removeEventListener('axiom-open-notifs', f);
+  }, []);
   const count = notifBellCount();
   const quiet = !count && notifBellQuiet();
   const label = 'Notifications' + (count ? ', ' + count + ' need you' : quiet ? ', new updates' : '');
@@ -136,7 +142,7 @@ function NotifGroupView({ cat, variant, onNavigate, filter, sel, setSel }) {
   );
   if (cat === 'alert') {
     const urgent = items.filter(n => n.urgent);
-    const notes = items.filter(n => n.kind === 'client-note').sort((a, b) => (b.important - a.important) || (new Date(b.created) - new Date(a.created)));
+    const notes = items.filter(n => n.kind === 'client-note').sort((a, b) => (importanceRank(b.importance) - importanceRank(a.importance)) || (new Date(b.created) - new Date(a.created)));
     const rest = items.filter(n => !n.urgent && n.kind !== 'client-note');
     const sec = (title, list) => !!list.length && <section className="nsec"><h3 className="nsec-title">{title} <span>{list.length}</span></h3>{list.map(row)}</section>;
     return (
@@ -144,8 +150,8 @@ function NotifGroupView({ cat, variant, onNavigate, filter, sel, setSel }) {
         {head}
         {sec('Urgent — follow-up required', urgent)}
         {sec('Due, expiring and updates', rest)}
-        {/* One row per note, Important first — never rolled up, so nothing a
-            colleague flagged hides behind a count. */}
+        {/* One row per notified note, highest priority first — never rolled
+            up, so nothing a colleague sent hides behind a count. */}
         {sec('Care-team notes', notes)}
       </React.Fragment>
     );
@@ -232,7 +238,7 @@ function NotifRow({ n, variant, onNavigate, selectable, selected, onSelect }) {
           const tags = [
             win && <NTag key="w" tone={win.tone}>{win.label}</NTag>,
             due && <NTag key="d" tone={due.tone}>{due.label}</NTag>,
-            n.important && <NTag key="i" tone="warn">Important</NTag>,
+            n.kind === 'client-note' && <NTag key="i" tone={importanceTone(n.importance)}>{n.importance} priority</NTag>,
             n.delegated_from && <NTag key="c" tone="info">Covering for {sName(n.delegated_from)}</NTag>,
             n.kind === 'report' && <NTag key="r" tone={n.status === 'Error' ? 'danger' : 'good'}>{n.status}</NTag>,
             variant === 'page' && <span key="s" className="nrow-src">{[n.from_staff_id ? sName(n.from_staff_id) : n.feed, notifType(n)].filter(Boolean).join(' · ')}</span>,
@@ -738,9 +744,10 @@ function ClientAttentionPanel({ client, derived }) {
      Order carries the urgency: urgent alerts (least time left first), then
      unread Important notes, then tasks, then due and expiring work. */
   const all = notifList('alert').concat(notifList('task')).filter(n => n.client_id === cid
-    && (n.kind !== 'client-note' || (n.important && !n.read)));
+    && (n.kind !== 'client-note' || !n.read));
   const rank = n => (n.urgent ? 0 : n.kind === 'client-note' ? 1 : n.category === 'task' ? 2 : 3);
-  const items = all.slice().sort((x, y) => rank(x) - rank(y) || notifSort(x, y));
+  const items = all.slice().sort((x, y) => rank(x) - rank(y)
+    || (rank(x) === 1 ? importanceRank(y.importance) - importanceRank(x.importance) : 0) || notifSort(x, y));
   const norm = t => String(t || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
   const said = items.filter(n => rank(n) === 3).map(n => norm(n.title));
   const extra = (derived || []).filter(d => !said.some(t => t.indexOf(norm(d.code || d.label)) !== -1))

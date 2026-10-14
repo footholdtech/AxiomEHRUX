@@ -50,6 +50,25 @@ Rendered on every client-specific page, full width, directly under the breadcrum
 
 ---
 
+### 2b. On phones (viewport < 540px)
+
+The same component, made denser so it doesn't take half the screen even when collapsed (collapsed: ~160px, down from ~400px):
+
+- **Avatar:** size **M** (28px), the size used for avatars in notes and the top bar. Desktop and tablet use L (44px).
+- **Client name:** still the display face, at 17/24 instead of 20/32. The demographic lines drop to 13/18.
+- **Status pill:** moves onto the pronouns line, so a long name never pushes it onto a line of its own.
+- **Chat With Chart:** a smaller button (12px label, 16px icon), pinned to the header's top-right corner and taken out of the action row.
+- **Round action buttons:** 32px (18px icons), down from 34px. Still well above the 24px minimum target size (WCAG 2.5.8), and they fit on one line.
+- **Expand / collapse toggle:** sits on the DOB line and reads **Expand** / **Collapse**, so a collapsed header has no extra row for it. Its accessible name keeps "details".
+- **Quick-view pills:** one row with the previous/next arrows on the same line. The "1 of N" count is hidden.
+- **Clinical Info:** one line that scrolls sideways, instead of wrapping to four lines.
+
+The top bar follows the DS sizing spec:
+
+- **Desktop (above 1184px):** the full bar.
+- **Tablet (850–1184px):** Notifications, Calendar and Messages fold into a **More (…)** menu, which carries the notification badge.
+- **Mobile (below 850px):** the agency name and wordmark hide too, and search becomes an icon that opens a full-width search sheet under the bar.
+
 ## 3. Quick-view catalogue
 
 Twelve sections an admin can place in the header. Each has its own options. Option kinds: **bool** (checkbox), **choice** (one of a list), **fields** (any number of a list).
@@ -60,6 +79,7 @@ Twelve sections an admin can place in the header. Each has its own options. Opti
 | **Enrollment** | Program, modality, site, enrolled date + days, status | Include closed enrollments (off) · Show payor and authorisation (on) |
 | **Allergies** | Allergen, category, reaction, severity, status · **+ Add Allergy** | Active allergies only (on) |
 | **Medications** | Current / Expired / Discontinued / All filters; schedule badge on controlled substances; refills left; pharmacy · bulk **Refill** and **Discontinue** · **+ Add Medication** (§3a) | Opens on (Current) · Show pharmacy (on) |
+| **Service Plans** | Active plans with status, last edit, and goal progress against the plan's own start and review dates (dates on hover) · View Plan opens the full plan in place (§3b) | Opens on (Active / All) |
 | **Vitals** | Latest BP, pulse, temp, resp, O₂, weight, BMI, pain + earlier readings · **+ Record Vitals** | Readings to list: 3/5 (3) |
 | **Immunizations** | Vaccine, dose, date, status (administered / historical / declined), lot · **+ Add Immunization** | Include declined (on) |
 | **Injections** | Per injectable: dose, interval, site, last given, next due (overdue flagged) · **+ Record Injection** | Doses to list: 3/5 (3) |
@@ -87,12 +107,38 @@ The old combined **Medical** view is replaced by Allergies, Medications and Vita
 - **Add Medication overlay** (field set from production's form): medication search (name, strength, class, controlled level), provider, sending site, provider's DEA number, form–strength, number, interval, as needed / with food, pharmacy, target symptom, duration, quantity, refills, directions (auto-composed, 1,000 characters), notes to pharmacist, substitutions, sensitivity classification, Dx codes, CPOE, Spanish directions, manual print.
 - **Safeguards demonstrated:** controlled schedule shown everywhere; C-II — no refills, 30-day maximum; C-III–V — up to 5 refills; DEA number required for controlled; allergy cross-check that must be acknowledged; 42 CFR Part 2 sensitivity defaulted for substance-use medications. Not a complete prescribing model.
 
+### 3b. Service Plans quick view
+
+**The golden thread:** documentation should trace back to the client's plan, so active plans sit one click from any note being written. Every plan the agency uses shows here. Where a plan template came from (Axiom or agency-built) isn't shown; users don't need it.
+
+- **Card per plan**, wider than other quick-view cards:
+  - **Header:** the plan name as plain text, not a link, so it doesn't suggest leaving the page, with the client header's own status badge (Active in green) top-right of the title.
+  - **One meta line:** "Last edited {date} by {name} · N objectives, M met".
+  - **Goal-progress bar:** the fill is average objective progress, and a thin marker shows *today* within the plan period. The **start / today / review dates appear only on hover or keyboard focus** of the bar. The verdict reads *On track* unless goal progress trails the elapsed plan time by more than 10 points, in which case it reads *Behind schedule* (warning tone). Completed plans read *Completed*.
+  - **View Plan** sits to the right of the summary when the card has room, and below it when not.
+- **Filters and links:** Active / All. **View all** goes to the Service Plan module. There's no "+ Add": a plan is a long, signed, multi-step form, so it's started from the module.
+- **View Plan dialog (large):** the plan as real, selectable text. No "read-only" label: the dialog simply has no fields to edit. It follows production's three steps:
+  - **Facts and progress:** status badge, objectives (N · M met), plan → review dates, last edited, and the progress bar with its dates.
+  - **Service Plan:** individuals at the meeting, family / natural supports, recommended services, transition plan, SMI determination.
+  - **Goals and Objectives:** per goal, the identified need, domain of wellness, specific objective, and baseline / current / target measures, with an interventions table. Each goal has a **copy** button, for pasting a goal into a note.
+  - **Agreements:** agreement, copy offered in preferred language, and the signatures table.
+  - **Footer:** Close and **Edit Service Plan**, which leaves the page for the module. There's no copy-the-whole-plan action; nobody needs it.
+
 ### 2a. Client Notes
 
-Notes care-team staff leave each other about a client. Always shown in the header regardless of configuration; the admin page lists it as a locked, pre-checked item. The overlay title carries a small **(Internal)** label; there is no subtitle. The thread reads as a conversation: oldest at the top, day dividers, each note with its author's avatar, name and role; the signed-in user's own notes sit on the right. Unread notes are marked the way a phone's message list does it: a red dot (the header badge's colour) in a left-hand gutter beside the avatar. The gutter is on every row, empty once read, so avatars stay aligned and the dot is the only difference. **Mark as Read** (tertiary button) sits in a fixed right-hand column, aligned with the note, so it is in the same place on every row; read notes offer **Mark as Unread** there on hover/focus. **Mark All as Read** is in the footer. A composer under the thread (the user's avatar, a text box, **Mark as important**, **Post Note**, ⌘/Ctrl+Enter) adds a note visible to the whole care team. Next to **Mark as important**, an info icon opens a tooltip explaining the cost: an Important note adds to the notification count of everyone on the client's care team until each person reads it (see NOTIFICATIONS-SPEC.md). It suggests using Important for something the team needs to know today, and calling as well in an emergency.
+Notes care-team staff leave each other about a client. Always shown in the header regardless of configuration; the admin page lists it as a locked, pre-checked item. The overlay title carries a small **(Internal)** label; there is no subtitle. The thread reads as a conversation: oldest at the top, day dividers, each note with its author's avatar, name and role; the signed-in user's own notes sit on the right. Unread notes are marked the way a phone's message list does it: a red dot (the header badge's colour) in a left-hand gutter beside the avatar. The gutter is on every row, empty once read, so avatars stay aligned and the dot is the only difference. **Mark as Read** (tertiary button) sits in a fixed right-hand column, aligned with the note, so it is in the same place on every row; read notes offer **Mark as Unread** there on hover/focus. **Mark All as Read** is in the footer. A composer under the thread collects **the same fields production does**, so the backend doesn't change:
+
+- **Importance** (required): Low, Medium, High, Critical, in that order. Defaults to **Low**.
+- **Topic** (required): pick one from the agency's topic table. The prototype uses a generic, de-duplicated list. Production's table has duplicates, and its source is still to be confirmed.
+- **Note** (required): free text. ⌘/Ctrl+Enter posts.
+- **Display in Client Header:** checked and disabled. Every note shows in the header; the box is kept for now to account for production's "Show in Patient Header" field, and should be removed later.
+- **Notify Care Team:** unchecked by default. When checked, the note goes to the notification center of everyone on the client's care team and counts there until each person marks it read (a read receipt). When unchecked, the note just lives on the client's chart. An info tooltip explains the cost, so it isn't overused.
+
+Each bubble shows the **topic** in bold, a **priority** tag (High and Critical in the warning tone) and, when it was sent to the team, a **Care team notified** tag. These replace the old free-text subject and *Important* flag.
 
 - **Deleting:** authors can delete their own notes only (trash icon beside the bubble on hover/focus, then an inline confirm). The note is replaced by a small **Message deleted** placeholder in the disabled colours, so the conversation around it still makes sense.
-- **Client Summary widget:** the same thread and composer appear as a **Client Notes (Internal)** panel on the Client Summary page. It has a plain title, with no unread count and no **Mark All as Read**: the thread scrolls, so "all" could include notes nobody has looked at. The *Important* tag is text only, matching Needs Attention and Notifications. Read state, new notes and deletions are shared with the header overlay and its badge.
+- **Client Summary widget:** a **Client Notes (Internal)** panel showing the thread only, a summary like the page's other widgets. It has no open composer, no count, and no Mark All as Read: the thread scrolls, so "all" could include notes nobody has looked at. A secondary **Add Internal Note** button in the widget header opens a dialog with the same fields (Importance, Topic, Note, Display in Client Header, Notify Care Team) and Cancel / Post Note. The header's Client Notes dialog keeps its inline composer, since it's a conversation.
+- **Read receipts only for notes sent to the team.** The unread dot, Mark as Read / Unread and the header badge apply only to notes posted with **Notify Care Team**, the same notes the bell counts. A plain note lives on the chart without asking anyone to mark it read, which gives staff room to protect each other's time and lets agencies set it as internal policy.
 
 **Colour restraint in the detail row:** tags are neutral grey. Only things that need chasing take a warning tone — an overdue instrument, a no-show, a high-severity allergy, a support contact with no release.
 

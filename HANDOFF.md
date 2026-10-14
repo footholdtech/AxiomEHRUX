@@ -417,32 +417,45 @@ Behaviour and bug fixes completed and verified in-browser:
   General & System stays lenient. Care-team notes are one alert per note,
   derived at runtime from the records store (`noteNotifs`), so read state is
   shared with Client Notes.
-- **Important care-team notes count in the bell** until read (`notifCounted`).
-  The composer explains this in an info tooltip (`IMPORTANT_NOTE_TIP`,
-  `Tooltip wide`). Testing tooltips by `.focus()` fails silently when the
-  preview window itself isn't focused (`document.hasFocus()` false) — use hover.
-- **Notes open from notifications** (`36-notes.jsx`). "Start Note" is a combo
-  dropdown (`StartNoteButton`) — no note starts until a type is chosen. The
-  link back to the notification is `NOTE_CTX` (set in `onCommit`, so a
-  cancelled client switch leaves nothing). Review items (co-sign, sign,
-  approve, lab) open the document in review mode; signing/deciding resolves
-  the notification and raw-navigates back to the summary after
-  `clearDirty()`. New note types are in `CLIENT_MODULE_NAMES` and the nav.
-- **Notification rows are deliberately quiet** (Lisa, 2026-10-13): no
-  Urgent/status labels, time on the title line, sender/feed on the page only,
-  no icons in the chart, no all-caps headings, no red fills (errors only), and
-  Needs Attention is one ordered list without categories.
-- **Needs Attention on the Client Summary is the notification store's
-  in-chart view** (`ClientAttentionPanel`, `NotifRow variant="chart"`), plus
-  the summary's derived due dates, de-duplicated by instrument code / consent
-  name. Fixed in passing: derived assessments are now age-appropriate (no CANS
-  for adults, no ANSA for youth), and an expiring consent no longer also reads
-  as "not signed".
+- **Client notes use production's fields** (2026-10-14): `topic` and `importance`
+  (Low→Critical, default Low) required, `show_in_header` (always true; shown
+  as a disabled checkbox), and `notify_team` (default off). Only `notify_team`
+  notes reach the notification center and count until read (`noteNotifs`,
+  `notifCounted`); the composer explains this in `NOTIFY_TEAM_TIP`. The old
+  free-text `subject` and `important` flag are gone. `NOTE_TOPICS` is a generic
+  stand-in — production's topic table has duplicates and customer facility
+  names, so it wasn't copied. Testing tooltips by `.focus()` fails silently
+  when the preview window isn't focused — use hover.
+- **Read receipts only for notified notes** (`noteNeedsRead` in 16-records):
+  thread dots, Mark as Read and the header badge ignore plain notes. The
+  Client Summary notes widget is thread-only (`composer={false}`) and adds
+  notes through `AddInternalNoteOverlay`; both share `useNoteDraft` /
+  `NoteFields`.
 - **Delivery Preferences is its own page** (`/notifications/preferences`,
   `NotifPreferencesPage`), linked from the page header, the flyout gear and
   the account Preferences flyout. Prefs key `axiom-notif-prefs-v2`.
 - **`.switch` must be `inline-block`.** Its root is a `<label>`; outside a flex
   row (e.g. a table cell) it collapsed and the track rendered as a sliver.
+- **Service Plans quick view** (`33-serviceplans.jsx`, data in
+  `service_plans.json` from build-header-fixtures.py). Progress = mean
+  objective progress vs. elapsed plan period (`planProgress`); "Behind" past a
+  10-point gap. The dialog shows the plan as text, a per-goal copy (`copyText`,
+  Clipboard API with textarea fallback) and Edit Service Plan → module. No
+  plan-origin (Axiom / custom) labels and no "read-only" wording in the UI —
+  Lisa, 2026-10-14. The `governance` field stays in the data only. Seeds gained the view, so the UI config key is now
+  `axiom-ui-config-v3` (earlier in-browser header edits reset).
+- **Phone emulation in the preview needs a reload after resizing** — a
+  resize alone leaves a 980px layout viewport and the breakpoints don't fire.
+- **Responsive** (2026-10-14): `useMedia(BP.*)` in 00-core — `tablet` ≤1184,
+  `mobile` ≤850 (top bar, per the DS sizing spec), `compact` ≤540 (client
+  header → `.cph--compact`). Layout that changes a size or label is done in
+  JSX from the hook; the rest is CSS keyed off the class.
+- **Hidden measuring mirrors must sit off-screen LEFT** (`position: fixed;
+  left: -10000px`). The tab strip's mirror at `left: 0` stuck out past the
+  right edge and widened a phone layout to 1249px (sideways scroll, zoomed
+  out). Negative overflow never scrolls. Same for `.cph-pager-mirror`.
+- **Don't size fixed panels with `100vw`** — it can exceed the visible width;
+  use `width: 100%; left: 0`.
 - **Loader flattens fixtures to arrays.** `RD.<table>` is the `records` array —
   there is no `_meta` at runtime (hit once: `RD.notifCenter.records` crashed).
 - **Every dialog is portalled to `<body>`.** `.chart-chrome` is sticky with its

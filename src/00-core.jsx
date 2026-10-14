@@ -54,6 +54,24 @@ function match(pattern, path) {
   return params;
 }
 
+/* ===== Viewport breakpoints =====
+   For layout that can't be done in CSS alone — a different component size or
+   label, an element moving elsewhere. The values mirror the DS: top
+   navigation is desktop > 1184, tablet 850–1184, mobile < 850; the client
+   header compacts below 540. */
+const BP = { tablet: '(max-width: 1184px)', mobile: '(max-width: 850px)', compact: '(max-width: 540px)' };
+function useMedia(query) {
+  const [m, setM] = useState(() => window.matchMedia(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const f = () => setM(mq.matches);
+    f();
+    mq.addEventListener('change', f);
+    return () => mq.removeEventListener('change', f);
+  }, [query]);
+  return m;
+}
+
 /* ===== Soft page reload =====
    Choosing the page you are already on (e.g. the client crumb while standing
    on that client's summary) reloads it in place: a small local spinner, the

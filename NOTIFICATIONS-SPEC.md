@@ -17,14 +17,14 @@ Three groups. The UI never calls them "tiers"; users see the group names.
 | **Approvals & Tasks** | Assigned to me and waiting on me: signatures, co-signs, approvals, orders, lab results to review, admission appointment requests, shift swaps, direct messages, referral responses, my own incomplete notes | **Always**, read or not | Only when actioned: signed, approved, returned, delegated, declined, replied or marked done. Org-locked items can't be dismissed. |
 | **Client Alerts — urgent** | Hospitalization, ED visit, incarceration, crisis-line call, urgent appointment request | **Until marked read** | Stays open with a follow-up window until a follow-up **note is signed** (Start Note). Can't be dismissed. |
 | **Client Alerts — due & updates** | Assessments due or expired (CANS, PHQ-9), consents needed or expiring, plan reviews, note gaps, unrecorded outcomes, new assignments | No: theme **dot** when unread | Mark as read (page only), open, or dismiss. |
-| **Client Alerts — care-team notes** | **One row per note** about my clients (last 14 days), *Important* first | **Important notes: yes, until read** (red dot). Others: no (theme dot). | Read state is the note's own, shared with the Client Notes thread and the client header badge. |
+| **Client Alerts — care-team notes** | **One row per note** sent with **Notify Care Team**, about my clients (last 14 days), highest priority first. Notes without it stay on the chart only. | **Yes, until marked read**, the read receipt (red dot) | Read state is the note's own, shared with the Client Notes thread and the client header badge, which also count only notes sent to the team. |
 | **General & System** | Reports ready or failed, announcements, maintenance, own credential reminders | **Never**: theme **dot** when unread | Mark as read or unread, dismiss, or bulk dismiss. |
 
 ### Signal rules
 
 | Signal | Meaning |
 |---|---|
-| **Red number** | Something needs you: an open task, an unread urgent alert, or an unread care-team note a colleague marked *Important*. |
+| **Red number** | Something needs you: an open task, an unread urgent alert, or an unread care-team note a colleague sent with *Notify Care Team*. |
 | **Theme-colour dot** | Something new you haven't seen, but nothing is waiting on you. |
 | **Nothing** | Seen, or not yours to act on. |
 
@@ -110,7 +110,7 @@ Tags, shown only when they change the next step:
 |---|---|
 | Follow-up window ("Follow up within 24 h · 15 h left") | neutral; warn at ≤ 6 h; danger when overdue |
 | Due / Overdue | warn when overdue |
-| Important (care-team note) | warn |
+| Note priority ("Low priority" … "Critical priority") | neutral for Low and Medium; warn for High and Critical |
 | Covering for … | info |
 | Report status | good / danger (error) |
 
@@ -129,7 +129,7 @@ Tags, shown only when they change the next step:
 | Urgent alert | **Start Note ▾**: combo dropdown; the user must pick a note type before anything starts. Then **Continue Note**. Signing the note closes the alert. | Open chart · Delegate · Dismiss *(locked)* |
 | Documentation gap | **Start Note ▾**, same as urgent | Open chart · Dismiss |
 | Due & updates | Open / Open Chart | Open chart · Dismiss |
-| Care-team note | Open Note (the Client Notes thread, in place; doesn't mark read) | Open chart · Dismiss |
+| Care-team note | Open Note (the Client Notes thread, in place; doesn't mark read). The row title is the note's **topic**, with a priority tag. | Open chart · Dismiss |
 | Report | View Report / Try Again | Dismiss |
 
 Locked items show **Dismiss** disabled with the reason: "Required by your organization — complete, return or delegate it."
@@ -166,7 +166,7 @@ The client's slice of the notification center, shown where the work happens. Act
 
 - **One flat list, no categories.** Each row's button already says what to do. The order carries the urgency:
   1. Urgent alerts, least time left first.
-  2. Unread Important care-team notes.
+  2. Unread care-team notes sent to the team, highest priority first.
   3. Tasks waiting on you.
   4. Due and expiring work: notification-center items plus the summary's own assessment and consent dates. Duplicates are removed by instrument code or consent name, and overdue items sort first.
 - **Rows:** no client name, avatar or icon, since the client is known. Each row has the title with its relative time, the detail, only the tags that matter, and the action.
@@ -211,7 +211,7 @@ AxiomEHR agencies configure their own note templates per program, client and cli
 ## 6. Open questions
 
 1. **Urgent "read" vs. resolved.** The prototype drops an urgent alert from the count when it's marked read, but keeps it open until a follow-up note is signed. Should the count instead hold until follow-up *starts*?
-2. ~~Care-team notes — should *Important* count?~~ **Decided: yes.** An unread Important note counts in the bell for everyone on the care team until they read it, so teams can flag something to each other without buying the full internal messaging package. The note composer has an info tooltip explaining this, so staff don't overuse *Important*.
+2. ~~Care-team notes — should they count?~~ **Decided: notes sent with *Notify Care Team* count.** One counts in the bell for everyone on the care team until each person marks it read (the read receipt), so teams can flag something to each other without buying the full internal messaging package. The composer's info tooltip explains this so staff don't overuse it. Note priority (Low → Critical) is shown, but it doesn't decide whether a note notifies.
 3. **Supervisor view.** The research asks for team-level completion (CEN response rate, overdue by team member). This page is the individual queue; the team view is a separate story.
 4. **In-chart surfacing.** Built on the Client Summary (§4.6). Open: should urgent alerts also show in the client header itself, so they're visible on every tab of the chart?
 5. **Who sets locks.** Which admin role sets which kinds are locked, and per program or agency-wide?

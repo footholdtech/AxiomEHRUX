@@ -902,7 +902,7 @@ function AddMedicationOverlay({ client, onClose }) {
 /* ---- Dispatcher used by QuickViewBody ------------------------------ */
 const CLINICAL_QV = {
   allergies: AllergiesQV, medications: MedicationsQV, vitals: VitalsQV,
-  immunizations: ImmunizationsQV, injections: InjectionsQV,
+  immunizations: ImmunizationsQV, injections: InjectionsQV, serviceplans: ServicePlansQV,
 };
 function ClinicalQuickView(props) {
   const def = QV_BY_KEY[props.view.key];
@@ -914,13 +914,12 @@ const isClinicalQV = key => !!(CLINICAL_QV[key] || (QV_BY_KEY[key] && QV_BY_KEY[
 /* ================= Client notes =================
    Notes care-team staff leave each other about this client. Always in the
    header — not configurable — because missing one is a care risk, not a
-   preference. The badge counts notes the signed-in user hasn't marked read.
-   (These will also surface in the notifications center for clients on the
-   user's caseload — behaviour to be defined.) */
+   preference. The badge counts notes sent with Notify Care Team that the
+   signed-in user hasn't marked read — the same notes the bell counts. */
 function ClientNotesButton({ client, preview }) {
   useRecordsVersion();
   const [open, setOpen] = useState(false);
-  const unread = getNotes(client).filter(n => !n.read).length;
+  const unread = getNotes(client).filter(noteNeedsRead).length;
   const label = 'Client Notes' + (unread ? ' · ' + unread + ' unread' : '');
   return (
     <React.Fragment>
@@ -944,30 +943,105 @@ function ClientNotesButton({ client, preview }) {
 const noteAgo = iso => { const d = Math.round((TODAY - _parse(iso)) / 86400000); return d <= 0 ? 'Today' : d === 1 ? 'Yesterday' : fmtDate(iso); };
 const noteTime = iso => { const [h, m] = iso.slice(11, 16).split(':').map(Number); return ((h + 11) % 12 + 1) + ':' + String(m).padStart(2, '0') + (h < 12 ? ' AM' : ' PM'); };
 const staffRole = id => (STAFF[id] ? roleName(STAFF[id].role_id) : '');
-const IMPORTANT_NOTE_TIP = 'Important notes add to the notification count of everyone on this client’s care team until each person reads them. Use it for something the team needs to know today — a missed dose, a safety concern, a change in plan. For an emergency, call as well.';
+/* Topics come from an agency-configured table in production (source still
+   to be confirmed; it has duplicates). This is a generic, de-duplicated
+   stand-in — no customer facility or pharmacy names — kept in the same long,
+   alphabetical, pick-one interaction. */
+const NOTE_TOPICS = ['Alcohol use', 'Allergies', 'Annual exam', 'Arrest / incarceration', 'Benzodiazepines', 'Care coordination',
+  'Contact information', 'Court / legal', 'Dental exam', 'Guardian', 'History', 'Hospital discharge', 'Housing', 'Illicit drug use',
+  'Incomplete labs', 'Judicial review', 'Lab results', 'Medical follow-up', 'Medication box monitoring', 'Medications', 'No-shows',
+  'Opioids', 'Other', 'Overdose', 'Pending referral — prior authorization needed', 'Pharmacy', 'Referrals', 'Scheduling',
+  'Stimulants', 'Substance use', 'Suboxone treatment', 'Therapy', 'Transportation'];
+const NOTIFY_TEAM_TIP = 'Sends this note to the notification center of everyone on this client’s care team. It adds to their notification count until each person marks it read, and that read receipt is recorded. Leave it unchecked to keep the note on the client’s chart only. Use it for something the team needs to know today — a missed dose, a safety concern, a change in plan. For an emergency, call as well.';
 const NotesTitle = ({ children }) => <React.Fragment>{children} <span className="cn-internal">(Internal)</span></React.Fragment>;
 
-function ClientNotesThread({ client, preview, className }) {
+/* A new note's fields — production's: Importance (default Low) and Topic,
+   both required, the note text, Display in Client Header (always on) and
+   Notify Care Team (default off, so reaching colleagues is a choice). Shared
+   by the thread's inline composer and the Add Internal Note dialog. */
+const NOTE_BLANK = { importance: 'Low', topic: '', body: '', notify: false };
+function useNoteDraft(client) {
+  const [d, setD] = useState(NOTE_BLANK);
+  const [tried, setTried] = useState(false);
+  const set = (k, v) => setD(x => ({ ...x, [k]: v }));
+  const post = () => {
+    setTried(true);
+    if (!d.body.trim() || !d.topic) return false;
+    addNote(client, { body: d.body.trim(), topic: d.topic, importance: d.importance, notify: d.notify });
+    setD(NOTE_BLANK); setTried(false);
+    return true;
+  };
+  return { d, set, tried, post };
+}
+function NoteFields({ draft, client, preview, onSubmit, rows = 2, trailing }) {
+  const { d, set, tried } = draft;
+  const first = (client.displayName || '').split(/\s+/)[0].replace(/[“”"]/g, '');
+  return (
+    <React.Fragment>
+      <div className="cn-compose-fields">
+        <Field label="Importance" required>
+          <Dropdown value={d.importance} options={NOTE_IMPORTANCE} onChange={v => set('importance', v)} />
+        </Field>
+        <Field label="Topic" required error={tried && !d.topic ? 'Choose a topic.' : null}>
+          <Dropdown value={d.topic} options={NOTE_TOPICS} placeholder="Please select an option" onChange={v => set('topic', v)} invalid={tried && !d.topic} menuMinWidth={280} />
+        </Field>
+      </div>
+      <Field label="Note" required error={tried && !d.body.trim() ? 'Write the note.' : null} wide>
+        <textarea className={'ta cn-input' + (tried && !d.body.trim() ? ' invalid' : '')} rows={rows} value={d.body} disabled={preview} aria-label="Note"
+          placeholder={preview ? 'Not available in the preview' : 'Write a note for ' + first + '’s care team…'}
+          onChange={e => set('body', e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); onSubmit && onSubmit(); } }} />
+      </Field>
+      <div className="cn-compose-foot">
+        {/* Always on: every note shows in the client header. Kept visible
+            for now so the field production collects is accounted for. */}
+        <Checkbox checked disabled onChange={() => {}} label="Display in Client Header" />
+        <span className="cn-imp-opt">
+          <Checkbox checked={d.notify} disabled={preview} onChange={v => set('notify', v)} label="Notify Care Team" />
+          {/* Notifying has a cost — it adds to every care-team member's
+              notification count — so say so where the choice is made. */}
+          <Tooltip wide label={NOTIFY_TEAM_TIP}>
+            <button type="button" className="icon-btn cn-imp-info" aria-label={'About notifying the care team: ' + NOTIFY_TEAM_TIP}><Icon name="info" size={15} /></button>
+          </Tooltip>
+        </span>
+        {trailing && <span className="spacer" />}
+        {trailing}
+      </div>
+    </React.Fragment>
+  );
+}
+
+function AddInternalNoteOverlay({ client, onClose }) {
+  const guard = useGuard();
+  const draft = useNoteDraft(client);
+  const submit = () => { if (draft.post()) { guard.setToast({ icon: 'check', title: 'Internal note added', detail: draft.d.notify ? 'The care team was notified.' : 'Saved to ' + client.name.split(' ')[0] + '’s chart.' }); onClose(); } };
+  return (
+    <Overlay size="md" title="Add Internal Note" subtitle={client.displayName} onClose={onClose} bodyClassName="cn-add-body"
+      footer={<React.Fragment><Button variant="secondary" onClick={onClose}>Cancel</Button><Button variant="primary" onClick={submit}>Post Note</Button></React.Fragment>}>
+      <NoteFields draft={draft} client={client} onSubmit={submit} rows={5} />
+    </Overlay>
+  );
+}
+
+/* `composer={false}`: thread only (the Client Summary widget, which adds
+   notes through a dialog instead). */
+function ClientNotesThread({ client, preview, className, composer = true }) {
   useRecordsVersion();
   const notes = getNotes(client).slice().reverse();          // oldest → newest
-  const [firstUnread] = useState(() => (notes.find(n => !n.read) || {}).note_id);
-  const [draft, setDraft] = useState('');
-  const [important, setImportant] = useState(false);
+  const [firstUnread] = useState(() => (notes.find(noteNeedsRead) || {}).note_id);
+  const draft = useNoteDraft(client);
   const [confirmId, setConfirmId] = useState(null);
   const threadRef = useRef(null), unreadRef = useRef(null);
-  const posted = useRef(false);
+  const seen = useRef(notes.length);
+  /* On open, land on the first note waiting on a read receipt; when a note
+     is added (here or from the dialog), show it. */
   useEffect(() => {
     const t = threadRef.current; if (!t) return;
-    if (!posted.current && unreadRef.current) t.scrollTop = unreadRef.current.offsetTop - t.offsetTop - 8;
+    const added = notes.length > seen.current; seen.current = notes.length;
+    if (!added && unreadRef.current) t.scrollTop = unreadRef.current.offsetTop - t.offsetTop - 8;
     else t.scrollTop = t.scrollHeight;
   }, [notes.length]);
-  const post = () => {
-    const body = draft.trim(); if (!body) return;
-    posted.current = true;
-    addNote(client, body, important);
-    setDraft(''); setImportant(false);
-  };
-  const first = (client.displayName || '').split(/\s+/)[0].replace(/[“”"]/g, '');
+  const post = () => draft.post();
   let lastDay = null;
   return (
     <div className={'cn-wrap' + (className ? ' ' + className : '')}>
@@ -983,18 +1057,18 @@ function ClientNotesThread({ client, preview, className }) {
             <React.Fragment key={n.note_id}>
               {showDay && <div className="cn-day"><span>{day}</span></div>}
               <article ref={n.note_id === firstUnread ? unreadRef : null}
-                className={'cn-msg' + (mine ? ' is-mine' : '') + (n.read ? '' : ' is-unread') + (n.deleted ? ' is-deleted' : '')}>
+                className={'cn-msg' + (mine ? ' is-mine' : '') + (noteNeedsRead(n) ? ' is-unread' : '') + (n.deleted ? ' is-deleted' : '')}>
                 {/* Unread marker in its own left gutter, the way a phone's
                     message list does it: present on every row (empty when read)
                     so avatars stay aligned and the dot is the only difference. */}
-                <span className="cn-gutter">{!n.read && <span className="cn-dot" aria-hidden="true" />}</span>
+                <span className="cn-gutter">{noteNeedsRead(n) && <span className="cn-dot" aria-hidden="true" />}</span>
                 <Avatar name={name} size="M" />
                 <div className="cn-msg-main">
                   <div className="cn-msg-head">
                     <span className="cn-msg-name">{mine ? 'You' : name}</span>
                     {role && role !== '—' && <span className="cn-msg-role">{role}</span>}
                     <span className="cn-msg-time">{noteTime(n.timestamp)}</span>
-                    {!n.read && <span className="sr-only">Unread</span>}
+                    {noteNeedsRead(n) && <span className="sr-only">Unread</span>}
                   </div>
                   {n.deleted ? (
                     <div className="cn-deleted">Message deleted</div>
@@ -1009,9 +1083,13 @@ function ClientNotesThread({ client, preview, className }) {
                   ) : (
                     <div className="cn-bubble-row">
                       <div className="cn-bubble">
-                        {/* Same tag as Needs Attention and Notifications: text only. */}
-                        {n.important && <span className="cn-imp"><NTag tone="warn">Important</NTag></span>}
-                        {n.subject && <b className="cn-subj">{n.subject}</b>}
+                        {/* Topic and priority, the same way Needs Attention and
+                            Notifications show them: text-only tags. */}
+                        <div className="cn-bubble-top">
+                          {n.topic && <b className="cn-subj">{n.topic}</b>}
+                          <NTag tone={importanceTone(n.importance)}>{(n.importance || 'Low') + ' priority'}</NTag>
+                          {n.notify_team && <NTag>Care team notified</NTag>}
+                        </div>
                         <p>{n.body}</p>
                       </div>
                       {/* Own notes: delete sits beside the bubble on hover/focus. */}
@@ -1024,10 +1102,11 @@ function ClientNotesThread({ client, preview, className }) {
                   )}
                 </div>
                 {/* Read state always in the same right-hand column, so the eye
-                    finds it in one place on every note. */}
+                    finds it in one place on every note — but only on notes sent
+                    to the team; plain notes ask nobody for a read receipt. */}
                 {!mine && (
                   <div className="cn-msg-acts">
-                    {!preview && !n.deleted && (n.read
+                    {!preview && !n.deleted && n.notify_team && (n.read
                       ? <Button size="sm" variant="ghost" className="cn-unread-btn" onClick={() => setNoteRead(n.note_id, false)}>Mark as Unread</Button>
                       : <Button size="sm" variant="ghost" onClick={() => setNoteRead(n.note_id, true)}><Icon name="check" size={14} /> Mark as Read</Button>)}
                   </div>
@@ -1037,37 +1116,24 @@ function ClientNotesThread({ client, preview, className }) {
           );
         }) : <div className="cph-qv-empty">No notes about this client yet. Start the conversation below.</div>}
       </div>
-      <div className={'cn-compose' + (preview ? ' is-inert' : '')}>
-        <Avatar name={ME.name} size="M" />
-        <div className="cn-compose-main">
-          <textarea className="ta cn-input" rows={2} value={draft} disabled={preview} aria-label="New note"
-            placeholder={preview ? 'Not available in the preview' : 'Write a note for ' + first + '’s care team…'}
-            onChange={e => setDraft(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); post(); } }} />
-          <div className="cn-compose-foot">
-            <span className="cn-imp-opt">
-              <Checkbox checked={important} disabled={preview} onChange={setImportant} label="Mark as important" />
-              {/* Important has a cost — it adds to every care-team member's
-                  notification count — so say so where the choice is made. */}
-              <Tooltip wide label={IMPORTANT_NOTE_TIP}>
-                <button type="button" className="icon-btn cn-imp-info" aria-label={'About important notes: ' + IMPORTANT_NOTE_TIP}><Icon name="info" size={15} /></button>
-              </Tooltip>
-            </span>
-            <span className="ovl-hint">Visible to everyone on this client’s care team</span>
-            <span className="spacer" />
-            <Button size="sm" variant="primary" disabled={preview || !draft.trim()} onClick={post}>Post Note</Button>
+      {composer && (
+        <div className={'cn-compose' + (preview ? ' is-inert' : '')}>
+          <Avatar name={ME.name} size="M" />
+          <div className="cn-compose-main">
+            <NoteFields draft={draft} client={client} preview={preview} onSubmit={post}
+              trailing={<Button size="sm" variant="primary" disabled={preview} onClick={post}>Post Note</Button>} />
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
 
-const markAllNotesRead = client => getNotes(client).filter(n => !n.read).forEach(n => setNoteRead(n.note_id, true));
+const markAllNotesRead = client => getNotes(client).filter(noteNeedsRead).forEach(n => setNoteRead(n.note_id, true));
 
 function ClientNotesOverlay({ client, preview, onClose }) {
   useRecordsVersion();
-  const unread = getNotes(client).filter(n => !n.read).length;
+  const unread = getNotes(client).filter(noteNeedsRead).length;
   return (
     <Overlay size="md" title={<NotesTitle>Client Notes</NotesTitle>} onClose={onClose} bodyClassName="cn-ovl-body"
       footer={<React.Fragment>
@@ -1081,11 +1147,16 @@ function ClientNotesOverlay({ client, preview, onClose }) {
 
 /* Client Summary widget — the same thread, inline. */
 function ClientNotesPanel({ client }) {
-  /* No count and no Mark All as Read up here: the thread scrolls, so "all"
-     would include notes nobody has looked at. Read them one by one. */
+  /* A summary, like the other widgets on this page: the thread only, no open
+     composer. Writing a note is a deliberate step, in a dialog. No count and
+     no Mark All as Read either — the thread scrolls, so "all" would include
+     notes nobody has looked at. */
+  const [adding, setAdding] = useState(false);
   return (
-    <Panel title={<NotesTitle>Client Notes</NotesTitle>}>
-      <ClientNotesThread client={client} className="cn-wrap--panel" />
+    <Panel title={<NotesTitle>Client Notes</NotesTitle>}
+      action={<Button size="sm" variant="secondary" onClick={() => setAdding(true)}><Icon name="plus" size={14} /> Add Internal Note</Button>}>
+      <ClientNotesThread client={client} className="cn-wrap--panel" composer={false} />
+      {adding && <AddInternalNoteOverlay client={client} onClose={() => setAdding(false)} />}
     </Panel>
   );
 }

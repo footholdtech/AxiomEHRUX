@@ -306,16 +306,20 @@ write("assessment_administrations.json", "Scored administrations with item-level
       list(adm[0].keys()), adm)
 
 # ---- Client notes (care team ↔ care team, about one client) ---------------
+# Same fields production collects on a patient note: Topic (from the agency's
+# topic table), Importance (Low → Critical), Show in header, and the new
+# Notify Care Team flag, which is what puts a note in colleagues' notification
+# centers with a read receipt. Topics must exist in NOTE_TOPICS (32-quickviews).
 TEMPLATES = [
-    ("Scheduling", "Asked to move Thursday sessions to afternoons — please check before booking.", False),
-    ("New allergy reported", "Mentioned a shellfish allergy at the front desk today. It isn't in the chart yet.", True),
-    ("Transportation", "Transportation voucher approved through the end of the month.", False),
-    ("Check-in suggested", "Was tearful in group this morning. Worth a check-in before the next session.", True),
-    ("Pharmacy follow-up", "Pharmacy called about prior authorization on the latest refill. Told them the prescriber will follow up.", False),
-    ("Court date moved", "Court date moved to the 14th. A letter of attendance will be needed.", False),
-    ("Contact preference", "Prefers text only — please don't call the home number.", True),
-    ("Housing", "Housing application submitted; waiting to hear back from the landlord.", False),
-    ("Missed dose", "Missed this morning's medication pass. Came in at noon and took it.", True),
+    ("Scheduling", "Asked to move Thursday sessions to afternoons — please check before booking.", "Low", False),
+    ("Allergies", "Mentioned a shellfish allergy at the front desk today. It isn't in the chart yet.", "High", True),
+    ("Transportation", "Transportation voucher approved through the end of the month.", "Low", False),
+    ("Therapy", "Was tearful in group this morning. Worth a check-in before the next session.", "Medium", True),
+    ("Pharmacy", "Pharmacy called about prior authorization on the latest refill. Told them the prescriber will follow up.", "Medium", False),
+    ("Court / legal", "Court date moved to the 14th. A letter of attendance will be needed.", "Medium", False),
+    ("Contact information", "Prefers text only — please don't call the home number.", "Medium", True),
+    ("Housing", "Housing application submitted; waiting to hear back from the landlord.", "Low", False),
+    ("Medications", "Missed this morning's medication pass. Came in at noon and took it.", "High", True),
 ]
 notes, n = [], 1
 for c in clients:
@@ -326,15 +330,101 @@ for c in clients:
         readers = [x["staff_id"] for x in staff if seed(cid + t[0] + x["staff_id"]) % 3 == 0 and x["staff_id"] != author]
         if k == 0 and "ST-2003" in readers: readers.remove("ST-2003")   # at least one unread for the signed-in user
         notes.append({"note_id": "CN-%04d" % n, "client_id": cid, "author_staff_id": author,
-                      "timestamp": "%sT%02d:%02d:00" % (iso(ago(k * 3 + s % 4)), 8 + s % 9, s % 60),
-                      "subject": t[0], "body": t[1], "important": t[2], "read_by": readers})
+                      # 8:00–15:59, so nothing lands after the prototype's 16:00 "now"
+                      "timestamp": "%sT%02d:%02d:00" % (iso(ago(k * 3 + s % 4)), 8 + s % 8, s % 60),
+                      "topic": t[0], "importance": t[2], "show_in_header": True, "notify_team": t[3],
+                      "body": t[1], "read_by": readers})
         n += 1
     for m in msgs:   # fold in the seed's staff messages that name this client
         if m.get("related_client_id") != cid: continue
         notes.append({"note_id": "CN-%04d" % n, "client_id": cid, "author_staff_id": m["sender_staff_id"],
-                      "timestamp": m["timestamp"], "subject": "Care coordination", "body": m["body"].replace(cid, "this client"),
-                      "important": False, "read_by": ["ST-2003"] if m["read_status"] == "Read" else []})
+                      "timestamp": m["timestamp"], "topic": "Care coordination", "importance": "Low", "show_in_header": True,
+                      "notify_team": False, "body": m["body"].replace(cid, "this client"),
+                      "read_by": ["ST-2003"] if m["read_status"] == "Read" else []})
         n += 1
-write("client_notes.json", "Notes care-team staff leave each other about a client. read_by lists the staff "
-      "who have opened each one; the header badge counts unread for the signed-in user.",
+write("client_notes.json", "Notes care-team staff leave each other about a client, with production's fields "
+      "(topic, importance, show_in_header) plus notify_team. read_by lists who has marked each one read.",
       list(notes[0].keys()), notes)
+
+# ---- Service plans (the "golden thread") ----------------------------------
+# Field set follows production's Service Plan form: Service Plan (plan type,
+# dates, meeting, supports, recommended services, transition plan, SMI),
+# Goals/Objective (identified need, domain of wellness, specific objective,
+# current measure, interventions with service category / codes / frequency /
+# provider) and Agreements (agreement, copy offered, signatures). Plans are
+# either Axiom-governed or agency-custom. Everything here is fictional.
+PLAN_TYPES = [("Outpatient", False), ("Residential", False), ("Case Management", False),
+              ("Medication Management", False), ("Housing Stability Plan", True), ("Recovery Support Plan", True)]
+GOALS = [
+    ("Wants to feel less depressed most days", "Behavioral health",
+     "Reduce PHQ-9 score from 16 to below 10", "PHQ-9 = 16", "PHQ-9 below 10", "PHQ-9 = 12",
+     [("Individual therapy", "H0004", "Weekly", "ST-2006"), ("Medication management", "99213", "Monthly", "ST-2002")]),
+    ("Keep stable housing", "Housing",
+     "Pay rent on time for 3 consecutive months", "Behind 1 month", "3 months on time", "1 month on time",
+     [("Case management", "T1016", "Twice a month", "ST-2004"), ("Housing support", "H0043", "Weekly", "ST-2005")]),
+    ("Stay sober and avoid relapse", "Substance use",
+     "Attend 3 recovery meetings a week and keep negative screens", "1 meeting a week", "3 meetings a week", "2 meetings a week",
+     [("Group counseling", "H0005", "Weekly", "ST-2006"), ("Peer support", "H0038", "Weekly", "ST-2008")]),
+    ("Get back to work", "Employment & education",
+     "Complete 2 job applications a week with support", "0 applications", "2 a week", "1 a week",
+     [("Supported employment", "H2023", "Weekly", "ST-2004")]),
+    ("Take medications as prescribed", "Physical health",
+     "Take morning medications at least 6 days of 7", "4 days of 7", "6 days of 7", "5 days of 7",
+     [("Medication monitoring", "H2010", "Daily", "ST-2008")]),
+    ("Spend more time with family", "Social connection",
+     "One family contact a week, by phone or in person", "Twice a month", "Weekly", "3 times a month",
+     [("Family therapy", "90847", "Twice a month", "ST-2006")]),
+    ("Manage daily routines on my own", "Daily living skills",
+     "Plan and cook 3 meals a week without help", "1 meal a week", "3 meals a week", "2 meals a week",
+     [("Skills training", "H2014", "Weekly", "ST-2004")]),
+]
+SUPPORTS = ["Yes — sister", "Yes — mother", "Yes — partner", "No", "Yes — grandmother"]
+plans, n = [], 1
+for c in clients:
+    cid = c["client_id"]
+    k = seed(cid + "plans")
+    for j, (ptype, custom) in enumerate(pick(PLAN_TYPES, cid + "ptype", 1 + k % 2)):
+        s = seed(cid + ptype)
+        start = ago(20 + s % 80)
+        length = (90, 120, 180)[s % 3]
+        end = start + dt.timedelta(days=length)
+        status = "Active"
+        if j == 1 and s % 2 == 0:          # some clients' second plan is an older, closed-out one
+            start = ago(220 + s % 60); end = start + dt.timedelta(days=180); status = "Completed"
+        elapsed = max(0, min(1, (TODAY - start).days / max(1, (end - start).days)))
+        bias = -30 if s % 3 == 1 else 0     # about a third of plans run behind their own calendar
+        goals = []
+        for g_i, g in enumerate(pick(GOALS, cid + ptype + "g", 2 + s % 3)):
+            gs = seed(cid + ptype + g[0])
+            # progress drifts around elapsed time, so some plans run ahead and some behind
+            prog = 100 if status == "Completed" else max(0, min(99, int(elapsed * 100) + bias + (gs % 41) - 20))
+            goals.append({
+                "goal_id": "SPG-%04d-%d" % (n, g_i + 1), "identified_need": g[0], "domain_of_wellness": g[1],
+                "specific_objective": g[2], "baseline_measure": g[3], "target_measure": g[4],
+                "current_measure": g[4] if prog >= 100 else g[3] if prog == 0 else g[5],
+                "progress_pct": prog, "status": "Met" if prog >= 100 else ("Not started" if prog == 0 else "In progress"),
+                "interventions": [{"service_category": iv[0], "service_code": iv[1], "frequency": iv[2], "provider_staff_id": iv[3]} for iv in g[6]],
+            })
+        editor = ("ST-2003", "ST-2004", "ST-2006")[s % 3]
+        plans.append({
+            "plan_id": "SP-%04d" % n, "client_id": cid, "plan_type": ptype, "governance": "Custom" if custom else "Axiom",
+            "status": status, "plan_date": iso(start), "review_date": iso(end),
+            "last_edited": iso(min(TODAY, start + dt.timedelta(days=(s % 30) + 3))), "last_edited_by": editor,
+            "individuals_at_meeting": "Client, primary clinician" + (", case manager" if s % 2 else ""),
+            "family_supports": SUPPORTS[s % len(SUPPORTS)],
+            "recommended_services": "Continue outpatient services; " + goals[0]["interventions"][0]["service_category"].lower() + " as primary service.",
+            "transition_plan": ("Not applicable", "Step-down to outpatient planned", "Discharge planning started")[s % 3],
+            "smi_determination": ("Not determined", "SMI — eligible", "Not SMI")[s % 3],
+            "agreement": "Yes" if s % 4 else "No",
+            "copy_offered": bool(s % 5),
+            "signatures": [
+                {"role": "Client", "name": None, "date": iso(start + dt.timedelta(days=1))},
+                {"role": "Employee", "staff_id": editor, "date": iso(start + dt.timedelta(days=1))},
+                {"role": "BH professional review", "staff_id": "ST-2002", "date": iso(start + dt.timedelta(days=4)) if s % 3 else None},
+            ],
+            "goals": goals,
+        })
+        n += 1
+write("service_plans.json", "Service plans per client — Axiom-governed and agency-custom — with goals, objectives, "
+      "measures, interventions and signatures, following production's Service Plan form. Fictional.",
+      list(plans[0].keys()), plans)
