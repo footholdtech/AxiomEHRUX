@@ -455,6 +455,13 @@ const PREVIEW_CLIENT = {
      to show in the preview — all as fictional as the rest of this record. The
      getters in 16-records.jsx use these instead of the fixtures. */
   records: {
+    plans: [{ plan_id: 'PREVIEW-SP1', plan_type: 'Outpatient', governance: 'Axiom', status: 'Active', plan_date: '2026-08-01', review_date: '2026-10-30',
+      last_edited: '2026-09-10', last_edited_by: null, individuals_at_meeting: 'Client, primary clinician', family_supports: 'Yes — best friend',
+      recommended_services: 'Weekly check-ins.', transition_plan: 'Not applicable', smi_determination: 'Not determined', agreement: 'Yes', copy_offered: true,
+      signatures: [{ role: 'Client', name: null, date: '2026-08-02' }],
+      goals: [{ goal_id: 'PREVIEW-G1', identified_need: 'Keep spirits high', domain_of_wellness: 'Social connection', specific_objective: 'One group outing a week',
+        baseline_measure: 'Twice a month', target_measure: 'Weekly', current_measure: 'Three a month', progress_pct: 60, status: 'In progress',
+        interventions: [{ service_category: 'Peer support', service_code: 'H0038', frequency: 'Weekly', provider_staff_id: null }] }] }],
     meds: [
       { med_rx_id: 'PREVIEW-M1', medication_display: 'Wonder Vitamin, Chewable 1 tab', drug_class: 'Supplement', schedule: null, sig: 'Chew one tablet daily with cheese',
         refills_authorized: 3, refills_remaining: 2, prescriber_staff_id: null, pharmacy: 'Toontown Apothecary', start_date: '2026-06-01', end_date: '2026-12-01', last_filled: '2026-09-01', status: 'Active', rx_status: 'E-PRESCRIBED' },
@@ -468,8 +475,8 @@ const PREVIEW_CLIENT = {
     injections: [{ injection_id: 'PREVIEW-J1', medication: 'Cyanocobalamin (Vitamin B12)', dose: '1000 mcg', date_given: '2026-09-01', next_due: '2026-10-01', interval_days: 30, site: 'Left deltoid' }],
     admins: [{ administration_id: 'PREVIEW-A1', form_id: 'PHQ9', date: '2026-09-01', administered_by_staff_id: null, responses: [0, 0, 1, 0, 0, 0, 1, 0, 0], score: 2, band: 'Minimal', flagged: false }],
     notes: [
-      { note_id: 'PREVIEW-N1', subject: 'Big ears, bigger heart', body: 'Brought cheese for the whole group again. Morale is excellent.', important: false, timestamp: '2026-09-21T10:00:00', author_staff_id: null, author_name: 'Sample Case Manager', author_role: 'Case Manager', read_by: [] },
-      { note_id: 'PREVIEW-N2', subject: 'Avoid haunted houses', body: 'Reminder: no field trips to anything resembling a lonesome-ghost situation.', important: true, timestamp: '2026-09-18T14:30:00', author_staff_id: null, author_name: 'Sample Clinician', author_role: 'Clinician', read_by: ['ST-2003'] },
+      { note_id: 'PREVIEW-N1', topic: 'Therapy', importance: 'Low', show_in_header: true, notify_team: false, body: 'Brought cheese for the whole group again. Morale is excellent.', timestamp: '2026-09-21T10:00:00', author_staff_id: null, author_name: 'Sample Case Manager', author_role: 'Case Manager', read_by: [] },
+      { note_id: 'PREVIEW-N2', topic: 'Other', importance: 'High', show_in_header: true, notify_team: true, body: 'Reminder: no field trips to anything resembling a lonesome-ghost situation.', timestamp: '2026-09-18T14:30:00', author_staff_id: null, author_name: 'Sample Clinician', author_role: 'Clinician', read_by: ['ST-2003'] },
     ],
   },
 };

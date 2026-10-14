@@ -116,6 +116,15 @@ const QUICKVIEW_CATALOG = [
     ],
   },
   {
+    /* The golden thread: a note should trace back to the plan's goals, so the
+       active plans sit one click from any documentation. */
+    key: 'serviceplans', label: 'Service Plans', icon: 'clipboard', module: 'Service Plan',
+    blurb: 'Active plans, goal progress against the plan dates, and the full plan to copy from.',
+    options: [
+      { key: 'defaultFilter', kind: 'choice', label: 'Opens on', choices: ['Active', 'All'], def: 'Active' },
+    ],
+  },
+  {
     key: 'notes', label: 'Clinical Notes', icon: 'documents',
     blurb: 'The most recent documentation on the chart.',
     options: [
@@ -245,7 +254,7 @@ const SEED_CONFIG = {
       showActions: true, actions: DEFAULT_ACTIONS.slice(),
       quickViews: [makeView('general'), makeView('enrollment'), makeView('allergies'),
         makeView('medications'), makeView('vitals'), makeView('contact'), makeView('appointments'),
-        makeView('notes'), makeView('phq9')],
+        makeView('serviceplans'), makeView('notes'), makeView('phq9')],
     },
     {
       id: 'hp-child', name: 'Default Child', status: 'active',
@@ -255,7 +264,7 @@ const SEED_CONFIG = {
       showActions: true, actions: DEFAULT_ACTIONS.slice(),
       quickViews: [makeView('general', { fields: ['Axiom ID', 'CIN', 'MRN', 'Primary Language'] }),
         makeView('demographics'), makeView('contact'), makeView('support'),
-        makeView('appointments', { count: '3' }), makeView('enrollment')],
+        makeView('appointments', { count: '3' }), makeView('serviceplans'), makeView('enrollment')],
     },
     {
       id: 'hp-prescriber', name: 'Prescriber', status: 'active',
@@ -268,7 +277,7 @@ const SEED_CONFIG = {
       quickViews: [makeView('medications'), makeView('allergies'), makeView('vitals'),
         makeView('diagnoses'), makeView('problems'), makeView('injections'), makeView('phq9'),
         makeView('pcl5'), makeView('aims'), makeView('audit'), makeView('assessments'),
-        makeView('general', { showCareTeam: false }), makeView('appointments', { count: '3' })],
+        makeView('general', { showCareTeam: false }), makeView('appointments', { count: '3' }), makeView('serviceplans')],
     },
   ],
 };
@@ -276,7 +285,9 @@ const SEED_CONFIG = {
 /* v2: the quick-view catalogue changed shape (Medical split, clinical views
    and instruments added). A new key gives every reviewer the new seed headers
    instead of an older saved copy that predates them. */
-const UI_CONFIG_KEY = 'axiom-ui-config-v2';
+/* v3: the seeds gained Service Plans — bumped so reviewers see them (earlier
+   in-browser header edits reset). */
+const UI_CONFIG_KEY = 'axiom-ui-config-v3';
 const UI_PREFS_KEY = 'axiom-ui-prefs';
 const DEFAULT_PREFS = { headerPreset: 'auto', collapsedByDefault: true };
 const clone = o => JSON.parse(JSON.stringify(o));

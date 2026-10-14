@@ -49,19 +49,21 @@ const NOTIF_GROUPS = [
 const NOTIF_GROUP = Object.fromEntries(NOTIF_GROUPS.map(g => [g.key, g]));
 
 /* ---- Read ------------------------------------------------------------ */
-/* Every care-team note about one of my clients from the last 14 days is its
-   own Client Alert. Read state is the note's own (16-records.jsx), so it is
-   the same in the Client Notes thread, the client header badge and here —
-   and it changes only when someone deliberately marks it, never on open. */
+/* A care-team note reaches the notification center only when its author
+   ticked Notify Care Team; otherwise it just lives on the client's chart.
+   Each notified note from the last 14 days about one of my clients is its own
+   Client Alert, counted until I mark it read (the read receipt). Read state is
+   the note's own (16-records.jsx), shared with the Client Notes thread and the
+   client header, and changes only when someone deliberately marks it. */
 const NOTE_PREFIX = 'CNN-';
 function noteNotifs() {
   const since = NOTIF_NOW - 14 * 86400000;
   return MY_CASELOAD.flatMap(c => getNotes(c)
-    .filter(n => n.author_staff_id !== ME.id && !n.deleted && new Date(n.timestamp) >= since)
+    .filter(n => n.notify_team && n.author_staff_id !== ME.id && !n.deleted && new Date(n.timestamp) >= since)
     .map(n => ({
       notification_id: NOTE_PREFIX + n.note_id, note_id: n.note_id, category: 'alert', kind: 'client-note', urgent: false,
-      source: 'Pending Notifications › Patient Notes', title: n.subject || 'Care-team note', detail: n.body,
-      client_id: c.client_id, from_staff_id: n.author_staff_id, created: n.timestamp, read: n.read, important: !!n.important,
+      source: 'Pending Notifications › Patient Notes', title: n.topic || 'Care-team note', detail: n.body,
+      client_id: c.client_id, from_staff_id: n.author_staff_id, created: n.timestamp, read: n.read, importance: n.importance || 'Low',
       status: null, done: NSESSION.done[NOTE_PREFIX + n.note_id] || null,
     })));
 }
@@ -77,9 +79,14 @@ function notifAll() {
 }
 const _ts = iso => new Date(iso).getTime();
 /* Counted = it needs me: open tasks, unread urgent alerts, and unread
-   care-team notes a colleague marked Important. */
+   care-team notes sent with Notify Care Team (only those reach this store). */
 const notifCounted = n => !n.done && ((n.category === 'task' && n.status === 'open')
-  || (n.category === 'alert' && (n.urgent || (n.kind === 'client-note' && n.important)) && !n.read));
+  || (n.category === 'alert' && (n.urgent || n.kind === 'client-note') && !n.read));
+/* Note importance, low to high — production's four levels. */
+const NOTE_IMPORTANCE = ['Low', 'Medium', 'High', 'Critical'];
+const importanceRank = v => NOTE_IMPORTANCE.indexOf(v || 'Low');
+/* Only High and Critical take a tone; Low and Medium stay neutral. */
+const importanceTone = v => (importanceRank(v) >= 2 ? 'warn' : null);
 /* Urgent alerts first, the least time left at the top; then anything past
    due; then tasks oldest-first (longest waiting) and everything else newest. */
 const _deadline = n => _ts(n.created) + (n.window_hours || 0) * 3600000;

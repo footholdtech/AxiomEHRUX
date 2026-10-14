@@ -1,0 +1,1953 @@
+{
+  "_meta": {
+    "description": "Service plans per client \u2014 Axiom-governed and agency-custom \u2014 with goals, objectives, measures, interventions and signatures, following production's Service Plan form. Fictional.",
+    "fictional": true,
+    "fields": [
+      "plan_id",
+      "client_id",
+      "plan_type",
+      "governance",
+      "status",
+      "plan_date",
+      "review_date",
+      "last_edited",
+      "last_edited_by",
+      "individuals_at_meeting",
+      "family_supports",
+      "recommended_services",
+      "transition_plan",
+      "smi_determination",
+      "agreement",
+      "copy_offered",
+      "signatures",
+      "goals"
+    ]
+  },
+  "records": [
+    {
+      "plan_id": "SP-0001",
+      "client_id": "CL-100234",
+      "plan_type": "Outpatient",
+      "governance": "Axiom",
+      "status": "Active",
+      "plan_date": "2026-08-17",
+      "review_date": "2026-12-15",
+      "last_edited": "2026-09-05",
+      "last_edited_by": "ST-2004",
+      "individuals_at_meeting": "Client, primary clinician",
+      "family_supports": "Yes \u2014 mother",
+      "recommended_services": "Continue outpatient services; case management as primary service.",
+      "transition_plan": "Step-down to outpatient planned",
+      "smi_determination": "SMI \u2014 eligible",
+      "agreement": "No",
+      "copy_offered": true,
+      "signatures": [
+        {
+          "role": "Client",
+          "name": null,
+          "date": "2026-08-18"
+        },
+        {
+          "role": "Employee",
+          "staff_id": "ST-2004",
+          "date": "2026-08-18"
+        },
+        {
+          "role": "BH professional review",
+          "staff_id": "ST-2002",
+          "date": "2026-08-21"
+        }
+      ],
+      "goals": [
+        {
+          "goal_id": "SPG-0001-1",
+          "identified_need": "Keep stable housing",
+          "domain_of_wellness": "Housing",
+          "specific_objective": "Pay rent on time for 3 consecutive months",
+          "baseline_measure": "Behind 1 month",
+          "target_measure": "3 months on time",
+          "current_measure": "1 month on time",
+          "progress_pct": 16,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Case management",
+              "service_code": "T1016",
+              "frequency": "Twice a month",
+              "provider_staff_id": "ST-2004"
+            },
+            {
+              "service_category": "Housing support",
+              "service_code": "H0043",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2005"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0001-2",
+          "identified_need": "Spend more time with family",
+          "domain_of_wellness": "Social connection",
+          "specific_objective": "One family contact a week, by phone or in person",
+          "baseline_measure": "Twice a month",
+          "target_measure": "Weekly",
+          "current_measure": "3 times a month",
+          "progress_pct": 7,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Family therapy",
+              "service_code": "90847",
+              "frequency": "Twice a month",
+              "provider_staff_id": "ST-2006"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0001-3",
+          "identified_need": "Take medications as prescribed",
+          "domain_of_wellness": "Physical health",
+          "specific_objective": "Take morning medications at least 6 days of 7",
+          "baseline_measure": "4 days of 7",
+          "target_measure": "6 days of 7",
+          "current_measure": "4 days of 7",
+          "progress_pct": 0,
+          "status": "Not started",
+          "interventions": [
+            {
+              "service_category": "Medication monitoring",
+              "service_code": "H2010",
+              "frequency": "Daily",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "plan_id": "SP-0002",
+      "client_id": "CL-100234",
+      "plan_type": "Residential",
+      "governance": "Axiom",
+      "status": "Active",
+      "plan_date": "2026-06-17",
+      "review_date": "2026-12-14",
+      "last_edited": "2026-07-07",
+      "last_edited_by": "ST-2006",
+      "individuals_at_meeting": "Client, primary clinician, case manager",
+      "family_supports": "Yes \u2014 partner",
+      "recommended_services": "Continue outpatient services; family therapy as primary service.",
+      "transition_plan": "Discharge planning started",
+      "smi_determination": "Not SMI",
+      "agreement": "Yes",
+      "copy_offered": true,
+      "signatures": [
+        {
+          "role": "Client",
+          "name": null,
+          "date": "2026-06-18"
+        },
+        {
+          "role": "Employee",
+          "staff_id": "ST-2006",
+          "date": "2026-06-18"
+        },
+        {
+          "role": "BH professional review",
+          "staff_id": "ST-2002",
+          "date": "2026-06-21"
+        }
+      ],
+      "goals": [
+        {
+          "goal_id": "SPG-0002-1",
+          "identified_need": "Spend more time with family",
+          "domain_of_wellness": "Social connection",
+          "specific_objective": "One family contact a week, by phone or in person",
+          "baseline_measure": "Twice a month",
+          "target_measure": "Weekly",
+          "current_measure": "3 times a month",
+          "progress_pct": 53,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Family therapy",
+              "service_code": "90847",
+              "frequency": "Twice a month",
+              "provider_staff_id": "ST-2006"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0002-2",
+          "identified_need": "Take medications as prescribed",
+          "domain_of_wellness": "Physical health",
+          "specific_objective": "Take morning medications at least 6 days of 7",
+          "baseline_measure": "4 days of 7",
+          "target_measure": "6 days of 7",
+          "current_measure": "5 days of 7",
+          "progress_pct": 57,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Medication monitoring",
+              "service_code": "H2010",
+              "frequency": "Daily",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0002-3",
+          "identified_need": "Stay sober and avoid relapse",
+          "domain_of_wellness": "Substance use",
+          "specific_objective": "Attend 3 recovery meetings a week and keep negative screens",
+          "baseline_measure": "1 meeting a week",
+          "target_measure": "3 meetings a week",
+          "current_measure": "2 meetings a week",
+          "progress_pct": 51,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Group counseling",
+              "service_code": "H0005",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2006"
+            },
+            {
+              "service_category": "Peer support",
+              "service_code": "H0038",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0002-4",
+          "identified_need": "Wants to feel less depressed most days",
+          "domain_of_wellness": "Behavioral health",
+          "specific_objective": "Reduce PHQ-9 score from 16 to below 10",
+          "baseline_measure": "PHQ-9 = 16",
+          "target_measure": "PHQ-9 below 10",
+          "current_measure": "PHQ-9 = 12",
+          "progress_pct": 66,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Individual therapy",
+              "service_code": "H0004",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2006"
+            },
+            {
+              "service_category": "Medication management",
+              "service_code": "99213",
+              "frequency": "Monthly",
+              "provider_staff_id": "ST-2002"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "plan_id": "SP-0003",
+      "client_id": "CL-100235",
+      "plan_type": "Residential",
+      "governance": "Axiom",
+      "status": "Active",
+      "plan_date": "2026-06-22",
+      "review_date": "2026-10-20",
+      "last_edited": "2026-07-17",
+      "last_edited_by": "ST-2004",
+      "individuals_at_meeting": "Client, primary clinician",
+      "family_supports": "Yes \u2014 partner",
+      "recommended_services": "Continue outpatient services; skills training as primary service.",
+      "transition_plan": "Step-down to outpatient planned",
+      "smi_determination": "SMI \u2014 eligible",
+      "agreement": "No",
+      "copy_offered": true,
+      "signatures": [
+        {
+          "role": "Client",
+          "name": null,
+          "date": "2026-06-23"
+        },
+        {
+          "role": "Employee",
+          "staff_id": "ST-2004",
+          "date": "2026-06-23"
+        },
+        {
+          "role": "BH professional review",
+          "staff_id": "ST-2002",
+          "date": "2026-06-26"
+        }
+      ],
+      "goals": [
+        {
+          "goal_id": "SPG-0003-1",
+          "identified_need": "Manage daily routines on my own",
+          "domain_of_wellness": "Daily living skills",
+          "specific_objective": "Plan and cook 3 meals a week without help",
+          "baseline_measure": "1 meal a week",
+          "target_measure": "3 meals a week",
+          "current_measure": "2 meals a week",
+          "progress_pct": 27,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Skills training",
+              "service_code": "H2014",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2004"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0003-2",
+          "identified_need": "Wants to feel less depressed most days",
+          "domain_of_wellness": "Behavioral health",
+          "specific_objective": "Reduce PHQ-9 score from 16 to below 10",
+          "baseline_measure": "PHQ-9 = 16",
+          "target_measure": "PHQ-9 below 10",
+          "current_measure": "PHQ-9 = 12",
+          "progress_pct": 27,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Individual therapy",
+              "service_code": "H0004",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2006"
+            },
+            {
+              "service_category": "Medication management",
+              "service_code": "99213",
+              "frequency": "Monthly",
+              "provider_staff_id": "ST-2002"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0003-3",
+          "identified_need": "Take medications as prescribed",
+          "domain_of_wellness": "Physical health",
+          "specific_objective": "Take morning medications at least 6 days of 7",
+          "baseline_measure": "4 days of 7",
+          "target_measure": "6 days of 7",
+          "current_measure": "5 days of 7",
+          "progress_pct": 63,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Medication monitoring",
+              "service_code": "H2010",
+              "frequency": "Daily",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "plan_id": "SP-0004",
+      "client_id": "CL-100236",
+      "plan_type": "Outpatient",
+      "governance": "Axiom",
+      "status": "Active",
+      "plan_date": "2026-08-07",
+      "review_date": "2027-02-03",
+      "last_edited": "2026-09-05",
+      "last_edited_by": "ST-2006",
+      "individuals_at_meeting": "Client, primary clinician",
+      "family_supports": "Yes \u2014 mother",
+      "recommended_services": "Continue outpatient services; case management as primary service.",
+      "transition_plan": "Discharge planning started",
+      "smi_determination": "Not SMI",
+      "agreement": "Yes",
+      "copy_offered": true,
+      "signatures": [
+        {
+          "role": "Client",
+          "name": null,
+          "date": "2026-08-08"
+        },
+        {
+          "role": "Employee",
+          "staff_id": "ST-2006",
+          "date": "2026-08-08"
+        },
+        {
+          "role": "BH professional review",
+          "staff_id": "ST-2002",
+          "date": "2026-08-11"
+        }
+      ],
+      "goals": [
+        {
+          "goal_id": "SPG-0004-1",
+          "identified_need": "Keep stable housing",
+          "domain_of_wellness": "Housing",
+          "specific_objective": "Pay rent on time for 3 consecutive months",
+          "baseline_measure": "Behind 1 month",
+          "target_measure": "3 months on time",
+          "current_measure": "1 month on time",
+          "progress_pct": 9,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Case management",
+              "service_code": "T1016",
+              "frequency": "Twice a month",
+              "provider_staff_id": "ST-2004"
+            },
+            {
+              "service_category": "Housing support",
+              "service_code": "H0043",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2005"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0004-2",
+          "identified_need": "Wants to feel less depressed most days",
+          "domain_of_wellness": "Behavioral health",
+          "specific_objective": "Reduce PHQ-9 score from 16 to below 10",
+          "baseline_measure": "PHQ-9 = 16",
+          "target_measure": "PHQ-9 below 10",
+          "current_measure": "PHQ-9 = 12",
+          "progress_pct": 14,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Individual therapy",
+              "service_code": "H0004",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2006"
+            },
+            {
+              "service_category": "Medication management",
+              "service_code": "99213",
+              "frequency": "Monthly",
+              "provider_staff_id": "ST-2002"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0004-3",
+          "identified_need": "Stay sober and avoid relapse",
+          "domain_of_wellness": "Substance use",
+          "specific_objective": "Attend 3 recovery meetings a week and keep negative screens",
+          "baseline_measure": "1 meeting a week",
+          "target_measure": "3 meetings a week",
+          "current_measure": "2 meetings a week",
+          "progress_pct": 31,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Group counseling",
+              "service_code": "H0005",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2006"
+            },
+            {
+              "service_category": "Peer support",
+              "service_code": "H0038",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0004-4",
+          "identified_need": "Spend more time with family",
+          "domain_of_wellness": "Social connection",
+          "specific_objective": "One family contact a week, by phone or in person",
+          "baseline_measure": "Twice a month",
+          "target_measure": "Weekly",
+          "current_measure": "3 times a month",
+          "progress_pct": 24,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Family therapy",
+              "service_code": "90847",
+              "frequency": "Twice a month",
+              "provider_staff_id": "ST-2006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "plan_id": "SP-0005",
+      "client_id": "CL-100236",
+      "plan_type": "Recovery Support Plan",
+      "governance": "Custom",
+      "status": "Completed",
+      "plan_date": "2025-12-30",
+      "review_date": "2026-06-28",
+      "last_edited": "2026-01-18",
+      "last_edited_by": "ST-2004",
+      "individuals_at_meeting": "Client, primary clinician",
+      "family_supports": "Yes \u2014 mother",
+      "recommended_services": "Continue outpatient services; family therapy as primary service.",
+      "transition_plan": "Step-down to outpatient planned",
+      "smi_determination": "SMI \u2014 eligible",
+      "agreement": "Yes",
+      "copy_offered": true,
+      "signatures": [
+        {
+          "role": "Client",
+          "name": null,
+          "date": "2025-12-31"
+        },
+        {
+          "role": "Employee",
+          "staff_id": "ST-2004",
+          "date": "2025-12-31"
+        },
+        {
+          "role": "BH professional review",
+          "staff_id": "ST-2002",
+          "date": "2026-01-03"
+        }
+      ],
+      "goals": [
+        {
+          "goal_id": "SPG-0005-1",
+          "identified_need": "Spend more time with family",
+          "domain_of_wellness": "Social connection",
+          "specific_objective": "One family contact a week, by phone or in person",
+          "baseline_measure": "Twice a month",
+          "target_measure": "Weekly",
+          "current_measure": "Weekly",
+          "progress_pct": 100,
+          "status": "Met",
+          "interventions": [
+            {
+              "service_category": "Family therapy",
+              "service_code": "90847",
+              "frequency": "Twice a month",
+              "provider_staff_id": "ST-2006"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0005-2",
+          "identified_need": "Stay sober and avoid relapse",
+          "domain_of_wellness": "Substance use",
+          "specific_objective": "Attend 3 recovery meetings a week and keep negative screens",
+          "baseline_measure": "1 meeting a week",
+          "target_measure": "3 meetings a week",
+          "current_measure": "3 meetings a week",
+          "progress_pct": 100,
+          "status": "Met",
+          "interventions": [
+            {
+              "service_category": "Group counseling",
+              "service_code": "H0005",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2006"
+            },
+            {
+              "service_category": "Peer support",
+              "service_code": "H0038",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0005-3",
+          "identified_need": "Take medications as prescribed",
+          "domain_of_wellness": "Physical health",
+          "specific_objective": "Take morning medications at least 6 days of 7",
+          "baseline_measure": "4 days of 7",
+          "target_measure": "6 days of 7",
+          "current_measure": "6 days of 7",
+          "progress_pct": 100,
+          "status": "Met",
+          "interventions": [
+            {
+              "service_category": "Medication monitoring",
+              "service_code": "H2010",
+              "frequency": "Daily",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "plan_id": "SP-0006",
+      "client_id": "CL-100237",
+      "plan_type": "Recovery Support Plan",
+      "governance": "Custom",
+      "status": "Active",
+      "plan_date": "2026-07-01",
+      "review_date": "2026-10-29",
+      "last_edited": "2026-07-17",
+      "last_edited_by": "ST-2004",
+      "individuals_at_meeting": "Client, primary clinician, case manager",
+      "family_supports": "No",
+      "recommended_services": "Continue outpatient services; family therapy as primary service.",
+      "transition_plan": "Step-down to outpatient planned",
+      "smi_determination": "SMI \u2014 eligible",
+      "agreement": "Yes",
+      "copy_offered": true,
+      "signatures": [
+        {
+          "role": "Client",
+          "name": null,
+          "date": "2026-07-02"
+        },
+        {
+          "role": "Employee",
+          "staff_id": "ST-2004",
+          "date": "2026-07-02"
+        },
+        {
+          "role": "BH professional review",
+          "staff_id": "ST-2002",
+          "date": "2026-07-05"
+        }
+      ],
+      "goals": [
+        {
+          "goal_id": "SPG-0006-1",
+          "identified_need": "Spend more time with family",
+          "domain_of_wellness": "Social connection",
+          "specific_objective": "One family contact a week, by phone or in person",
+          "baseline_measure": "Twice a month",
+          "target_measure": "Weekly",
+          "current_measure": "3 times a month",
+          "progress_pct": 26,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Family therapy",
+              "service_code": "90847",
+              "frequency": "Twice a month",
+              "provider_staff_id": "ST-2006"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0006-2",
+          "identified_need": "Wants to feel less depressed most days",
+          "domain_of_wellness": "Behavioral health",
+          "specific_objective": "Reduce PHQ-9 score from 16 to below 10",
+          "baseline_measure": "PHQ-9 = 16",
+          "target_measure": "PHQ-9 below 10",
+          "current_measure": "PHQ-9 = 12",
+          "progress_pct": 29,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Individual therapy",
+              "service_code": "H0004",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2006"
+            },
+            {
+              "service_category": "Medication management",
+              "service_code": "99213",
+              "frequency": "Monthly",
+              "provider_staff_id": "ST-2002"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0006-3",
+          "identified_need": "Take medications as prescribed",
+          "domain_of_wellness": "Physical health",
+          "specific_objective": "Take morning medications at least 6 days of 7",
+          "baseline_measure": "4 days of 7",
+          "target_measure": "6 days of 7",
+          "current_measure": "5 days of 7",
+          "progress_pct": 33,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Medication monitoring",
+              "service_code": "H2010",
+              "frequency": "Daily",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "plan_id": "SP-0007",
+      "client_id": "CL-100238",
+      "plan_type": "Outpatient",
+      "governance": "Axiom",
+      "status": "Active",
+      "plan_date": "2026-08-13",
+      "review_date": "2026-11-11",
+      "last_edited": "2026-08-16",
+      "last_edited_by": "ST-2003",
+      "individuals_at_meeting": "Client, primary clinician",
+      "family_supports": "Yes \u2014 sister",
+      "recommended_services": "Continue outpatient services; group counseling as primary service.",
+      "transition_plan": "Not applicable",
+      "smi_determination": "Not determined",
+      "agreement": "No",
+      "copy_offered": false,
+      "signatures": [
+        {
+          "role": "Client",
+          "name": null,
+          "date": "2026-08-14"
+        },
+        {
+          "role": "Employee",
+          "staff_id": "ST-2003",
+          "date": "2026-08-14"
+        },
+        {
+          "role": "BH professional review",
+          "staff_id": "ST-2002",
+          "date": null
+        }
+      ],
+      "goals": [
+        {
+          "goal_id": "SPG-0007-1",
+          "identified_need": "Stay sober and avoid relapse",
+          "domain_of_wellness": "Substance use",
+          "specific_objective": "Attend 3 recovery meetings a week and keep negative screens",
+          "baseline_measure": "1 meeting a week",
+          "target_measure": "3 meetings a week",
+          "current_measure": "2 meetings a week",
+          "progress_pct": 64,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Group counseling",
+              "service_code": "H0005",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2006"
+            },
+            {
+              "service_category": "Peer support",
+              "service_code": "H0038",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0007-2",
+          "identified_need": "Manage daily routines on my own",
+          "domain_of_wellness": "Daily living skills",
+          "specific_objective": "Plan and cook 3 meals a week without help",
+          "baseline_measure": "1 meal a week",
+          "target_measure": "3 meals a week",
+          "current_measure": "2 meals a week",
+          "progress_pct": 55,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Skills training",
+              "service_code": "H2014",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2004"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "plan_id": "SP-0008",
+      "client_id": "CL-100238",
+      "plan_type": "Recovery Support Plan",
+      "governance": "Custom",
+      "status": "Completed",
+      "plan_date": "2026-01-05",
+      "review_date": "2026-07-04",
+      "last_edited": "2026-01-18",
+      "last_edited_by": "ST-2004",
+      "individuals_at_meeting": "Client, primary clinician",
+      "family_supports": "Yes \u2014 sister",
+      "recommended_services": "Continue outpatient services; supported employment as primary service.",
+      "transition_plan": "Step-down to outpatient planned",
+      "smi_determination": "SMI \u2014 eligible",
+      "agreement": "No",
+      "copy_offered": false,
+      "signatures": [
+        {
+          "role": "Client",
+          "name": null,
+          "date": "2026-01-06"
+        },
+        {
+          "role": "Employee",
+          "staff_id": "ST-2004",
+          "date": "2026-01-06"
+        },
+        {
+          "role": "BH professional review",
+          "staff_id": "ST-2002",
+          "date": "2026-01-09"
+        }
+      ],
+      "goals": [
+        {
+          "goal_id": "SPG-0008-1",
+          "identified_need": "Get back to work",
+          "domain_of_wellness": "Employment & education",
+          "specific_objective": "Complete 2 job applications a week with support",
+          "baseline_measure": "0 applications",
+          "target_measure": "2 a week",
+          "current_measure": "2 a week",
+          "progress_pct": 100,
+          "status": "Met",
+          "interventions": [
+            {
+              "service_category": "Supported employment",
+              "service_code": "H2023",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2004"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0008-2",
+          "identified_need": "Stay sober and avoid relapse",
+          "domain_of_wellness": "Substance use",
+          "specific_objective": "Attend 3 recovery meetings a week and keep negative screens",
+          "baseline_measure": "1 meeting a week",
+          "target_measure": "3 meetings a week",
+          "current_measure": "3 meetings a week",
+          "progress_pct": 100,
+          "status": "Met",
+          "interventions": [
+            {
+              "service_category": "Group counseling",
+              "service_code": "H0005",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2006"
+            },
+            {
+              "service_category": "Peer support",
+              "service_code": "H0038",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0008-3",
+          "identified_need": "Keep stable housing",
+          "domain_of_wellness": "Housing",
+          "specific_objective": "Pay rent on time for 3 consecutive months",
+          "baseline_measure": "Behind 1 month",
+          "target_measure": "3 months on time",
+          "current_measure": "3 months on time",
+          "progress_pct": 100,
+          "status": "Met",
+          "interventions": [
+            {
+              "service_category": "Case management",
+              "service_code": "T1016",
+              "frequency": "Twice a month",
+              "provider_staff_id": "ST-2004"
+            },
+            {
+              "service_category": "Housing support",
+              "service_code": "H0043",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2005"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "plan_id": "SP-0009",
+      "client_id": "CL-100239",
+      "plan_type": "Medication Management",
+      "governance": "Axiom",
+      "status": "Active",
+      "plan_date": "2026-07-04",
+      "review_date": "2026-11-01",
+      "last_edited": "2026-07-17",
+      "last_edited_by": "ST-2004",
+      "individuals_at_meeting": "Client, primary clinician",
+      "family_supports": "Yes \u2014 sister",
+      "recommended_services": "Continue outpatient services; group counseling as primary service.",
+      "transition_plan": "Step-down to outpatient planned",
+      "smi_determination": "SMI \u2014 eligible",
+      "agreement": "No",
+      "copy_offered": false,
+      "signatures": [
+        {
+          "role": "Client",
+          "name": null,
+          "date": "2026-07-05"
+        },
+        {
+          "role": "Employee",
+          "staff_id": "ST-2004",
+          "date": "2026-07-05"
+        },
+        {
+          "role": "BH professional review",
+          "staff_id": "ST-2002",
+          "date": "2026-07-08"
+        }
+      ],
+      "goals": [
+        {
+          "goal_id": "SPG-0009-1",
+          "identified_need": "Stay sober and avoid relapse",
+          "domain_of_wellness": "Substance use",
+          "specific_objective": "Attend 3 recovery meetings a week and keep negative screens",
+          "baseline_measure": "1 meeting a week",
+          "target_measure": "3 meetings a week",
+          "current_measure": "2 meetings a week",
+          "progress_pct": 33,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Group counseling",
+              "service_code": "H0005",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2006"
+            },
+            {
+              "service_category": "Peer support",
+              "service_code": "H0038",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0009-2",
+          "identified_need": "Take medications as prescribed",
+          "domain_of_wellness": "Physical health",
+          "specific_objective": "Take morning medications at least 6 days of 7",
+          "baseline_measure": "4 days of 7",
+          "target_measure": "6 days of 7",
+          "current_measure": "5 days of 7",
+          "progress_pct": 47,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Medication monitoring",
+              "service_code": "H2010",
+              "frequency": "Daily",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0009-3",
+          "identified_need": "Get back to work",
+          "domain_of_wellness": "Employment & education",
+          "specific_objective": "Complete 2 job applications a week with support",
+          "baseline_measure": "0 applications",
+          "target_measure": "2 a week",
+          "current_measure": "1 a week",
+          "progress_pct": 31,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Supported employment",
+              "service_code": "H2023",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2004"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "plan_id": "SP-0010",
+      "client_id": "CL-100240",
+      "plan_type": "Medication Management",
+      "governance": "Axiom",
+      "status": "Active",
+      "plan_date": "2026-08-13",
+      "review_date": "2027-02-09",
+      "last_edited": "2026-09-05",
+      "last_edited_by": "ST-2006",
+      "individuals_at_meeting": "Client, primary clinician",
+      "family_supports": "Yes \u2014 sister",
+      "recommended_services": "Continue outpatient services; family therapy as primary service.",
+      "transition_plan": "Discharge planning started",
+      "smi_determination": "Not SMI",
+      "agreement": "No",
+      "copy_offered": false,
+      "signatures": [
+        {
+          "role": "Client",
+          "name": null,
+          "date": "2026-08-14"
+        },
+        {
+          "role": "Employee",
+          "staff_id": "ST-2006",
+          "date": "2026-08-14"
+        },
+        {
+          "role": "BH professional review",
+          "staff_id": "ST-2002",
+          "date": "2026-08-17"
+        }
+      ],
+      "goals": [
+        {
+          "goal_id": "SPG-0010-1",
+          "identified_need": "Spend more time with family",
+          "domain_of_wellness": "Social connection",
+          "specific_objective": "One family contact a week, by phone or in person",
+          "baseline_measure": "Twice a month",
+          "target_measure": "Weekly",
+          "current_measure": "3 times a month",
+          "progress_pct": 26,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Family therapy",
+              "service_code": "90847",
+              "frequency": "Twice a month",
+              "provider_staff_id": "ST-2006"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0010-2",
+          "identified_need": "Stay sober and avoid relapse",
+          "domain_of_wellness": "Substance use",
+          "specific_objective": "Attend 3 recovery meetings a week and keep negative screens",
+          "baseline_measure": "1 meeting a week",
+          "target_measure": "3 meetings a week",
+          "current_measure": "2 meetings a week",
+          "progress_pct": 26,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Group counseling",
+              "service_code": "H0005",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2006"
+            },
+            {
+              "service_category": "Peer support",
+              "service_code": "H0038",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0010-3",
+          "identified_need": "Wants to feel less depressed most days",
+          "domain_of_wellness": "Behavioral health",
+          "specific_objective": "Reduce PHQ-9 score from 16 to below 10",
+          "baseline_measure": "PHQ-9 = 16",
+          "target_measure": "PHQ-9 below 10",
+          "current_measure": "PHQ-9 = 12",
+          "progress_pct": 33,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Individual therapy",
+              "service_code": "H0004",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2006"
+            },
+            {
+              "service_category": "Medication management",
+              "service_code": "99213",
+              "frequency": "Monthly",
+              "provider_staff_id": "ST-2002"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0010-4",
+          "identified_need": "Keep stable housing",
+          "domain_of_wellness": "Housing",
+          "specific_objective": "Pay rent on time for 3 consecutive months",
+          "baseline_measure": "Behind 1 month",
+          "target_measure": "3 months on time",
+          "current_measure": "1 month on time",
+          "progress_pct": 8,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Case management",
+              "service_code": "T1016",
+              "frequency": "Twice a month",
+              "provider_staff_id": "ST-2004"
+            },
+            {
+              "service_category": "Housing support",
+              "service_code": "H0043",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2005"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "plan_id": "SP-0011",
+      "client_id": "CL-100241",
+      "plan_type": "Outpatient",
+      "governance": "Axiom",
+      "status": "Active",
+      "plan_date": "2026-08-21",
+      "review_date": "2027-02-17",
+      "last_edited": "2026-08-26",
+      "last_edited_by": "ST-2006",
+      "individuals_at_meeting": "Client, primary clinician",
+      "family_supports": "Yes \u2014 partner",
+      "recommended_services": "Continue outpatient services; medication monitoring as primary service.",
+      "transition_plan": "Discharge planning started",
+      "smi_determination": "Not SMI",
+      "agreement": "No",
+      "copy_offered": true,
+      "signatures": [
+        {
+          "role": "Client",
+          "name": null,
+          "date": "2026-08-22"
+        },
+        {
+          "role": "Employee",
+          "staff_id": "ST-2006",
+          "date": "2026-08-22"
+        },
+        {
+          "role": "BH professional review",
+          "staff_id": "ST-2002",
+          "date": "2026-08-25"
+        }
+      ],
+      "goals": [
+        {
+          "goal_id": "SPG-0011-1",
+          "identified_need": "Take medications as prescribed",
+          "domain_of_wellness": "Physical health",
+          "specific_objective": "Take morning medications at least 6 days of 7",
+          "baseline_measure": "4 days of 7",
+          "target_measure": "6 days of 7",
+          "current_measure": "5 days of 7",
+          "progress_pct": 36,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Medication monitoring",
+              "service_code": "H2010",
+              "frequency": "Daily",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0011-2",
+          "identified_need": "Manage daily routines on my own",
+          "domain_of_wellness": "Daily living skills",
+          "specific_objective": "Plan and cook 3 meals a week without help",
+          "baseline_measure": "1 meal a week",
+          "target_measure": "3 meals a week",
+          "current_measure": "2 meals a week",
+          "progress_pct": 1,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Skills training",
+              "service_code": "H2014",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2004"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0011-3",
+          "identified_need": "Get back to work",
+          "domain_of_wellness": "Employment & education",
+          "specific_objective": "Complete 2 job applications a week with support",
+          "baseline_measure": "0 applications",
+          "target_measure": "2 a week",
+          "current_measure": "1 a week",
+          "progress_pct": 33,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Supported employment",
+              "service_code": "H2023",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2004"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0011-4",
+          "identified_need": "Spend more time with family",
+          "domain_of_wellness": "Social connection",
+          "specific_objective": "One family contact a week, by phone or in person",
+          "baseline_measure": "Twice a month",
+          "target_measure": "Weekly",
+          "current_measure": "3 times a month",
+          "progress_pct": 13,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Family therapy",
+              "service_code": "90847",
+              "frequency": "Twice a month",
+              "provider_staff_id": "ST-2006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "plan_id": "SP-0012",
+      "client_id": "CL-100241",
+      "plan_type": "Medication Management",
+      "governance": "Axiom",
+      "status": "Active",
+      "plan_date": "2026-08-16",
+      "review_date": "2027-02-12",
+      "last_edited": "2026-09-05",
+      "last_edited_by": "ST-2006",
+      "individuals_at_meeting": "Client, primary clinician, case manager",
+      "family_supports": "Yes \u2014 partner",
+      "recommended_services": "Continue outpatient services; group counseling as primary service.",
+      "transition_plan": "Discharge planning started",
+      "smi_determination": "Not SMI",
+      "agreement": "Yes",
+      "copy_offered": true,
+      "signatures": [
+        {
+          "role": "Client",
+          "name": null,
+          "date": "2026-08-17"
+        },
+        {
+          "role": "Employee",
+          "staff_id": "ST-2006",
+          "date": "2026-08-17"
+        },
+        {
+          "role": "BH professional review",
+          "staff_id": "ST-2002",
+          "date": "2026-08-20"
+        }
+      ],
+      "goals": [
+        {
+          "goal_id": "SPG-0012-1",
+          "identified_need": "Stay sober and avoid relapse",
+          "domain_of_wellness": "Substance use",
+          "specific_objective": "Attend 3 recovery meetings a week and keep negative screens",
+          "baseline_measure": "1 meeting a week",
+          "target_measure": "3 meetings a week",
+          "current_measure": "2 meetings a week",
+          "progress_pct": 39,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Group counseling",
+              "service_code": "H0005",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2006"
+            },
+            {
+              "service_category": "Peer support",
+              "service_code": "H0038",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0012-2",
+          "identified_need": "Take medications as prescribed",
+          "domain_of_wellness": "Physical health",
+          "specific_objective": "Take morning medications at least 6 days of 7",
+          "baseline_measure": "4 days of 7",
+          "target_measure": "6 days of 7",
+          "current_measure": "5 days of 7",
+          "progress_pct": 5,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Medication monitoring",
+              "service_code": "H2010",
+              "frequency": "Daily",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0012-3",
+          "identified_need": "Keep stable housing",
+          "domain_of_wellness": "Housing",
+          "specific_objective": "Pay rent on time for 3 consecutive months",
+          "baseline_measure": "Behind 1 month",
+          "target_measure": "3 months on time",
+          "current_measure": "1 month on time",
+          "progress_pct": 28,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Case management",
+              "service_code": "T1016",
+              "frequency": "Twice a month",
+              "provider_staff_id": "ST-2004"
+            },
+            {
+              "service_category": "Housing support",
+              "service_code": "H0043",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2005"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0012-4",
+          "identified_need": "Manage daily routines on my own",
+          "domain_of_wellness": "Daily living skills",
+          "specific_objective": "Plan and cook 3 meals a week without help",
+          "baseline_measure": "1 meal a week",
+          "target_measure": "3 meals a week",
+          "current_measure": "2 meals a week",
+          "progress_pct": 26,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Skills training",
+              "service_code": "H2014",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2004"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "plan_id": "SP-0013",
+      "client_id": "CL-100242",
+      "plan_type": "Residential",
+      "governance": "Axiom",
+      "status": "Active",
+      "plan_date": "2026-08-03",
+      "review_date": "2026-12-01",
+      "last_edited": "2026-08-16",
+      "last_edited_by": "ST-2004",
+      "individuals_at_meeting": "Client, primary clinician",
+      "family_supports": "Yes \u2014 sister",
+      "recommended_services": "Continue outpatient services; skills training as primary service.",
+      "transition_plan": "Step-down to outpatient planned",
+      "smi_determination": "SMI \u2014 eligible",
+      "agreement": "Yes",
+      "copy_offered": false,
+      "signatures": [
+        {
+          "role": "Client",
+          "name": null,
+          "date": "2026-08-04"
+        },
+        {
+          "role": "Employee",
+          "staff_id": "ST-2004",
+          "date": "2026-08-04"
+        },
+        {
+          "role": "BH professional review",
+          "staff_id": "ST-2002",
+          "date": "2026-08-07"
+        }
+      ],
+      "goals": [
+        {
+          "goal_id": "SPG-0013-1",
+          "identified_need": "Manage daily routines on my own",
+          "domain_of_wellness": "Daily living skills",
+          "specific_objective": "Plan and cook 3 meals a week without help",
+          "baseline_measure": "1 meal a week",
+          "target_measure": "3 meals a week",
+          "current_measure": "2 meals a week",
+          "progress_pct": 2,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Skills training",
+              "service_code": "H2014",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2004"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0013-2",
+          "identified_need": "Spend more time with family",
+          "domain_of_wellness": "Social connection",
+          "specific_objective": "One family contact a week, by phone or in person",
+          "baseline_measure": "Twice a month",
+          "target_measure": "Weekly",
+          "current_measure": "3 times a month",
+          "progress_pct": 30,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Family therapy",
+              "service_code": "90847",
+              "frequency": "Twice a month",
+              "provider_staff_id": "ST-2006"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0013-3",
+          "identified_need": "Keep stable housing",
+          "domain_of_wellness": "Housing",
+          "specific_objective": "Pay rent on time for 3 consecutive months",
+          "baseline_measure": "Behind 1 month",
+          "target_measure": "3 months on time",
+          "current_measure": "1 month on time",
+          "progress_pct": 24,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Case management",
+              "service_code": "T1016",
+              "frequency": "Twice a month",
+              "provider_staff_id": "ST-2004"
+            },
+            {
+              "service_category": "Housing support",
+              "service_code": "H0043",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2005"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "plan_id": "SP-0014",
+      "client_id": "CL-100243",
+      "plan_type": "Case Management",
+      "governance": "Axiom",
+      "status": "Active",
+      "plan_date": "2026-07-26",
+      "review_date": "2027-01-22",
+      "last_edited": "2026-08-06",
+      "last_edited_by": "ST-2006",
+      "individuals_at_meeting": "Client, primary clinician",
+      "family_supports": "No",
+      "recommended_services": "Continue outpatient services; family therapy as primary service.",
+      "transition_plan": "Discharge planning started",
+      "smi_determination": "Not SMI",
+      "agreement": "Yes",
+      "copy_offered": true,
+      "signatures": [
+        {
+          "role": "Client",
+          "name": null,
+          "date": "2026-07-27"
+        },
+        {
+          "role": "Employee",
+          "staff_id": "ST-2006",
+          "date": "2026-07-27"
+        },
+        {
+          "role": "BH professional review",
+          "staff_id": "ST-2002",
+          "date": "2026-07-30"
+        }
+      ],
+      "goals": [
+        {
+          "goal_id": "SPG-0014-1",
+          "identified_need": "Spend more time with family",
+          "domain_of_wellness": "Social connection",
+          "specific_objective": "One family contact a week, by phone or in person",
+          "baseline_measure": "Twice a month",
+          "target_measure": "Weekly",
+          "current_measure": "3 times a month",
+          "progress_pct": 45,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Family therapy",
+              "service_code": "90847",
+              "frequency": "Twice a month",
+              "provider_staff_id": "ST-2006"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0014-2",
+          "identified_need": "Get back to work",
+          "domain_of_wellness": "Employment & education",
+          "specific_objective": "Complete 2 job applications a week with support",
+          "baseline_measure": "0 applications",
+          "target_measure": "2 a week",
+          "current_measure": "1 a week",
+          "progress_pct": 33,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Supported employment",
+              "service_code": "H2023",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2004"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0014-3",
+          "identified_need": "Wants to feel less depressed most days",
+          "domain_of_wellness": "Behavioral health",
+          "specific_objective": "Reduce PHQ-9 score from 16 to below 10",
+          "baseline_measure": "PHQ-9 = 16",
+          "target_measure": "PHQ-9 below 10",
+          "current_measure": "PHQ-9 = 12",
+          "progress_pct": 28,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Individual therapy",
+              "service_code": "H0004",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2006"
+            },
+            {
+              "service_category": "Medication management",
+              "service_code": "99213",
+              "frequency": "Monthly",
+              "provider_staff_id": "ST-2002"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0014-4",
+          "identified_need": "Take medications as prescribed",
+          "domain_of_wellness": "Physical health",
+          "specific_objective": "Take morning medications at least 6 days of 7",
+          "baseline_measure": "4 days of 7",
+          "target_measure": "6 days of 7",
+          "current_measure": "5 days of 7",
+          "progress_pct": 14,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Medication monitoring",
+              "service_code": "H2010",
+              "frequency": "Daily",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "plan_id": "SP-0015",
+      "client_id": "CL-100243",
+      "plan_type": "Recovery Support Plan",
+      "governance": "Custom",
+      "status": "Completed",
+      "plan_date": "2026-01-11",
+      "review_date": "2026-07-10",
+      "last_edited": "2026-01-18",
+      "last_edited_by": "ST-2004",
+      "individuals_at_meeting": "Client, primary clinician",
+      "family_supports": "Yes \u2014 grandmother",
+      "recommended_services": "Continue outpatient services; family therapy as primary service.",
+      "transition_plan": "Step-down to outpatient planned",
+      "smi_determination": "SMI \u2014 eligible",
+      "agreement": "Yes",
+      "copy_offered": true,
+      "signatures": [
+        {
+          "role": "Client",
+          "name": null,
+          "date": "2026-01-12"
+        },
+        {
+          "role": "Employee",
+          "staff_id": "ST-2004",
+          "date": "2026-01-12"
+        },
+        {
+          "role": "BH professional review",
+          "staff_id": "ST-2002",
+          "date": "2026-01-15"
+        }
+      ],
+      "goals": [
+        {
+          "goal_id": "SPG-0015-1",
+          "identified_need": "Spend more time with family",
+          "domain_of_wellness": "Social connection",
+          "specific_objective": "One family contact a week, by phone or in person",
+          "baseline_measure": "Twice a month",
+          "target_measure": "Weekly",
+          "current_measure": "Weekly",
+          "progress_pct": 100,
+          "status": "Met",
+          "interventions": [
+            {
+              "service_category": "Family therapy",
+              "service_code": "90847",
+              "frequency": "Twice a month",
+              "provider_staff_id": "ST-2006"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0015-2",
+          "identified_need": "Stay sober and avoid relapse",
+          "domain_of_wellness": "Substance use",
+          "specific_objective": "Attend 3 recovery meetings a week and keep negative screens",
+          "baseline_measure": "1 meeting a week",
+          "target_measure": "3 meetings a week",
+          "current_measure": "3 meetings a week",
+          "progress_pct": 100,
+          "status": "Met",
+          "interventions": [
+            {
+              "service_category": "Group counseling",
+              "service_code": "H0005",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2006"
+            },
+            {
+              "service_category": "Peer support",
+              "service_code": "H0038",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0015-3",
+          "identified_need": "Take medications as prescribed",
+          "domain_of_wellness": "Physical health",
+          "specific_objective": "Take morning medications at least 6 days of 7",
+          "baseline_measure": "4 days of 7",
+          "target_measure": "6 days of 7",
+          "current_measure": "6 days of 7",
+          "progress_pct": 100,
+          "status": "Met",
+          "interventions": [
+            {
+              "service_category": "Medication monitoring",
+              "service_code": "H2010",
+              "frequency": "Daily",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "plan_id": "SP-0016",
+      "client_id": "CL-100244",
+      "plan_type": "Medication Management",
+      "governance": "Axiom",
+      "status": "Active",
+      "plan_date": "2026-06-22",
+      "review_date": "2026-10-20",
+      "last_edited": "2026-07-17",
+      "last_edited_by": "ST-2004",
+      "individuals_at_meeting": "Client, primary clinician",
+      "family_supports": "Yes \u2014 partner",
+      "recommended_services": "Continue outpatient services; group counseling as primary service.",
+      "transition_plan": "Step-down to outpatient planned",
+      "smi_determination": "SMI \u2014 eligible",
+      "agreement": "No",
+      "copy_offered": true,
+      "signatures": [
+        {
+          "role": "Client",
+          "name": null,
+          "date": "2026-06-23"
+        },
+        {
+          "role": "Employee",
+          "staff_id": "ST-2004",
+          "date": "2026-06-23"
+        },
+        {
+          "role": "BH professional review",
+          "staff_id": "ST-2002",
+          "date": "2026-06-26"
+        }
+      ],
+      "goals": [
+        {
+          "goal_id": "SPG-0016-1",
+          "identified_need": "Stay sober and avoid relapse",
+          "domain_of_wellness": "Substance use",
+          "specific_objective": "Attend 3 recovery meetings a week and keep negative screens",
+          "baseline_measure": "1 meeting a week",
+          "target_measure": "3 meetings a week",
+          "current_measure": "2 meetings a week",
+          "progress_pct": 35,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Group counseling",
+              "service_code": "H0005",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2006"
+            },
+            {
+              "service_category": "Peer support",
+              "service_code": "H0038",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0016-2",
+          "identified_need": "Manage daily routines on my own",
+          "domain_of_wellness": "Daily living skills",
+          "specific_objective": "Plan and cook 3 meals a week without help",
+          "baseline_measure": "1 meal a week",
+          "target_measure": "3 meals a week",
+          "current_measure": "2 meals a week",
+          "progress_pct": 36,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Skills training",
+              "service_code": "H2014",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2004"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0016-3",
+          "identified_need": "Spend more time with family",
+          "domain_of_wellness": "Social connection",
+          "specific_objective": "One family contact a week, by phone or in person",
+          "baseline_measure": "Twice a month",
+          "target_measure": "Weekly",
+          "current_measure": "3 times a month",
+          "progress_pct": 44,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Family therapy",
+              "service_code": "90847",
+              "frequency": "Twice a month",
+              "provider_staff_id": "ST-2006"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "plan_id": "SP-0017",
+      "client_id": "CL-100245",
+      "plan_type": "Housing Stability Plan",
+      "governance": "Custom",
+      "status": "Active",
+      "plan_date": "2026-08-31",
+      "review_date": "2026-11-29",
+      "last_edited": "2026-09-15",
+      "last_edited_by": "ST-2003",
+      "individuals_at_meeting": "Client, primary clinician",
+      "family_supports": "Yes \u2014 partner",
+      "recommended_services": "Continue outpatient services; skills training as primary service.",
+      "transition_plan": "Not applicable",
+      "smi_determination": "Not determined",
+      "agreement": "Yes",
+      "copy_offered": true,
+      "signatures": [
+        {
+          "role": "Client",
+          "name": null,
+          "date": "2026-09-01"
+        },
+        {
+          "role": "Employee",
+          "staff_id": "ST-2003",
+          "date": "2026-09-01"
+        },
+        {
+          "role": "BH professional review",
+          "staff_id": "ST-2002",
+          "date": null
+        }
+      ],
+      "goals": [
+        {
+          "goal_id": "SPG-0017-1",
+          "identified_need": "Manage daily routines on my own",
+          "domain_of_wellness": "Daily living skills",
+          "specific_objective": "Plan and cook 3 meals a week without help",
+          "baseline_measure": "1 meal a week",
+          "target_measure": "3 meals a week",
+          "current_measure": "2 meals a week",
+          "progress_pct": 30,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Skills training",
+              "service_code": "H2014",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2004"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0017-2",
+          "identified_need": "Take medications as prescribed",
+          "domain_of_wellness": "Physical health",
+          "specific_objective": "Take morning medications at least 6 days of 7",
+          "baseline_measure": "4 days of 7",
+          "target_measure": "6 days of 7",
+          "current_measure": "5 days of 7",
+          "progress_pct": 10,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Medication monitoring",
+              "service_code": "H2010",
+              "frequency": "Daily",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "plan_id": "SP-0018",
+      "client_id": "CL-100245",
+      "plan_type": "Residential",
+      "governance": "Axiom",
+      "status": "Active",
+      "plan_date": "2026-07-03",
+      "review_date": "2026-12-30",
+      "last_edited": "2026-07-17",
+      "last_edited_by": "ST-2006",
+      "individuals_at_meeting": "Client, primary clinician, case manager",
+      "family_supports": "Yes \u2014 mother",
+      "recommended_services": "Continue outpatient services; medication monitoring as primary service.",
+      "transition_plan": "Discharge planning started",
+      "smi_determination": "Not SMI",
+      "agreement": "Yes",
+      "copy_offered": true,
+      "signatures": [
+        {
+          "role": "Client",
+          "name": null,
+          "date": "2026-07-04"
+        },
+        {
+          "role": "Employee",
+          "staff_id": "ST-2006",
+          "date": "2026-07-04"
+        },
+        {
+          "role": "BH professional review",
+          "staff_id": "ST-2002",
+          "date": "2026-07-07"
+        }
+      ],
+      "goals": [
+        {
+          "goal_id": "SPG-0018-1",
+          "identified_need": "Take medications as prescribed",
+          "domain_of_wellness": "Physical health",
+          "specific_objective": "Take morning medications at least 6 days of 7",
+          "baseline_measure": "4 days of 7",
+          "target_measure": "6 days of 7",
+          "current_measure": "5 days of 7",
+          "progress_pct": 55,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Medication monitoring",
+              "service_code": "H2010",
+              "frequency": "Daily",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0018-2",
+          "identified_need": "Stay sober and avoid relapse",
+          "domain_of_wellness": "Substance use",
+          "specific_objective": "Attend 3 recovery meetings a week and keep negative screens",
+          "baseline_measure": "1 meeting a week",
+          "target_measure": "3 meetings a week",
+          "current_measure": "2 meetings a week",
+          "progress_pct": 36,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Group counseling",
+              "service_code": "H0005",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2006"
+            },
+            {
+              "service_category": "Peer support",
+              "service_code": "H0038",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2008"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0018-3",
+          "identified_need": "Manage daily routines on my own",
+          "domain_of_wellness": "Daily living skills",
+          "specific_objective": "Plan and cook 3 meals a week without help",
+          "baseline_measure": "1 meal a week",
+          "target_measure": "3 meals a week",
+          "current_measure": "2 meals a week",
+          "progress_pct": 40,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Skills training",
+              "service_code": "H2014",
+              "frequency": "Weekly",
+              "provider_staff_id": "ST-2004"
+            }
+          ]
+        },
+        {
+          "goal_id": "SPG-0018-4",
+          "identified_need": "Spend more time with family",
+          "domain_of_wellness": "Social connection",
+          "specific_objective": "One family contact a week, by phone or in person",
+          "baseline_measure": "Twice a month",
+          "target_measure": "Weekly",
+          "current_measure": "3 times a month",
+          "progress_pct": 50,
+          "status": "In progress",
+          "interventions": [
+            {
+              "service_category": "Family therapy",
+              "service_code": "90847",
+              "frequency": "Twice a month",
+              "provider_staff_id": "ST-2006"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

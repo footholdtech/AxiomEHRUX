@@ -1,15 +1,17 @@
 {
   "_meta": {
-    "description": "Notes care-team staff leave each other about a client. read_by lists the staff who have opened each one; the header badge counts unread for the signed-in user.",
+    "description": "Notes care-team staff leave each other about a client, with production's fields (topic, importance, show_in_header) plus notify_team. read_by lists who has marked each one read.",
     "fictional": true,
     "fields": [
       "note_id",
       "client_id",
       "author_staff_id",
       "timestamp",
-      "subject",
+      "topic",
+      "importance",
+      "show_in_header",
+      "notify_team",
       "body",
-      "important",
       "read_by"
     ]
   },
@@ -18,10 +20,12 @@
       "note_id": "CN-0001",
       "client_id": "CL-100234",
       "author_staff_id": "ST-2005",
-      "timestamp": "2026-09-19T13:59:00",
-      "subject": "Transportation",
+      "timestamp": "2026-09-19T11:59:00",
+      "topic": "Transportation",
+      "importance": "Low",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Transportation voucher approved through the end of the month.",
-      "important": false,
       "read_by": [
         "ST-2002",
         "ST-2004",
@@ -33,10 +37,12 @@
       "note_id": "CN-0002",
       "client_id": "CL-100234",
       "author_staff_id": "ST-2009",
-      "timestamp": "2026-09-19T16:08:00",
-      "subject": "Housing",
+      "timestamp": "2026-09-19T12:08:00",
+      "topic": "Housing",
+      "importance": "Low",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Housing application submitted; waiting to hear back from the landlord.",
-      "important": false,
       "read_by": [
         "ST-2001",
         "ST-2004",
@@ -48,10 +54,12 @@
       "note_id": "CN-0003",
       "client_id": "CL-100234",
       "author_staff_id": "ST-2005",
-      "timestamp": "2026-09-13T09:19:00",
-      "subject": "Scheduling",
+      "timestamp": "2026-09-13T15:19:00",
+      "topic": "Scheduling",
+      "importance": "Low",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Asked to move Thursday sessions to afternoons \u2014 please check before booking.",
-      "important": false,
       "read_by": [
         "ST-2002",
         "ST-2008"
@@ -60,37 +68,13 @@
     {
       "note_id": "CN-0004",
       "client_id": "CL-100234",
-      "author_staff_id": "ST-2006",
-      "timestamp": "2026-09-13T16:56:00",
-      "subject": "Contact preference",
-      "body": "Prefers text only \u2014 please don't call the home number.",
-      "important": true,
-      "read_by": [
-        "ST-2001",
-        "ST-2008",
-        "ST-2010"
-      ]
-    },
-    {
-      "note_id": "CN-0005",
-      "client_id": "CL-100235",
       "author_staff_id": "ST-2004",
-      "timestamp": "2026-09-22T08:00:00",
-      "subject": "Transportation",
-      "body": "Transportation voucher approved through the end of the month.",
-      "important": false,
-      "read_by": [
-        "ST-2006"
-      ]
-    },
-    {
-      "note_id": "CN-0006",
-      "client_id": "CL-100235",
-      "author_staff_id": "ST-2009",
-      "timestamp": "2026-09-17T10:38:00",
-      "subject": "Pharmacy follow-up",
-      "body": "Pharmacy called about prior authorization on the latest refill. Told them the prescriber will follow up.",
-      "important": false,
+      "timestamp": "2026-09-12T09:25:00",
+      "topic": "Contact information",
+      "importance": "Medium",
+      "show_in_header": true,
+      "notify_team": true,
+      "body": "Prefers text only \u2014 please don't call the home number.",
       "read_by": [
         "ST-2001",
         "ST-2002",
@@ -99,13 +83,46 @@
       ]
     },
     {
+      "note_id": "CN-0005",
+      "client_id": "CL-100235",
+      "author_staff_id": "ST-2004",
+      "timestamp": "2026-09-22T12:00:00",
+      "topic": "Transportation",
+      "importance": "Low",
+      "show_in_header": true,
+      "notify_team": false,
+      "body": "Transportation voucher approved through the end of the month.",
+      "read_by": [
+        "ST-2006"
+      ]
+    },
+    {
+      "note_id": "CN-0006",
+      "client_id": "CL-100235",
+      "author_staff_id": "ST-2006",
+      "timestamp": "2026-09-16T15:31:00",
+      "topic": "Pharmacy",
+      "importance": "Medium",
+      "show_in_header": true,
+      "notify_team": false,
+      "body": "Pharmacy called about prior authorization on the latest refill. Told them the prescriber will follow up.",
+      "read_by": [
+        "ST-2001",
+        "ST-2004",
+        "ST-2007",
+        "ST-2010"
+      ]
+    },
+    {
       "note_id": "CN-0007",
       "client_id": "CL-100236",
       "author_staff_id": "ST-2004",
-      "timestamp": "2026-09-21T13:05:00",
-      "subject": "Scheduling",
+      "timestamp": "2026-09-21T09:05:00",
+      "topic": "Scheduling",
+      "importance": "Low",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Asked to move Thursday sessions to afternoons \u2014 please check before booking.",
-      "important": false,
       "read_by": [
         "ST-2009"
       ]
@@ -114,10 +131,12 @@
       "note_id": "CN-0008",
       "client_id": "CL-100236",
       "author_staff_id": "ST-2009",
-      "timestamp": "2026-09-19T16:08:00",
-      "subject": "Check-in suggested",
+      "timestamp": "2026-09-19T08:08:00",
+      "topic": "Therapy",
+      "importance": "Medium",
+      "show_in_header": true,
+      "notify_team": true,
       "body": "Was tearful in group this morning. Worth a check-in before the next session.",
-      "important": true,
       "read_by": [
         "ST-2002",
         "ST-2004",
@@ -128,24 +147,27 @@
     {
       "note_id": "CN-0009",
       "client_id": "CL-100236",
-      "author_staff_id": "ST-2008",
-      "timestamp": "2026-09-13T13:47:00",
-      "subject": "Missed dose",
+      "author_staff_id": "ST-2005",
+      "timestamp": "2026-09-15T09:09:00",
+      "topic": "Medications",
+      "importance": "High",
+      "show_in_header": true,
+      "notify_team": true,
       "body": "Missed this morning's medication pass. Came in at noon and took it.",
-      "important": true,
       "read_by": [
-        "ST-2002",
-        "ST-2005"
+        "ST-2006"
       ]
     },
     {
       "note_id": "CN-0010",
       "client_id": "CL-100236",
       "author_staff_id": "ST-2006",
-      "timestamp": "2026-09-12T12:01:00",
-      "subject": "Transportation",
+      "timestamp": "2026-09-12T09:01:00",
+      "topic": "Transportation",
+      "importance": "Low",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Transportation voucher approved through the end of the month.",
-      "important": false,
       "read_by": [
         "ST-2005"
       ]
@@ -155,9 +177,11 @@
       "client_id": "CL-100236",
       "author_staff_id": "ST-2003",
       "timestamp": "2026-08-01T09:12:00",
-      "subject": "Care coordination",
+      "topic": "Care coordination",
+      "importance": "Low",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Can you review the updated treatment plan for this client before Friday's review?",
-      "important": false,
       "read_by": [
         "ST-2003"
       ]
@@ -167,9 +191,11 @@
       "client_id": "CL-100236",
       "author_staff_id": "ST-2007",
       "timestamp": "2026-08-01T10:05:00",
-      "subject": "Care coordination",
+      "topic": "Care coordination",
+      "importance": "Low",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Reviewed, looks good. Approved for Friday.",
-      "important": false,
       "read_by": [
         "ST-2003"
       ]
@@ -178,10 +204,12 @@
       "note_id": "CN-0013",
       "client_id": "CL-100237",
       "author_staff_id": "ST-2004",
-      "timestamp": "2026-09-20T08:30:00",
-      "subject": "Scheduling",
+      "timestamp": "2026-09-20T10:30:00",
+      "topic": "Scheduling",
+      "importance": "Low",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Asked to move Thursday sessions to afternoons \u2014 please check before booking.",
-      "important": false,
       "read_by": [
         "ST-2008"
       ]
@@ -189,28 +217,35 @@
     {
       "note_id": "CN-0014",
       "client_id": "CL-100237",
-      "author_staff_id": "ST-2008",
-      "timestamp": "2026-09-17T08:42:00",
-      "subject": "Court date moved",
+      "author_staff_id": "ST-2006",
+      "timestamp": "2026-09-16T11:31:00",
+      "topic": "Court / legal",
+      "importance": "Medium",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Court date moved to the 14th. A letter of attendance will be needed.",
-      "important": false,
       "read_by": [
-        "ST-2005",
-        "ST-2006"
+        "ST-2002",
+        "ST-2004",
+        "ST-2007",
+        "ST-2009"
       ]
     },
     {
       "note_id": "CN-0015",
       "client_id": "CL-100237",
-      "author_staff_id": "ST-2008",
-      "timestamp": "2026-09-13T11:27:00",
-      "subject": "Check-in suggested",
+      "author_staff_id": "ST-2004",
+      "timestamp": "2026-09-15T13:05:00",
+      "topic": "Therapy",
+      "importance": "Medium",
+      "show_in_header": true,
+      "notify_team": true,
       "body": "Was tearful in group this morning. Worth a check-in before the next session.",
-      "important": true,
       "read_by": [
-        "ST-2001",
+        "ST-2003",
+        "ST-2005",
         "ST-2006",
-        "ST-2010"
+        "ST-2009"
       ]
     },
     {
@@ -218,31 +253,38 @@
       "client_id": "CL-100237",
       "author_staff_id": "ST-2010",
       "timestamp": "2026-07-25T16:00:00",
-      "subject": "Care coordination",
+      "topic": "Care coordination",
+      "importance": "Low",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Discharge summary for this client is missing a signature, please complete when you have a moment.",
-      "important": false,
       "read_by": []
     },
     {
       "note_id": "CN-0017",
       "client_id": "CL-100238",
-      "author_staff_id": "ST-2008",
-      "timestamp": "2026-09-22T08:12:00",
-      "subject": "Contact preference",
+      "author_staff_id": "ST-2006",
+      "timestamp": "2026-09-21T13:21:00",
+      "topic": "Contact information",
+      "importance": "Medium",
+      "show_in_header": true,
+      "notify_team": true,
       "body": "Prefers text only \u2014 please don't call the home number.",
-      "important": true,
       "read_by": [
-        "ST-2006"
+        "ST-2007",
+        "ST-2009"
       ]
     },
     {
       "note_id": "CN-0018",
       "client_id": "CL-100238",
       "author_staff_id": "ST-2005",
-      "timestamp": "2026-09-16T09:19:00",
-      "subject": "Transportation",
+      "timestamp": "2026-09-16T15:19:00",
+      "topic": "Transportation",
+      "importance": "Low",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Transportation voucher approved through the end of the month.",
-      "important": false,
       "read_by": [
         "ST-2002",
         "ST-2009"
@@ -251,26 +293,29 @@
     {
       "note_id": "CN-0019",
       "client_id": "CL-100238",
-      "author_staff_id": "ST-2005",
-      "timestamp": "2026-09-14T08:54:00",
-      "subject": "Check-in suggested",
+      "author_staff_id": "ST-2004",
+      "timestamp": "2026-09-14T10:50:00",
+      "topic": "Therapy",
+      "importance": "Medium",
+      "show_in_header": true,
+      "notify_team": true,
       "body": "Was tearful in group this morning. Worth a check-in before the next session.",
-      "important": true,
       "read_by": [
-        "ST-2003",
-        "ST-2004",
-        "ST-2009",
-        "ST-2010"
+        "ST-2001",
+        "ST-2002",
+        "ST-2007"
       ]
     },
     {
       "note_id": "CN-0020",
       "client_id": "CL-100239",
       "author_staff_id": "ST-2005",
-      "timestamp": "2026-09-22T10:44:00",
-      "subject": "Scheduling",
+      "timestamp": "2026-09-22T12:44:00",
+      "topic": "Scheduling",
+      "importance": "Low",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Asked to move Thursday sessions to afternoons \u2014 please check before booking.",
-      "important": false,
       "read_by": [
         "ST-2006",
         "ST-2010"
@@ -279,24 +324,27 @@
     {
       "note_id": "CN-0021",
       "client_id": "CL-100239",
-      "author_staff_id": "ST-2006",
-      "timestamp": "2026-09-17T09:46:00",
-      "subject": "Pharmacy follow-up",
+      "author_staff_id": "ST-2005",
+      "timestamp": "2026-09-16T11:39:00",
+      "topic": "Pharmacy",
+      "importance": "Medium",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Pharmacy called about prior authorization on the latest refill. Told them the prescriber will follow up.",
-      "important": false,
       "read_by": [
-        "ST-2007",
-        "ST-2009"
+        "ST-2003"
       ]
     },
     {
       "note_id": "CN-0022",
       "client_id": "CL-100240",
       "author_staff_id": "ST-2009",
-      "timestamp": "2026-09-22T15:28:00",
-      "subject": "Transportation",
+      "timestamp": "2026-09-22T08:28:00",
+      "topic": "Transportation",
+      "importance": "Low",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Transportation voucher approved through the end of the month.",
-      "important": false,
       "read_by": [
         "ST-2001",
         "ST-2006",
@@ -307,62 +355,73 @@
       "note_id": "CN-0023",
       "client_id": "CL-100240",
       "author_staff_id": "ST-2006",
-      "timestamp": "2026-09-16T08:51:00",
-      "subject": "New allergy reported",
+      "timestamp": "2026-09-17T14:06:00",
+      "topic": "Allergies",
+      "importance": "High",
+      "show_in_header": true,
+      "notify_team": true,
       "body": "Mentioned a shellfish allergy at the front desk today. It isn't in the chart yet.",
-      "important": true,
       "read_by": [
-        "ST-2002",
+        "ST-2003",
         "ST-2005",
-        "ST-2008"
+        "ST-2009"
       ]
     },
     {
       "note_id": "CN-0024",
       "client_id": "CL-100241",
-      "author_staff_id": "ST-2004",
-      "timestamp": "2026-09-20T11:30:00",
-      "subject": "Check-in suggested",
+      "author_staff_id": "ST-2009",
+      "timestamp": "2026-09-20T10:18:00",
+      "topic": "Therapy",
+      "importance": "Medium",
+      "show_in_header": true,
+      "notify_team": true,
       "body": "Was tearful in group this morning. Worth a check-in before the next session.",
-      "important": true,
       "read_by": [
-        "ST-2008"
+        "ST-2004",
+        "ST-2010"
       ]
     },
     {
       "note_id": "CN-0025",
       "client_id": "CL-100241",
       "author_staff_id": "ST-2009",
-      "timestamp": "2026-09-19T12:28:00",
-      "subject": "Contact preference",
+      "timestamp": "2026-09-18T13:53:00",
+      "topic": "Contact information",
+      "importance": "Medium",
+      "show_in_header": true,
+      "notify_team": true,
       "body": "Prefers text only \u2014 please don't call the home number.",
-      "important": true,
       "read_by": [
-        "ST-2002",
-        "ST-2005",
-        "ST-2008"
+        "ST-2007"
       ]
     },
     {
       "note_id": "CN-0026",
       "client_id": "CL-100242",
-      "author_staff_id": "ST-2006",
-      "timestamp": "2026-09-21T11:21:00",
-      "subject": "New allergy reported",
+      "author_staff_id": "ST-2008",
+      "timestamp": "2026-09-22T08:32:00",
+      "topic": "Allergies",
+      "importance": "High",
+      "show_in_header": true,
+      "notify_team": true,
       "body": "Mentioned a shellfish allergy at the front desk today. It isn't in the chart yet.",
-      "important": true,
       "read_by": [
-        "ST-2007"
+        "ST-2001",
+        "ST-2006",
+        "ST-2010"
       ]
     },
     {
       "note_id": "CN-0027",
       "client_id": "CL-100242",
       "author_staff_id": "ST-2005",
-      "timestamp": "2026-09-17T08:54:00",
-      "subject": "Scheduling",
+      "timestamp": "2026-09-17T14:54:00",
+      "topic": "Scheduling",
+      "importance": "Low",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Asked to move Thursday sessions to afternoons \u2014 please check before booking.",
-      "important": false,
       "read_by": [
         "ST-2007"
       ]
@@ -370,16 +429,15 @@
     {
       "note_id": "CN-0028",
       "client_id": "CL-100243",
-      "author_staff_id": "ST-2009",
-      "timestamp": "2026-09-20T11:18:00",
-      "subject": "Contact preference",
+      "author_staff_id": "ST-2006",
+      "timestamp": "2026-09-19T11:11:00",
+      "topic": "Contact information",
+      "importance": "Medium",
+      "show_in_header": true,
+      "notify_team": true,
       "body": "Prefers text only \u2014 please don't call the home number.",
-      "important": true,
       "read_by": [
-        "ST-2001",
-        "ST-2002",
-        "ST-2007",
-        "ST-2010"
+        "ST-2005"
       ]
     },
     {
@@ -387,9 +445,11 @@
       "client_id": "CL-100243",
       "author_staff_id": "ST-2005",
       "timestamp": "2026-09-17T14:54:00",
-      "subject": "Housing",
+      "topic": "Housing",
+      "importance": "Low",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Housing application submitted; waiting to hear back from the landlord.",
-      "important": false,
       "read_by": [
         "ST-2001",
         "ST-2002",
@@ -401,41 +461,46 @@
     {
       "note_id": "CN-0030",
       "client_id": "CL-100244",
-      "author_staff_id": "ST-2004",
-      "timestamp": "2026-09-19T09:55:00",
-      "subject": "New allergy reported",
+      "author_staff_id": "ST-2009",
+      "timestamp": "2026-09-20T10:18:00",
+      "topic": "Allergies",
+      "importance": "High",
+      "show_in_header": true,
+      "notify_team": true,
       "body": "Mentioned a shellfish allergy at the front desk today. It isn't in the chart yet.",
-      "important": true,
       "read_by": [
-        "ST-2005",
-        "ST-2009",
+        "ST-2001",
+        "ST-2002",
+        "ST-2007",
         "ST-2010"
       ]
     },
     {
       "note_id": "CN-0031",
       "client_id": "CL-100244",
-      "author_staff_id": "ST-2006",
-      "timestamp": "2026-09-17T11:06:00",
-      "subject": "Pharmacy follow-up",
+      "author_staff_id": "ST-2005",
+      "timestamp": "2026-09-16T15:59:00",
+      "topic": "Pharmacy",
+      "importance": "Medium",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Pharmacy called about prior authorization on the latest refill. Told them the prescriber will follow up.",
-      "important": false,
       "read_by": [
-        "ST-2001",
-        "ST-2002",
-        "ST-2007",
-        "ST-2008",
-        "ST-2010"
+        "ST-2003",
+        "ST-2006",
+        "ST-2009"
       ]
     },
     {
       "note_id": "CN-0032",
       "client_id": "CL-100244",
       "author_staff_id": "ST-2006",
-      "timestamp": "2026-09-16T14:36:00",
-      "subject": "Transportation",
+      "timestamp": "2026-09-16T12:36:00",
+      "topic": "Transportation",
+      "importance": "Low",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Transportation voucher approved through the end of the month.",
-      "important": false,
       "read_by": [
         "ST-2002",
         "ST-2005",
@@ -446,10 +511,12 @@
       "note_id": "CN-0033",
       "client_id": "CL-100244",
       "author_staff_id": "ST-2005",
-      "timestamp": "2026-09-12T12:49:00",
-      "subject": "Housing",
+      "timestamp": "2026-09-12T13:49:00",
+      "topic": "Housing",
+      "importance": "Low",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Housing application submitted; waiting to hear back from the landlord.",
-      "important": false,
       "read_by": [
         "ST-2007",
         "ST-2009",
@@ -461,19 +528,23 @@
       "client_id": "CL-100244",
       "author_staff_id": "ST-2008",
       "timestamp": "2026-07-28T08:40:00",
-      "subject": "Care coordination",
+      "topic": "Care coordination",
+      "importance": "Low",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Vitals for this client came back elevated BP again this morning, flagging for your review.",
-      "important": false,
       "read_by": []
     },
     {
       "note_id": "CN-0035",
       "client_id": "CL-100245",
       "author_staff_id": "ST-2009",
-      "timestamp": "2026-09-19T15:43:00",
-      "subject": "Transportation",
+      "timestamp": "2026-09-19T11:43:00",
+      "topic": "Transportation",
+      "importance": "Low",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Transportation voucher approved through the end of the month.",
-      "important": false,
       "read_by": [
         "ST-2001",
         "ST-2006",
@@ -484,16 +555,16 @@
     {
       "note_id": "CN-0036",
       "client_id": "CL-100245",
-      "author_staff_id": "ST-2008",
-      "timestamp": "2026-09-18T11:57:00",
-      "subject": "Pharmacy follow-up",
+      "author_staff_id": "ST-2005",
+      "timestamp": "2026-09-19T12:04:00",
+      "topic": "Pharmacy",
+      "importance": "Medium",
+      "show_in_header": true,
+      "notify_team": false,
       "body": "Pharmacy called about prior authorization on the latest refill. Told them the prescriber will follow up.",
-      "important": false,
       "read_by": [
         "ST-2003",
-        "ST-2004",
-        "ST-2009",
-        "ST-2010"
+        "ST-2006"
       ]
     }
   ]

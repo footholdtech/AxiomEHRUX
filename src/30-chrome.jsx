@@ -113,13 +113,16 @@ const PAGE_INDEX = (() => {
   return out;
 })();
 
-function GlobalSearch() {
+/* `autoFocus` / `onDone`: the phone search sheet opens focused and closes
+   once a result is chosen. */
+function GlobalSearch({ autoFocus, onDone }) {
   const guard = useGuard();
   const [q, setQ] = useState('');
   const [scope, setScope] = useState('All');
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const inputRef = useRef(null);
+  useEffect(() => { if (autoFocus && inputRef.current) inputRef.current.focus(); }, [autoFocus]);
   useEffect(() => {
     const c = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
     document.addEventListener('mousedown', c);
@@ -140,7 +143,7 @@ function GlobalSearch() {
     if (guard.clientId) return guard.go('/chart/' + guard.clientId + '/' + slug, { client: guard.clientId });
     return guard.go('/module/' + slug);
   };
-  const reset = () => { setQ(''); setOpen(false); };
+  const reset = () => { setQ(''); setOpen(false); onDone && onDone(); };
   const clear = () => { setQ(''); if (inputRef.current) inputRef.current.focus(); };
 
   const hasResults = clientHits.length > 0 || pageHits.length > 0;
@@ -218,24 +221,73 @@ function GlobalSearch() {
   );
 }
 
+/* Top navigation per the DS sizing spec: desktop > 1184 shows everything;
+   tablet 850–1184 folds the utilities (Notifications, Calendar, Messages) into
+   a More menu that carries the notification badge; mobile < 850 also drops
+   the agency name and the wordmark and turns search into an icon that opens a
+   full-width search sheet under the bar. */
 function TopNav({ onHamburger, navOpen, onPrefs }) {
   const guard = useGuard();
+  const tablet = useMedia(BP.tablet), mobile = useMedia(BP.mobile);
   const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef(null);
-  useEffect(() => { const c = e => { if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false); }; document.addEventListener('mousedown', c); return () => document.removeEventListener('mousedown', c); }, []);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const menuRef = useRef(null), moreRef = useRef(null);
+  useNotifVersion();
+  const count = notifBellCount(), quiet = !count && notifBellQuiet();
+  useEffect(() => {
+    const c = e => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
+      if (moreRef.current && !moreRef.current.contains(e.target)) setMoreOpen(false);
+    };
+    document.addEventListener('mousedown', c);
+    return () => document.removeEventListener('mousedown', c);
+  }, []);
+  useEffect(() => { if (!mobile) setSearchOpen(false); }, [mobile]);
+  useEffect(() => { if (!tablet) setMoreOpen(false); }, [tablet]);
   return (
-    <header className="topnav">
+    <header className={'topnav' + (tablet ? ' topnav--tablet' : '') + (mobile ? ' topnav--mobile' : '')}>
       <div className="tn-left">
         <button className={'hamburger' + (navOpen ? ' active' : '')} aria-label="Menu" aria-expanded={navOpen} onClick={onHamburger}><Icon name="menu" size={20} /></button>
-        <button className="org" onClick={() => guard.go('/')} title={'Go to ' + AGENCY.name + ' home'}>
-          <span className="logo-dot"><Icon name="plus" size={9} /></span> {AGENCY.name}
-        </button>
-        <GlobalSearch />
+        {!mobile && (
+          <button className="org" onClick={() => guard.go('/')} title={'Go to ' + AGENCY.name + ' home'}>
+            <span className="logo-dot"><Icon name="plus" size={9} /></span> {AGENCY.name}
+          </button>
+        )}
+        {!mobile && <GlobalSearch />}
       </div>
       <div className="tn-right">
-        <NotifBell />
-        <a className="tn-link"><Icon name="calendar" size={16} /> Calendar</a>
-        <a className="tn-link"><Icon name="messages" size={16} /> Messages</a>
+        {mobile && (
+          <button className={'tn-icon-btn' + (searchOpen ? ' active' : '')} aria-label="Search" aria-expanded={searchOpen} onClick={() => setSearchOpen(o => !o)}>
+            <Icon name="search" size={20} />
+          </button>
+        )}
+        {/* Always mounted, even folded: the bell owns the notifications flyout,
+            which the More menu opens too. */}
+        <span className={'tn-utils' + (tablet ? ' is-folded' : '')}>
+          <NotifBell />
+          <a className="tn-link"><Icon name="calendar" size={16} /> Calendar</a>
+          <a className="tn-link"><Icon name="messages" size={16} /> Messages</a>
+        </span>
+        {tablet && (
+          <div className="menu-anchor" ref={moreRef}>
+            <button className="tn-icon-btn tn-more" onClick={() => setMoreOpen(o => !o)} aria-haspopup="menu" aria-expanded={moreOpen}
+              aria-label={'More' + (count ? ', ' + count + ' notifications need you' : quiet ? ', new notifications' : '')}>
+              <Icon name="dsUtil6" size={20} />
+              {count > 0 && <NCount n={count} className="ncount--bell ncount--more" />}
+              {quiet && <NDot tone="quiet" className="ndot--bell" />}
+            </button>
+            {moreOpen && (
+              <div className="dropdown" role="menu">
+                <button className="menu-item" role="menuitem" onClick={() => { setMoreOpen(false); window.dispatchEvent(new Event('axiom-open-notifs')); }}>
+                  <Icon name="bell" size={17} /> Notifications <span className="spacer" />{count > 0 && <NCount n={count} />}
+                </button>
+                <button className="menu-item" role="menuitem"><Icon name="calendar" size={17} /> Calendar</button>
+                <button className="menu-item" role="menuitem"><Icon name="messages" size={17} /> Messages</button>
+              </div>
+            )}
+          </div>
+        )}
         <div className="menu-anchor" ref={menuRef}>
           <button className="tn-avatar-btn" onClick={() => setMenuOpen(o => !o)} aria-haspopup="menu" aria-expanded={menuOpen} aria-label="Account menu">
             <Avatar name={ME.name} size="M" />
@@ -254,8 +306,11 @@ function TopNav({ onHamburger, navOpen, onPrefs }) {
         </div>
         {/* The standalone build hands the logo over as a data URI; the dev
             build loads it from assets/. */}
-        <img className="brand-logo" src={window.__AXIOM_LOGO || 'assets/radicle-health.svg'} alt="Radicle Health" />
+        {!mobile && <img className="brand-logo" src={window.__AXIOM_LOGO || 'assets/radicle-health.svg'} alt="Radicle Health" />}
       </div>
+      {mobile && searchOpen && (
+        <div className="tn-search-sheet"><GlobalSearch autoFocus onDone={() => setSearchOpen(false)} /></div>
+      )}
     </header>
   );
 }
@@ -762,7 +817,9 @@ function QuickViewBody({ view, client, attrsShown, onEditAttrs, preview }) {
    growing. Pages are computed against a hidden mirror of every pill, so
    nothing is painted mid-reflow; the page holding the active quick view is
    always the one shown. */
-function PillPager({ views, active, onSelect }) {
+/* `maxRows` is 2, or 1 on a phone so the pills and their arrows stay on one
+   line. */
+function PillPager({ views, active, onSelect, maxRows = 2 }) {
   const wrapRef = useRef(null), mirrorRef = useRef(null), arrowsRef = useRef(null);
   const [pages, setPages] = useState([views.map((_, i) => i)]);
   const [page, setPage] = useState(0);
@@ -778,7 +835,7 @@ function PillPager({ views, active, onSelect }) {
       widths.forEach((w, i) => {
         const need = cur.length && x ? x + GAP + w : w;
         if (need <= budget || !cur.length) { cur.push(i); x = need; }
-        else if (row < 2) { row++; cur.push(i); x = w; }
+        else if (row < maxRows) { row++; cur.push(i); x = w; }
         else { out.push(cur); cur = [i]; row = 1; x = w; }
       });
       if (cur.length) out.push(cur);
@@ -788,7 +845,7 @@ function PillPager({ views, active, onSelect }) {
     let p = paginate(full);
     if (p.length > 1) p = paginate(full - ((arrowsRef.current && arrowsRef.current.offsetWidth) || 104) - GAP);
     setPages(p);
-  }, []);
+  }, [maxRows]);
 
   useEffect(() => {
     measure();
@@ -849,6 +906,15 @@ function PillPager({ views, active, onSelect }) {
   );
 }
 
+function ChatWithChartButton({ compact }) {
+  return (
+    <button className={'cph-chat' + (compact ? ' cph-chat--compact' : '')}>
+      <Icon name="dsSparkle" size={compact ? 16 : 20} />
+      <span>Chat With Chart</span>
+    </button>
+  );
+}
+
 /* `preset` overrides the resolved one — that is how the Admin configuration
    page previews a draft with the real component instead of a mock of it. */
 function ClientPageHeader({ client, preset, preview }) {
@@ -863,6 +929,11 @@ function ClientPageHeader({ client, preset, preview }) {
   const [tab, setTab] = useState(views[0].key);
   const [editing, setEditing] = useState(false);
   const [attrs, setAttrs] = useState(null);   // null = use the client's own
+  /* Phones (< 540px): the same header, denser, so it doesn't take half the
+     screen even collapsed — M avatar, smaller display name, smaller round
+     buttons, Chat With Chart pinned top-right, the toggle beside DOB with a
+     short label, and one line of quick-view pills. */
+  const compact = useMedia(BP.compact);
   /* The strip reads the same records as the quick views, so a vitals reading
      or allergy added from the header shows up here at once. */
   useRecordsVersion();
@@ -900,19 +971,33 @@ function ClientPageHeader({ client, preset, preview }) {
     { count: 'Work list' },
   ];
 
+  const status = <span className={'cph-status cph-status--' + (client.status === 'Active' ? 'success' : 'inactive')}>{client.status}</span>;
+  const toggle = (
+    <button className="cph-toggle" aria-expanded={expanded} aria-label={expanded ? 'Collapse details' : 'Expand details'} onClick={() => setExpanded(x => !x)}>
+      <span>{compact ? (expanded ? 'Collapse' : 'Expand') : (expanded ? 'Collapse Details' : 'Expand Details')}</span>
+      <Icon name={expanded ? 'dsChevUp' : 'dsChevDown'} size={compact ? 18 : 20} />
+    </button>
+  );
+
   return (
-    <section className={'cph' + (expanded ? ' cph--expanded' : '')} data-node-id="8139:96518"
+    <section className={'cph' + (expanded ? ' cph--expanded' : '') + (compact ? ' cph--compact' : '')} data-node-id="8139:96518"
       aria-label={'Client header — ' + client.displayName}>
+      {compact && header.showActions && <ChatWithChartButton compact />}
       <div className="cph-top">
         <div className="cph-identity">
-          <Avatar name={client.name} size="L" />
+          <Avatar name={client.name} size={compact ? 'M' : 'L'} />
           <div className="cph-demo">
             <div className="cph-nameline">
               <h1 className="cph-name">{client.displayName}</h1>
-              <span className={'cph-status cph-status--' + (client.status === 'Active' ? 'success' : 'inactive')}>{client.status}</span>
+              {!compact && status}
             </div>
-            <div className="cph-pronouns">{client.pronouns}</div>
-            <div className="cph-dob"><b>DOB:</b> <span>{fmtDate(client.dob)}, {client.age} yr old</span></div>
+            {/* On a phone the status rides the pronouns line, so it never
+                wraps onto a line of its own under a long name. */}
+            <div className="cph-pronouns">{client.pronouns}{compact && status}</div>
+            <div className="cph-dob"><b>DOB:</b> <span>{fmtDate(client.dob)}, {client.age} yr old</span>
+              {compact && <span className="spacer" />}
+              {compact && toggle}
+            </div>
           </div>
         </div>
 
@@ -934,23 +1019,20 @@ function ClientPageHeader({ client, preset, preview }) {
                 <Tooltip label="More Actions">
                   <button className="cph-icon-btn cph-icon-btn--sq" aria-label="More Actions"><Icon name="dsUtil6" size={20} /></button>
                 </Tooltip>
-                <span className="cph-divider" aria-hidden="true" />
-                <button className="cph-chat">
-                  <Icon name="dsSparkle" size={20} />
-                  <span>Chat With Chart</span>
-                </button>
+                {!compact && <span className="cph-divider" aria-hidden="true" />}
+                {!compact && <ChatWithChartButton />}
               </React.Fragment>
             )}
           </div>
 
-          <div className="cph-navrow">
-            {/* Pills are an expanded-state affordance only. */}
-            {expanded ? <PillPager views={views} active={tab} onSelect={setTab} /> : <span className="spacer" />}
-            <button className="cph-toggle" aria-expanded={expanded} onClick={() => setExpanded(x => !x)}>
-              <span>{expanded ? 'Collapse Details' : 'Expand Details'}</span>
-              <Icon name={expanded ? 'dsChevUp' : 'dsChevDown'} size={20} />
-            </button>
-          </div>
+          {/* Pills are an expanded-state affordance only. On a phone the
+              toggle lives on the DOB line, so collapsed there is no row here. */}
+          {(!compact || expanded) && (
+            <div className="cph-navrow">
+              {expanded ? <PillPager views={views} active={tab} onSelect={setTab} maxRows={compact ? 1 : 2} /> : <span className="spacer" />}
+              {!compact && toggle}
+            </div>
+          )}
         </div>
       </div>
 

@@ -147,6 +147,10 @@ function getAdmins(client, formId) {
     : own(SESSION.added.admins, client.client_id).concat(own(RD.assessmentAdmins, client.client_id));
   return rows.filter(r => r.form_id === formId).sort(byDateDesc('date'));
 }
+function getServicePlans(client) {
+  const rows = client.records ? (client.records.plans || []) : own(RD.servicePlans, client.client_id);
+  return rows.slice().sort((a, b) => (a.status === 'Active' ? 0 : 1) - (b.status === 'Active' ? 0 : 1) || byDateDesc('plan_date')(a, b));
+}
 function getNotes(client) {
   const rows = client.records ? (client.records.notes || [])
     : own(RD.clientNotes, client.client_id).concat(own(SESSION.added.notes, client.client_id));
@@ -167,10 +171,17 @@ function patchMeds(ids, fn) {
   touchRecords();
 }
 function setNoteRead(noteId, read) { SESSION.noteRead[noteId] = read; touchRecords(); }
+/* Read receipts apply only to notes sent with Notify Care Team. A plain note
+   lives on the chart without asking anyone to mark it read — so staff can
+   protect each other's time, and agencies can make that an internal policy. */
+const noteNeedsRead = n => !!n.notify_team && !n.read && !n.deleted;
 /* Authors may delete their own notes only. The row stays as a tombstone so the
    conversation around it still makes sense. */
 function deleteNote(noteId) { SESSION.noteDeleted[noteId] = true; touchRecords(); }
-function addNote(client, body, important) {
+/* Production's patient-note fields: topic and importance (required), shown in
+   the client header (always, for now), plus Notify Care Team — the flag that
+   sends it to colleagues' notification centers with a read receipt. */
+function addNote(client, { body, topic, importance, notify }) {
   addRecord('notes', { note_id: newId('CN'), client_id: client.client_id, author_staff_id: ME.id,
-    timestamp: isoOf(TODAY) + 'T' + new Date().toTimeString().slice(0, 5) + ':00', subject: '', body, important: !!important, read_by: [ME.id] });
+    timestamp: isoOf(TODAY) + 'T' + new Date().toTimeString().slice(0, 5) + ':00', topic, importance: importance || 'Low', show_in_header: true, notify_team: !!notify, body, read_by: [ME.id] });
 }
