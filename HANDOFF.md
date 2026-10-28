@@ -1,4 +1,4 @@
-# Handoff — AxiomEHR Discharge Plan prototype
+# Handoff — AxiomEHR interaction prototype
 
 Everything a fresh session needs to finish the design-fidelity pass. Written
 2026-09-22, at the point where the behaviour work was done and the visual work
@@ -246,9 +246,11 @@ Behaviour and bug fixes completed and verified in-browser:
 - **Tab pills are expanded-state only** — the DS dropped them from the
   collapsed variant. Collapsed renders zero pills.
 - **The attribute pencil sits inside the attribute box** and opens
-  `AttributesOverlay`: pick from the agency's 15-name vocabulary, or name a
-  net-new attribute and choose its glyph. Selection is component state only;
-  nothing is written back.
+  `AttributesOverlay` (see CLIENT-HEADER-SPEC §2a): add from the agency's
+  library (search, chart suggestions, categories), edit start/end dates, remove
+  as entered in error, and read each attribute's history. Saves to the session
+  store in `16-records.jsx`, so the box, the collapsed-header indicator and the
+  dialog agree; a reload starts clean.
   - Its rows are `div role="checkbox"`, **not** `<label>`. `Checkbox` renders
     its own `<label>`, and nesting labels is invalid HTML that double-toggles
     in some browsers. The row owns the click and `.rds-checkbox` is
@@ -470,6 +472,16 @@ Behaviour and bug fixes completed and verified in-browser:
 - **Staggered entry** on the dashboard and Client Summary: 240ms fade + 6px
   rise, 55ms apart. Opacity and a small offset only, per the trap below.
 
+### Wayfinding: no dead ends (2026-10-28)
+
+`src/47-pages.jsx`. Every breadcrumb and nav item now leads to a real page.
+
+- **One map of where things live.** `NAV_PLACE` / `navTrail()` / `openNavItem()` in `30-chrome.jsx` are built from `NAV_SECTIONS`, so every page draws the trail the left nav implies (Reports › Dynamic Report Builder, Documents › PHQ, Clients › Allergy). Categories (Assessments, Builders) are drawers, never crumbs.
+- **Section pages.** `/reports`, `/billing`, `/admin`: the section's children in nav order (categories, then links). `/documents` is the document search instead; `/clients` stays the client list.
+- **Documents** (`DocumentsPage`): every document across the user's clients (`clientDocs`), filtered by client, author (incl. Me), document type, status and a date range with production's quick sets (Today −30 −7 / Today 7 30), plus keyword search. Filters apply live; Reset Filters appears once something changes. New Document chooses a note type, then a client if none is in context. Opening a row goes through the guard (a different client in context is a named switch) and lands on `/chart/:id/doc-…`, a chart tab named for the document. Production's Clinical Forms Search route opens this page.
+- **Record pages.** Every module and page has a table and an **Add** that opens a form **on the page**, not a dialog, so the loop is visible: typing marks the page dirty, the breadcrumb and nav intercept, Save or Cancel makes it clean. Client modules render inside the chart; everything else is client-agnostic. Real specs for Allergy, Vitals, Immunization, Injection, Diagnosis, Problem List, Payor Assignment and Appointments; Prescription and the scored instruments keep their existing dialogs (prescribing and item-level scoring have real logic). Everything else uses sample entries with a date / status / entry form, labelled as sample data. Records save to the session store, so an allergy added on the Allergy page shows in the header count at once.
+- A deep-linked client switch now keeps the module or document that was asked for instead of dropping to the summary.
+
 ## 4. Outstanding — needs the artboards
 
 Lisa's list, in her words, with what is blocking each:
@@ -511,9 +523,11 @@ Also outstanding from the "next set" Lisa mentioned but has not sent yet.
 ```bash
 python3 tools/build-clinical-fixtures.py   # per-client diagnosis + problem tables
 python3 tools/build-header-fixtures.py     # header quick-view tables (run before build-refdata)
+python3 tools/build-attribute-fixtures.py  # attribute catalog, agency list, per-chart assignments (run before build-refdata)
+python3 tools/fetch-attribute-icons.py     # only when adding Fluent glyphs; needs network
 python3 tools/build-notification-fixtures.py  # notification center (run before build-refdata)
 python3 tools/build-refdata.py             # fixtures -> assets/refdata.js
-python3 tools/build.py                     # -> index.html + AxiomEHR-Discharge-Plan.html
+python3 tools/build.py                     # -> index.html + AxiomEHR-Prototype.html
 python3 tools/serve.py                     # dev server, sends no-store
 ```
 

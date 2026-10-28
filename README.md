@@ -1,10 +1,10 @@
-# AxiomEHR — Discharge Plan interaction prototype
+# AxiomEHR interaction prototype
 
 An interaction-design prototype for two problems raised on the LA County site
 visit. Built on the Radicle Health Design System, using the same tokens,
 components and chrome as the existing `axiom-ehr-prototype`.
 
-**Double-click `AxiomEHR-Discharge-Plan.html`.** One file, ~4.9 MB, nothing else
+**Double-click `AxiomEHR-Prototype.html`.** One file, ~4.9 MB, nothing else
 needed — no server, no Node, no internet, any browser. Styles, fonts, icons,
 reference data, React and Babel are all inlined.
 
@@ -143,9 +143,11 @@ fixtures with anything that is not clearly fictional.
 ```bash
 python3 tools/build-clinical-fixtures.py   # regenerate the two per-client tables
 python3 tools/build-header-fixtures.py     # meds, immunizations, injections, vitals, assessments, client notes
+python3 tools/build-attribute-fixtures.py  # attribute catalog, agency list, per-chart assignments (run before build-refdata)
+python3 tools/fetch-attribute-icons.py     # only when adding Fluent glyphs; needs network
 python3 tools/build-notification-fixtures.py  # notification center items (run before build-refdata)
 python3 tools/build-refdata.py             # bundle fixtures -> assets/refdata.js
-python3 tools/build.py                     # -> index.html + AxiomEHR-Discharge-Plan.html
+python3 tools/build.py                     # -> index.html + AxiomEHR-Prototype.html
 python3 tools/serve.py                     # dev server on :8791, sends no-store
 ```
 
@@ -200,7 +202,7 @@ you won't get an intercept on those two paths.
 | `src/60-summary.jsx` | The generated discharge summary |
 | `src/90-app.jsx` | Routes and mount |
 | `vendor/` | React, ReactDOM and Babel, vendored so nothing loads from a CDN |
-| `index.html` · `AxiomEHR-Discharge-Plan.html` | Generated output — identical, self-contained, never hand-edited |
+| `index.html` · `AxiomEHR-Prototype.html` | Generated output — identical, self-contained, never hand-edited |
 | `styles/discharge.css` | Everything new; loads after the shared `app.css` |
 
 House rules carried over from the design system: semantic tokens only,

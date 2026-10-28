@@ -191,7 +191,7 @@ function WaitingOnOthers({ items }) {
               <div className="nrow-detail">{n.detail}</div>
             </div>
             <span className="nrow-when">{notifAgo(n.created)}</span>
-            <Button size="sm" variant="ghost" disabled={n.nudged} onClick={() => { nudgeNotif(n.notification_id); guard.setToast({ icon: 'check', title: 'Reminder sent', detail: 'To ' + sName(n.waiting_on) + '.' }); }}>
+            <Button size="sm" variant="ghost" disabled={n.nudged} onClick={() => { nudgeNotif(n.notification_id); guard.setToast({ status: 'success', title: 'Reminder sent', detail: 'To ' + sName(n.waiting_on) + '.' }); }}>
               {n.nudged ? 'Reminder Sent' : 'Send Reminder'}
             </Button>
           </div>
@@ -259,7 +259,7 @@ function NotifActions({ n, client, variant, onNavigate, openChart }) {
   const guard = useGuard();
   const [mode, setMode] = useState(null);
   const close = () => setMode(null);
-  const done = (action, title, detail, extra) => { resolveNotif(n.notification_id, action, extra); guard.setToast({ icon: 'check', title, detail }); close(); };
+  const done = (action, title, detail, extra) => { resolveNotif(n.notification_id, action, extra); guard.setToast({ status: 'success', title, detail }); close(); };
   /* Open a document on this client's chart. `ctx` links it back to this
      notification (review / draft / new), set only once the navigation
      actually commits — a cancelled client switch leaves nothing behind. */
@@ -308,9 +308,9 @@ function NotifActions({ n, client, variant, onNavigate, openChart }) {
     }
   } else {
     if (n.kind === 'report') primary = n.status === 'Error'
-      ? { label: 'Try Again', onClick: () => { setNotifRead(n.notification_id, true); guard.setToast({ icon: 'check', title: 'Report queued', detail: 'You’ll get a notification when it’s ready.' }); } }
-      : { label: 'View Report', onClick: () => { setNotifRead(n.notification_id, true); guard.setToast({ icon: 'info', title: 'Reports are out of scope', detail: 'This would open the report.' }); } };
-    if (n.kind === 'credential') primary = { label: 'Upload Renewal', onClick: () => guard.setToast({ icon: 'info', title: 'Staff profile is out of scope', detail: 'This would open your profile.' }) };
+      ? { label: 'Try Again', onClick: () => { setNotifRead(n.notification_id, true); guard.setToast({ status: 'success', title: 'Report queued', detail: 'You’ll get a notification when it’s ready.' }); } }
+      : { label: 'View Report', onClick: () => { setNotifRead(n.notification_id, true); guard.setToast({ status: 'info', title: 'Reports are out of scope', detail: 'This would open the report.' }); } };
+    if (n.kind === 'credential') primary = { label: 'Upload Renewal', onClick: () => guard.setToast({ status: 'info', title: 'Staff profile is out of scope', detail: 'This would open your profile.' }) };
     more.push({ label: 'Dismiss', onClick: () => done('dismissed', 'Dismissed', n.title) });
   }
   /* General items can be marked read anywhere. Client alerts only on the
@@ -552,7 +552,7 @@ function NotificationsPage({ tab }) {
   const filtered = q || type !== 'All types' || clientF !== 'All clients' || days !== 'Any time' || scope !== 'All';
   const allOn = shown.length > 0 && shown.every(n => sel.indexOf(n.notification_id) !== -1);
   const chosen = shown.filter(n => sel.indexOf(n.notification_id) !== -1);
-  const bulkDone = (title, detail) => { setSel([]); guard.setToast({ icon: 'check', title, detail }); };
+  const bulkDone = (title, detail) => { setSel([]); guard.setToast({ status: 'success', title, detail }); };
 
   return (
     <div className="page npage">
@@ -619,7 +619,7 @@ function NotifPreferencesPage() {
   const setSub = (k, sub, v) => setP(x => ({ ...x, [k]: { ...x[k], [sub]: v } }));
   const staff = (RD.staff || []).filter(s => s.staff_id !== ME.id);
   const covBad = p.coverage.on && (!p.coverage.to || !p.coverage.until);
-  const save = () => { writeNotifPrefs(p); setSaved(p); guard.setToast({ icon: 'check', title: 'Delivery preferences saved', detail: 'Changes apply to new notifications.' }); };
+  const save = () => { writeNotifPrefs(p); setSaved(p); guard.setToast({ status: 'success', title: 'Delivery preferences saved', detail: 'Changes apply to new notifications.' }); };
   /* Turn a whole channel on or off for a section, skipping locked/n.a. cells. */
   const setColumn = (sec, ch, v) => setP(x => {
     const m = { ...x.matrix };

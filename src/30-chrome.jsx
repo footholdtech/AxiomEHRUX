@@ -76,6 +76,39 @@ const NAV_SECTIONS = [
    not client modules, so they never take a client with them. */
 const NAV_LANDING = ['Foster Home', 'Inpatient Module', 'Residential'];
 
+/* ---- Where every destination lives -------------------------------
+   One map from a nav label to its section, so every page can draw the same
+   trail the left nav implies: Reports › Dynamic Report Builder, Documents ›
+   PHQ. Section crumbs are real pages (SECTION_PATH): a section shows its
+   children in nav order, Documents is the searchable list of documents, and
+   Clients is the client list. Categories ("Assessments") are drawers in the
+   nav, not destinations, so they never appear as a crumb. */
+const SECTION_PATH = { clients: '/clients', documents: '/documents', reports: '/reports', billing: '/billing', admin: '/admin' };
+const NAV_PLACE = (() => {
+  const m = {};
+  NAV_SECTIONS.forEach(s => {
+    if (s.to) return;
+    (s.categories || []).forEach(c => c.items.forEach(i => { if (!m[i]) m[i] = { section: s, category: c.label }; }));
+    (s.links || []).forEach(l => { if (!m[l]) m[l] = { section: s, category: null }; });
+  });
+  return m;
+})();
+const NAV_BY_SLUG = Object.fromEntries(Object.keys(NAV_PLACE).map(l => [slugify(l), l]));
+/* Section › page, or just the page if the nav doesn't know it. */
+function navTrail(label) {
+  const p = NAV_PLACE[label];
+  return p ? [{ label: p.section.label, to: SECTION_PATH[p.section.key] }, { label }] : [{ label }];
+}
+/* Open a nav destination the way the left nav does. A client module opens on
+   the chart in context, or on the client picker when there isn't one — it
+   never adopts a client by itself. Everything else is client-agnostic. */
+function openNavItem(guard, name) {
+  const slug = slugify(name);
+  if (!isClientModule(name)) return guard.go('/' + slug);
+  if (guard.clientId) return guard.go('/chart/' + guard.clientId + '/' + slug, { client: guard.clientId });
+  return guard.go('/module/' + slug);
+}
+
 /* ---- Global search ---------------------------------------------
    DS `top navigation` → `Search w/prefix` (Radicle Design System, node
    1876:36155 on the ↪ Top Navigation page). The DS annotations are explicit
@@ -137,12 +170,7 @@ function GlobalSearch({ autoFocus, onDone }) {
   const pageHits = (scope === 'Clients' || !s) ? [] : PAGE_INDEX.filter(p =>
     p.label.toLowerCase().indexOf(s) !== -1).slice(0, 6);
 
-  const openModule = name => {
-    const slug = slugify(name);
-    if (!isClientModule(name)) return guard.go('/' + slug);
-    if (guard.clientId) return guard.go('/chart/' + guard.clientId + '/' + slug, { client: guard.clientId });
-    return guard.go('/module/' + slug);
-  };
+  const openModule = name => openNavItem(guard, name);
   const reset = () => { setQ(''); setOpen(false); onDone && onDone(); };
   const clear = () => { setQ(''); if (inputRef.current) inputRef.current.focus(); };
 
@@ -344,125 +372,345 @@ function TopNav({ onHamburger, navOpen, onPrefs }) {
    DS's own button docs require it: "Icon-only buttons must provide an
    accessible name via aria-label… describe the action, not the icon shape." */
 
-/* Glyphs a clinician can pick from when naming a brand-new attribute. The four
-   the DS frame shows, plus the general-purpose Fluent flags already bundled. */
-const ATTR_ICONS = ['dsPeople', 'dsSyringe', 'dsWarning', 'dsGavel', 'flag', 'check', 'clients'];
+/* ---- Client attributes -------------------------------------------
+   Data and rules live in 16-records.jsx (agencyAttrs, selectableAttrs, getAttrAssignments,
+   attrState, attrSuggestions). */
 
-/* Default glyph per attribute, matched on the name because this prototype's
-   attributes come from the shared fixture vocabulary rather than the four the
-   design frame happens to show. */
-const attrIcon = (name = '') => {
-  const n = name.toLowerCase();
-  if (/allerg/.test(n)) return 'dsSyringe';
-  if (/court|legal|guardian|probation|parole/.test(n)) return 'dsGavel';
-  if (/ideation|suicid|risk|elope|aggress|self-harm/.test(n)) return 'dsWarning';
-  return 'dsPeople';
+/* An attribute's mark: its library glyph, or the image an admin uploaded. */
+function AttrGlyph({ attr, size = 20 }) {
+  if (attr && attr.image) return <img className="attr-img" src={attr.image} width={size} height={size} alt="" />;
+  return <Icon name={(attr && attr.icon) || 'dsPeople'} size={size} />;
+}
+
+/* Collapsed header: every attribute on the chart, in the same container as
+   the expanded attribute box. Never truncated — a hidden "+2" could be the one
+   that matters clinically — so the marks wrap instead. Hover or focus lists
+   the names; clicking (or tapping) opens Manage Attributes. */
+function AttrIndicator({ rows, onOpen }) {
+  const [tip, setTip] = useState(false);
+  if (!rows.length) return null;
+  const names = rows.map(r => r.attribute.name).join(', ');
+  return (
+    <span className="tip-anchor cph-attrind-wrap" onMouseEnter={() => setTip(true)} onMouseLeave={() => setTip(false)}>
+      <button type="button" className="cph-attrind" aria-label={'Manage attributes. On this chart: ' + names}
+        onClick={onOpen} onFocus={() => setTip(true)} onBlur={() => setTip(false)}>
+        {rows.map(r => <AttrGlyph key={r.assignment_id} attr={r.attribute} />)}
+      </button>
+      {tip && (
+        <span className="tip tip--bottom tip--list" role="tooltip">
+          <span className="tip-list-head">Attributes ({rows.length})</span>
+          {rows.map(r => <span key={r.assignment_id} className="tip-list-row"><AttrGlyph attr={r.attribute} size={16} />{r.attribute.name}</span>)}
+        </span>
+      )}
+    </span>
+  );
+}
+
+const attrStamp = s => s ? fmtDate(s.slice(0, 10)) + (s.length > 10 ? ' ' + fmtClock(s.slice(11, 16)) : '') : '—';
+const fmtClock = hhmm => { const [h, m] = hhmm.split(':').map(Number); return ((h % 12) || 12) + ':' + String(m).padStart(2, '0') + (h < 12 ? ' AM' : ' PM'); };
+const attrSpan = (s, e) => (s ? fmtDate(s) : '—') + ' – ' + (e ? fmtDate(e) : 'no end date');
+function attrDatesText(r, state) {
+  const s = r.start_date ? fmtDate(r.start_date) : null, e = r.end_date ? fmtDate(r.end_date) : null;
+  if (!s) return 'No dates recorded';
+  if (state === 'scheduled') return 'Starts ' + s + (e ? ' · Ends ' + e : '');
+  if (state === 'ended' || state === 'removed') return s + ' – ' + (e || 'no end date');
+  return 'Since ' + s + (e ? (r.end_date === isoOf(TODAY) ? ' · Ends today' : ' · Ends ' + e) : ' · No end date');
+}
+const ATTR_EVENT_TEXT = {
+  added: ev => 'Added · ' + attrSpan(ev.start_date, ev.end_date),
+  dates: ev => 'Dates changed to ' + attrSpan(ev.start_date, ev.end_date),
+  ended: ev => 'Ended ' + fmtDate(ev.end_date),
+  removed: () => 'Removed',
+  note: ev => 'Internal note added' + (ev.reason ? ' · ' + ev.reason : ''),
 };
+const ATTR_TAG = { scheduled: 'Scheduled', ended: 'Ended', removed: 'Removed' };
+const nowStamp = () => isoOf(TODAY) + 'T' + new Date().toTimeString().slice(0, 5);
 
-/* ---- Manage attributes overlay ---------------------------------
-   Opened from the pencil inside the attribute box. Pick from the agency's
-   configured vocabulary, or name a new one and choose its glyph. Prototype
-   scope: the selection lives in component state, nothing is written back. */
-function AttributesOverlay({ client, selected, onClose, onSave }) {
-  const [sel, setSel] = useState(() => new Set(selected.map(a => a.name)));
-  const [custom, setCustom] = useState([]);
-  const [draft, setDraft] = useState('');
-  const [draftIcon, setDraftIcon] = useState(ATTR_ICONS[0]);
-  useEffect(() => { const k = e => { if (e.key === 'Escape') onClose(); }; window.addEventListener('keydown', k); return () => window.removeEventListener('keydown', k); }, [onClose]);
-
-  const vocab = (RD.attributes || []).map(a => a.name);
-  const toggle = n => setSel(s => { const x = new Set(s); x.has(n) ? x.delete(n) : x.add(n); return x; });
-  const addCustom = () => {
-    const name = draft.trim();
-    if (!name || sel.has(name)) return;
-    setCustom(c => c.concat([{ name, icon: draftIcon }]));
-    setSel(s => new Set(s).add(name));
-    setDraft('');
-  };
-  const save = () => {
-    const byName = {};
-    custom.forEach(c => { byName[c.name] = c.icon; });
-    onSave([...sel].map(name => ({ name, icon: byName[name] || attrIcon(name) })));
-  };
-
-  return ReactDOM.createPortal(
-    <React.Fragment>
-      <div className="modal-scrim" onClick={onClose} />
-      <div className="attrmodal" role="dialog" aria-modal="true" aria-labelledby="attrmodal-title">
-        <div className="intercept-head">
-          <div className="modal-head-content">
-            <h2 className="intercept-title" id="attrmodal-title">Manage Client Attributes</h2>
+/* One attribute on the chart, as a card: what it is, when it applies, who
+   added it, its notes and its history. Dates edit in place.
+   Taking an attribute off is deliberate, because a saved one carries history:
+   only an attribute added in this session (not saved yet) has a ×. A saved one
+   has an explicit Remove, unless the agency requires it to end by end date
+   (a court order, say), in which case the card says so and Edit Dates is the
+   way off. A removal waits, with Undo, until Save Changes. */
+function AttrChartRow({ client, r, orig, editing, onEdit, onDone, onChange, onDrop, onRemove, onUndo, error, note, noteTried, onNote, onNoteSet, onNoteDiscard }) {
+  const [hist, setHist] = useState(false);
+  const state = attrState(r);
+  const isNew = !orig;
+  const origState = orig && attrState(orig);
+  const pending = r.removed && orig && !orig.removed;
+  const changed = orig && !pending && (orig.start_date !== r.start_date || orig.end_date !== r.end_date);
+  const live = isNew || origState === 'active' || origState === 'scheduled';
+  const endDateOnly = (r.attribute && r.attribute.removal) === 'end-date';
+  const events = (r.history || []).slice().reverse();
+  const notes = isNew ? [] : getAttrNotes(client, r.assignment_id);
+  return (
+    <div className={'attrm-card' + (!live ? ' is-past' : '') + (pending ? ' is-pending' : '')}>
+      <div className="attrm-row-main">
+        <span className="attrm-glyph"><AttrGlyph attr={r.attribute} /></span>
+        <div className="attrm-row-text">
+          <div className="attrm-row-name">
+            <span>{r.attribute.name}</span>
+            {isNew && <span className="ntag ntag--info">New</span>}
+            {pending && <span className="ntag">Will Be Removed</span>}
+            {changed && <span className="ntag ntag--info">Edited</span>}
+            {!isNew && !pending && ATTR_TAG[state] && <span className="ntag">{ATTR_TAG[state]}</span>}
           </div>
-          <div className="modal-head-actions">
-            <button className="icon-btn modal-dismiss" aria-label="Close" onClick={onClose} data-node-id="2048:586">
-              <Icon name="close" size={20} />
-            </button>
-          </div>
+          <div className="attrm-row-meta">{attrDatesText(r, pending ? origState : state)}</div>
+          {!isNew && <div className="attrm-row-meta">Added by {sName(r.added_by_staff_id)} · {attrStamp(r.added_at)}</div>}
         </div>
-
-        <div className="info-banner" role="note">
-          <Icon name="info" size={20} />
-          <div>Attributes flag handling requirements on <b>{client.shortName}</b>’s chart. They are not diagnoses and nothing here changes clinical status.</div>
-        </div>
-
-        <div className="attrmodal-body">
-          <div className="attrmodal-cap">Agency Attributes</div>
-          <div className="attrmodal-list">
-            {/* A div, not a label: `Checkbox` renders its own <label>, and
-                nesting labels is invalid HTML that double-toggles in some
-                browsers. The row owns the click and the box is
-                pointer-events:none, so exactly one toggle fires wherever you
-                hit it. */}
-            {vocab.map(n => (
-              <div key={n} className={'attrmodal-opt' + (sel.has(n) ? ' on' : '')} role="checkbox"
-                aria-checked={sel.has(n)} tabIndex={0} onClick={() => toggle(n)}
-                onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(n); } }}>
-                <Checkbox checked={sel.has(n)} onChange={() => {}} ariaLabel={n} />
-                <Icon name={attrIcon(n)} size={20} />
-                <span>{n}</span>
-              </div>
-            ))}
-            {custom.map(c => (
-              <div key={c.name} className="attrmodal-opt on" role="checkbox"
-                aria-checked={sel.has(c.name)} tabIndex={0} onClick={() => toggle(c.name)}
-                onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(c.name); } }}>
-                <Checkbox checked={sel.has(c.name)} onChange={() => {}} ariaLabel={c.name} />
-                <Icon name={c.icon} size={20} />
-                <span>{c.name}</span>
-                <span className="badge status-info">New</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="attrmodal-cap">Add a New Attribute</div>
-          <div className="attrmodal-new">
-            <div className="attrmodal-icons" role="radiogroup" aria-label="Attribute icon">
-              {ATTR_ICONS.map(ic => (
-                <button key={ic} type="button" role="radio" aria-checked={draftIcon === ic}
-                  className={'attrmodal-ic' + (draftIcon === ic ? ' on' : '')}
-                  aria-label={'Icon ' + ic} onClick={() => setDraftIcon(ic)}>
-                  <Icon name={ic} size={20} />
-                </button>
-              ))}
-            </div>
-            <div className="form-input attrmodal-input">
-              <input value={draft} onChange={e => setDraft(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addCustom(); } }}
-                placeholder="Attribute name, e.g. Requires Wheelchair Access" aria-label="New attribute name" />
-            </div>
-            <Button variant="secondary" onClick={addCustom} disabled={!draft.trim()}>Add Attribute</Button>
-          </div>
-        </div>
-
-        <div className="intercept-foot">
-          <Button variant="ghost" onClick={onClose}>Cancel</Button>
-          <span className="spacer" />
-          <span className="attrmodal-count">{sel.size} selected</span>
-          <Button variant="primary" onClick={save}>Save Attributes</Button>
-        </div>
+        {isNew && (
+          <button type="button" className="icon-btn attrm-x" aria-label={'Don’t add ' + r.attribute.name} title="Don’t add" onClick={onDrop}>
+            <Icon name="close" size={18} />
+          </button>
+        )}
       </div>
-    </React.Fragment>,
-  document.body);
+
+      {editing && !pending && (
+        <div className="attrm-edit">
+          <div className="ovl-grid ovl-grid--2">
+            <DateField label="Start date" required quick={false} value={r.start_date} onChange={v => onChange({ start_date: v || null })}
+              error={error === 'start' ? 'Choose a start date.' : null} />
+            <DateField label="End date" quick={false} value={r.end_date} min={r.start_date} onChange={v => onChange({ end_date: v || null })}
+              hint="Leave blank if it doesn’t end." error={error === 'end' ? 'End date can’t be before the start date.' : null} />
+          </div>
+          {!isNew && <div className="attrm-edit-actions"><span className="spacer" /><Button size="sm" variant="secondary" onClick={onDone}>Done</Button></div>}
+        </div>
+      )}
+
+      {notes.length > 0 && (
+        <ul className="attrm-notes" aria-label={'Notes about ' + r.attribute.name}>
+          {notes.map(n => (
+            <li key={n.note_id}>
+              <div className="attrm-note-head"><b>{n.topic}</b> · {n.author_staff_id === ME.id ? 'You' : sName(n.author_staff_id)} · {attrStamp(n.timestamp.slice(0, 16))}</div>
+              <div className="attrm-note-body">{n.body}</div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {note && !pending && (
+        <div className="attrm-compose">
+          <div className="attrm-compose-cap">Internal Note</div>
+          <NoteFields client={client} rows={3}
+            draft={{ d: note, tried: noteTried, set: onNoteSet }}
+            trailing={<Button size="sm" variant="ghost" onClick={onNoteDiscard}>Discard Note</Button>} />
+        </div>
+      )}
+
+      <div className="attrm-card-actions">
+        {pending && <Button size="sm" variant="ghost" onClick={onUndo}>Undo</Button>}
+        {live && !pending && !editing && <Button size="sm" variant="ghost" onClick={onEdit}>Edit Dates</Button>}
+        {live && !pending && !note && <Button size="sm" variant="ghost" onClick={onNote}>Add Internal Note</Button>}
+        {live && !pending && !isNew && !endDateOnly && <Button size="sm" variant="ghost" onClick={onRemove}>Remove</Button>}
+        {events.length > 0 && (
+          <Button size="sm" variant="ghost" aria-expanded={hist} onClick={() => setHist(h => !h)}>
+            {hist ? 'Hide History' : 'History (' + events.length + ')'}
+          </Button>
+        )}
+      </div>
+      {live && !pending && r.attribute.status === 'Inactive' && (
+        <div className="attrm-card-hint">Your agency no longer offers this attribute. It stays on the chart until it’s removed or ends.</div>
+      )}
+      {live && !pending && !isNew && endDateOnly && (
+        <div className="attrm-card-hint">Your agency requires an end date to take this off the chart.</div>
+      )}
+      {hist && (
+        <ol className="attrm-hist" aria-label={r.attribute.name + ' history'}>
+          {events.map((ev, i) => (
+            <li key={i}>
+              <div className="attrm-hist-what">{(ATTR_EVENT_TEXT[ev.action] || (() => ev.action))(ev)}</div>
+              <div className="attrm-hist-who">{sName(ev.by_staff_id)} · {attrStamp(ev.at)}</div>
+              {ev.reason && ev.action !== 'note' && <div className="attrm-hist-why">{ev.reason}</div>}
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
+  );
+}
+
+/* ---- Manage Attributes dialog -------------------------------------
+   Opened from the pencil in the attribute box.
+   Left: add from the agency's list, searched by name, with what the chart
+   suggests first. Clinicians can't create attributes here: the list is
+   finite so attributes can be reported on, and admins own it.
+   Right: what's on the chart, with dates, who added each one and its history.
+   Nothing saves until Save Changes; every change is written to the audit
+   trail as the signed-in user. */
+function AttributesOverlay({ client, onClose }) {
+  const guard = useGuard();
+  const [orig] = useState(() => getAttrAssignments(client));
+  const origById = useMemo(() => _ix(orig, 'assignment_id'), [orig]);
+  const [rows, setRows] = useState(() => orig.map(r => ({ ...r })));
+  const [editing, setEditing] = useState(() => new Set());
+  const [q, setQ] = useState('');
+  const [showPast, setShowPast] = useState(false);
+  const [tried, setTried] = useState(false);
+  /* Internal notes drafted on a card: assignment_id -> note fields. Posted
+     with Save Changes, linked to the attribute. */
+  const [notes, setNotes] = useState({});
+  const noteFor = a => ({ ...NOTE_BLANK, topic: (a && a.note_topic && NOTE_TOPICS.indexOf(a.note_topic) !== -1) ? a.note_topic : '' });
+  const noteBad = n => !n.body.trim() || !n.topic;
+
+  const patch = (id, p) => setRows(rs => rs.map(r => (r.assignment_id === id ? { ...r, ...p } : r)));
+  const setEdit = (id, on) => setEditing(s => { const x = new Set(s); on ? x.add(id) : x.delete(id); return x; });
+  const pendingNew = rows.filter(r => !origById[r.assignment_id]);
+  const pendingByAttr = _ix(pendingNew, 'attribute_id');
+  const onChartIds = new Set(rows.filter(r => !pendingByAttr[r.attribute_id] && ['active', 'scheduled'].indexOf(attrState(r)) !== -1).map(r => r.attribute_id));
+
+  const toggle = a => {
+    const p = pendingByAttr[a.attribute_id];
+    if (p) { dropRow(p); return; }
+    const id = newId('CA');
+    setRows(rs => rs.concat([{ assignment_id: id, client_id: client.client_id, attribute_id: a.attribute_id, attribute: a,
+      start_date: isoOf(TODAY), end_date: null, removed: false, history: [] }]));
+    setEdit(id, true);
+  };
+  const dropRow = r => { setRows(rs => rs.filter(x => x !== r)); setNotes(ns => { const x = { ...ns }; delete x[r.assignment_id]; return x; }); };
+  const errorOf = r => !r.start_date ? 'start' : (r.end_date && r.end_date < r.start_date ? 'end' : null);
+  const liveNotes = Object.keys(notes).filter(id => rows.some(r => r.assignment_id === id && !r.removed));
+  const invalid = rows.some(r => !r.removed && errorOf(r)) || liveNotes.some(id => noteBad(notes[id]));
+  const changes = rows.filter(r => {
+    const o = origById[r.assignment_id];
+    return !o || o.removed !== r.removed || o.start_date !== r.start_date || o.end_date !== r.end_date || o.ended_at !== r.ended_at;
+  });
+  const nChanges = changes.length + liveNotes.filter(id => !changes.some(r => r.assignment_id === id)).length;
+
+  const save = () => {
+    setTried(true);
+    if (invalid || !nChanges) return;
+    const at = nowStamp();
+    /* Post the notes first so each attribute's history can point at its note. */
+    const posted = {};
+    liveNotes.forEach(id => {
+      const n = notes[id], r = rows.find(x => x.assignment_id === id);
+      posted[id] = addNote(client, { body: n.body.trim(), topic: n.topic, importance: n.importance, notify: n.notify,
+        attr: { assignment_id: id, attribute_id: r.attribute_id } });
+    });
+    const noteEv = id => posted[id] ? [{ action: 'note', at, by_staff_id: ME.id, start_date: null, end_date: null, reason: posted[id].topic, note_id: posted[id].note_id }] : [];
+    const next = rows.map(r => {
+      const o = origById[r.assignment_id];
+      if (!o) return { ...r, added_by_staff_id: ME.id, added_at: at,
+        history: [{ action: 'added', at, by_staff_id: ME.id, start_date: r.start_date, end_date: r.end_date, reason: null }].concat(noteEv(r.assignment_id)) };
+      if (!changes.includes(r)) return posted[r.assignment_id] ? { ...r, history: (r.history || []).concat(noteEv(r.assignment_id)) } : r;
+      const action = r.removed ? 'removed' : (r.ended_at && !o.ended_at ? 'ended' : 'dates');
+      return { ...r, ended_at: action === 'ended' ? at : r.ended_at,
+        history: (r.history || []).concat([{ action, at, by_staff_id: ME.id, start_date: r.start_date, end_date: r.end_date,
+        reason: null }]).concat(noteEv(r.assignment_id)) };
+    });
+    saveAttrAssignments(client, next);
+    const added = changes.filter(r => !origById[r.assignment_id]).length, removed = changes.filter(r => r.removed).length;
+    const ended = changes.filter(r => !r.removed && r.ended_at && !origById[r.assignment_id]?.ended_at).length;
+    const edited = changes.length - added - removed - ended;
+    const nNotes = liveNotes.length, notified = liveNotes.some(id => notes[id].notify);
+    guard.setToast({ status: 'success', title: 'Attributes saved',
+      detail: [added && added + ' added', edited && edited + ' updated', ended && ended + ' ended', removed && removed + ' removed',
+        nNotes && nNotes + (nNotes === 1 ? ' note' : ' notes') + ' posted' + (notified ? ', care team notified' : '')].filter(Boolean).join(' · ') });
+    onClose();
+  };
+
+  const ql = q.trim().toLowerCase();
+  const sugg = attrSuggestions(client, rows.filter(r => !pendingByAttr[r.attribute_id]));
+  /* Alphabetical. Categories organise the list for administrators; here they
+     only make a clinician hunt. */
+  const matches = selectableAttrs().filter(a => !ql || a.name.toLowerCase().indexOf(ql) !== -1)
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const option = (a, why) => {
+    const on = onChartIds.has(a.attribute_id);
+    const checked = on || !!pendingByAttr[a.attribute_id];
+    const act = () => { if (!on) toggle(a); };
+    return (
+      /* A div, not a label: `Checkbox` renders its own <label>, and nesting
+         labels double-toggles in some browsers. The row owns the click and
+         the box is pointer-events:none, so exactly one toggle fires. */
+      <div key={a.attribute_id + (why ? '-s' : '')} className={'attrmodal-opt' + (on ? ' is-on-chart' : '')} role="checkbox"
+        aria-checked={checked} aria-disabled={on} tabIndex={on ? -1 : 0} onClick={act}
+        onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); act(); } }}>
+        <Checkbox checked={checked} disabled={on} onChange={() => {}} ariaLabel={a.name} />
+        <span className="attrm-glyph"><AttrGlyph attr={a} /></span>
+        <span className="attrmodal-opt-text">
+          <span className="attrmodal-opt-name">{a.name}</span>
+          {(why || on) && <span className="attrmodal-opt-why">{on ? 'On this chart' : why}</span>}
+        </span>
+      </div>
+    );
+  };
+
+  /* Sorted by what each row was when the dialog opened, so an attribute you
+     just ended or removed stays where it was, with Undo, until you save. */
+  const live = r => { const o = origById[r.assignment_id]; return !o || ['active', 'scheduled'].indexOf(attrState(o)) !== -1; };
+  const current = rows.filter(live)
+    .sort((a, b) => (!origById[b.assignment_id]) - (!origById[a.assignment_id]));
+  const past = rows.filter(r => current.indexOf(r) === -1);
+  const chartRow = r => (
+    <AttrChartRow key={r.assignment_id} r={r} orig={origById[r.assignment_id]}
+      editing={editing.has(r.assignment_id) || (tried && !!errorOf(r) && !r.removed)}
+      error={(tried || !origById[r.assignment_id]) ? errorOf(r) : null}
+      onEdit={() => setEdit(r.assignment_id, true)} onDone={() => setEdit(r.assignment_id, false)}
+      onChange={p => patch(r.assignment_id, p)}
+      onDrop={() => dropRow(r)}
+      onRemove={() => { const o = origById[r.assignment_id]; patch(r.assignment_id, { removed: true, start_date: o.start_date, end_date: o.end_date }); setEdit(r.assignment_id, false); }}
+      onUndo={() => { const o = origById[r.assignment_id]; patch(r.assignment_id, { removed: false, start_date: o.start_date, end_date: o.end_date }); }}
+      client={client} note={notes[r.assignment_id]} noteTried={tried}
+      onNote={() => setNotes(ns => ({ ...ns, [r.assignment_id]: noteFor(r.attribute) }))}
+      onNoteSet={(k, v) => setNotes(ns => ({ ...ns, [r.assignment_id]: { ...ns[r.assignment_id], [k]: v } }))}
+      onNoteDiscard={() => setNotes(ns => { const x = { ...ns }; delete x[r.assignment_id]; return x; })} />
+  );
+
+  return (
+    <Overlay size="lg" title="Manage Attributes" subtitle={client.displayName} onClose={onClose} bodyClassName="attrm-body"
+      footer={
+        <React.Fragment>
+          <Button variant="secondary" onClick={onClose}>Cancel</Button>
+          <span className="spacer" />
+          {/* Same badge as the Discharge Plan's unsaved state. */}
+          {nChanges > 0 && <span className="badge status-amber attrm-unsaved"><Icon name="edit" size={12} />{nChanges} unsaved {nChanges === 1 ? 'change' : 'changes'}</span>}
+          <Button variant="primary" onClick={save} disabled={!nChanges}>Save Changes</Button>
+        </React.Fragment>
+      }>
+      <div className="attrm">
+        <section className="attrm-col" aria-labelledby="attrm-add">
+          <h3 className="attrm-cap" id="attrm-add">Add Attributes</h3>
+          <MiniSearch value={q} onChange={setQ} placeholder="Search attributes by name" />
+          <div className="ff-hint">Your agency manages this list. Ask an administrator to add an attribute.</div>
+          <div className="attrm-scroll">
+            {!ql && sugg.length > 0 && (
+              <div className="attrm-group">
+                <div className="attrm-sub">Suggested From the Chart</div>
+                {sugg.map(s => option(s.attr, s.why))}
+              </div>
+            )}
+            {matches.length > 0 && (
+              <div className="attrm-group">
+                {!ql && sugg.length > 0 && <div className="attrm-sub">All Attributes</div>}
+                {matches.map(a => option(a))}
+              </div>
+            )}
+            {!matches.length && <div className="attrm-empty">No attributes match “{q.trim()}”. Ask an administrator if it should be added.</div>}
+          </div>
+        </section>
+
+        <section className="attrm-col" aria-labelledby="attrm-chart">
+          <h3 className="attrm-cap" id="attrm-chart">On This Chart</h3>
+          <div className="attrm-scroll">
+            {current.map(chartRow)}
+            {!current.length && <div className="attrm-empty">No attributes on {client.shortName}’s chart.</div>}
+            {past.length > 0 && (
+              <React.Fragment>
+                <button type="button" className="attrm-past-toggle" aria-expanded={showPast} onClick={() => setShowPast(x => !x)}>
+                  <Icon name={showPast ? 'dsChevUp' : 'dsChevDown'} size={16} />
+                  {showPast ? 'Hide' : 'Show'} Ended and Removed ({past.length})
+                </button>
+                {showPast && past.map(chartRow)}
+              </React.Fragment>
+            )}
+          </div>
+        </section>
+      </div>
+    </Overlay>
+  );
 }
 
 /* ---- Quick-view bodies -----------------------------------------
@@ -519,11 +767,11 @@ function AttrBox({ shown, onEdit }) {
   return (
     <div className="cph-flags">
       <div className="cph-flags-list">
-        {shown.map(a => <span key={a.name} className="cph-attr"><Icon name={a.icon} size={20} />{a.name}</span>)}
+        {shown.map(r => <span key={r.assignment_id} className="cph-attr"><AttrGlyph attr={r.attribute} />{r.attribute.name}</span>)}
         {!shown.length && <span className="cph-attr cph-attr--none">No attributes on this chart</span>}
       </div>
       {/* Inside the box, per the design. */}
-      <button className="icon-btn cph-pencil" aria-label="Manage Client Attributes" title="Manage Client Attributes" onClick={onEdit}>
+      <button className="icon-btn cph-pencil" aria-label="Manage Attributes" title="Manage Attributes" onClick={onEdit}>
         <Icon name="dsEdit" size={20} />
       </button>
     </div>
@@ -906,11 +1154,13 @@ function PillPager({ views, active, onSelect, maxRows = 2 }) {
   );
 }
 
+/* On a phone the button is pinned beside the name, in space that can't grow,
+   so its label shortens to "Chat". Its accessible name stays the full one. */
 function ChatWithChartButton({ compact }) {
   return (
-    <button className={'cph-chat' + (compact ? ' cph-chat--compact' : '')}>
+    <button className={'cph-chat' + (compact ? ' cph-chat--compact' : '')} aria-label={compact ? 'Chat With Chart' : undefined}>
       <Icon name="dsSparkle" size={compact ? 16 : 20} />
-      <span>Chat With Chart</span>
+      <span>{compact ? 'Chat' : 'Chat With Chart'}</span>
     </button>
   );
 }
@@ -928,28 +1178,67 @@ function ClientPageHeader({ client, preset, preview }) {
   const [expanded, setExpanded] = useState(!collapsedDefault);
   const [tab, setTab] = useState(views[0].key);
   const [editing, setEditing] = useState(false);
-  const [attrs, setAttrs] = useState(null);   // null = use the client's own
   /* Phones (< 540px): the same header, denser, so it doesn't take half the
      screen even collapsed — M avatar, smaller display name, smaller round
      buttons, Chat With Chart pinned top-right, the toggle beside DOB with a
      short label, and one line of quick-view pills. */
-  const compact = useMedia(BP.compact);
+  /* Laid out for the header's own width, not the viewport's, so an open left
+     nav can never squeeze the action row over the name. Narrow (< 860px)
+     stacks the identity over the actions and lets them wrap; compact (< 540px)
+     is the phone layout. A phone viewport is always compact. */
+  const [cphRef, cphW] = useElementWidth();
+  const compact = useMedia(BP.compact) || (cphW != null && cphW < 540);
+  const narrow = cphW != null && cphW < 860;
   /* The strip reads the same records as the quick views, so a vitals reading
      or allergy added from the header shows up here at once. */
   useRecordsVersion();
   const allVitals = getVitals(client);
   const v = allVitals[0] || client.vitals;
-  const shown = attrs || client.attrs.map(a => ({ name: a.name, icon: attrIcon(a.name) }));
+  const shown = activeAttrs(client);
 
-  /* A new chart returns to the clinician's default and forgets any local
-     attribute edits. */
-  useEffect(() => { setExpanded(!collapsedDefault); setAttrs(null); }, [client.client_id, collapsedDefault]);
+  /* A new chart returns to the clinician's default. */
+  useEffect(() => { setExpanded(!collapsedDefault); }, [client.client_id, collapsedDefault]);
   /* An admin can remove the quick view somebody is standing on. Fall back to
      the first one rather than rendering an empty detail row. */
   useEffect(() => {
     if (!views.some(x => x.key === tab)) setTab(views[0].key);
   }, [views, tab]);
   const activeView = views.find(x => x.key === tab) || views[0];
+  /* The attribute box only lives in the expanded General view; everywhere
+     else the header shows the compact indicator instead. */
+  const boxShowing = expanded && activeView.key === 'general' && activeView.options && activeView.options.showAttributes;
+  const attrInd = !boxShowing && <AttrIndicator rows={shown} onOpen={() => setEditing(true)} />;
+
+  /* Wide layout (name and actions on one row): the attributes sit after the
+     status only while the whole line fits beside the actions. Otherwise they
+     drop below the DOB — about where the expanded header keeps them — rather
+     than crowding or sliding under the action buttons. Measured, not a
+     breakpoint, because it depends on the name and how many attributes there
+     are. A hidden one-line copy of name + status + marks gives the width the
+     line wants; the action row's own width is what's left over. The action
+     row is also held at its full width, so nothing can ever overlap it — a
+     long name wraps instead. */
+  const topRef = useRef(null), actionsRef = useRef(null), mirrorRef = useRef(null);
+  const [fit, setFit] = useState({ below: false, actionsW: 0 });
+  const wide = !compact && !narrow;
+  React.useLayoutEffect(() => {
+    let next = { below: false, actionsW: 0 };
+    if (wide && topRef.current && actionsRef.current) {
+      const top = topRef.current, cs = getComputedStyle(top);
+      const inner = top.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - (parseFloat(cs.columnGap) || 0);
+      /* The buttons' own width, not the row's: the row stretches to fill
+         whatever the name line leaves, so measuring it would never let the
+         attributes move back up. */
+      const kids = [...actionsRef.current.children];
+      const ag = parseFloat(getComputedStyle(actionsRef.current).columnGap) || 0;
+      const actionsW = Math.ceil(kids.reduce((s, k) => s + k.getBoundingClientRect().width, 0) + ag * Math.max(0, kids.length - 1));
+      const idEl = top.querySelector('.cph-identity');
+      const lead = idEl.firstElementChild.getBoundingClientRect().width + (parseFloat(getComputedStyle(idEl).columnGap) || 0);
+      const lineW = mirrorRef.current ? Math.ceil(mirrorRef.current.getBoundingClientRect().width) : 0;
+      next = { below: !!(attrInd && shown.length) && lead + lineW > inner - actionsW, actionsW };
+    }
+    if (next.below !== fit.below || next.actionsW !== fit.actionsW) setFit(next);
+  });
 
   /* Expanded/collapsed is the clinician's choice and nothing else changes it.
      Scrolling used to fold the header automatically; it was removed because
@@ -980,29 +1269,38 @@ function ClientPageHeader({ client, preset, preview }) {
   );
 
   return (
-    <section className={'cph' + (expanded ? ' cph--expanded' : '') + (compact ? ' cph--compact' : '')} data-node-id="8139:96518"
+    <section ref={cphRef} className={'cph' + (expanded ? ' cph--expanded' : '') + (narrow ? ' cph--narrow' : '') + (compact ? ' cph--compact' : '')} data-node-id="8139:96518"
       aria-label={'Client header — ' + client.displayName}>
       {compact && header.showActions && <ChatWithChartButton compact />}
-      <div className="cph-top">
+      <div className="cph-top" ref={topRef}>
+        {/* The one-line width the name, status and attributes would need. */}
+        {wide && attrInd && shown.length > 0 && (
+          <div className="cph-nameline cph-mirror" ref={mirrorRef} aria-hidden="true">
+            <span className="cph-name">{client.displayName}</span>{status}
+            <span className="cph-attrind">{shown.map(r => <AttrGlyph key={r.assignment_id} attr={r.attribute} />)}</span>
+          </div>
+        )}
         <div className="cph-identity">
           <Avatar name={client.name} size={compact ? 'M' : 'L'} />
           <div className="cph-demo">
             <div className="cph-nameline">
               <h1 className="cph-name">{client.displayName}</h1>
               {!compact && status}
+              {!compact && !fit.below && attrInd}
             </div>
             {/* On a phone the status rides the pronouns line, so it never
                 wraps onto a line of its own under a long name. */}
-            <div className="cph-pronouns">{client.pronouns}{compact && status}</div>
+            <div className="cph-pronouns">{client.pronouns}{compact && status}{compact && attrInd}</div>
             <div className="cph-dob"><b>DOB:</b> <span>{fmtDate(client.dob)}, {client.age} yr old</span>
               {compact && <span className="spacer" />}
               {compact && toggle}
             </div>
+            {fit.below && <div className="cph-attrline">{attrInd}</div>}
           </div>
         </div>
 
-        <div className="cph-nav">
-          <div className="cph-actions">
+        <div className="cph-nav" style={fit.actionsW ? { minWidth: fit.actionsW } : undefined}>
+          <div className="cph-actions" ref={actionsRef}>
             {/* Client Notes is always here, ahead of the configurable actions —
                 a care-team note nobody sees is a care risk, not a layout
                 preference, so no header configuration can remove it. */}
@@ -1067,8 +1365,7 @@ function ClientPageHeader({ client, preset, preview }) {
       )}
 
       {editing && (
-        <AttributesOverlay client={client} selected={shown} onClose={() => setEditing(false)}
-          onSave={next => { setAttrs(next); setEditing(false); }} />
+        <AttributesOverlay client={client} onClose={() => setEditing(false)} />
       )}
     </section>
   );
@@ -1171,12 +1468,7 @@ function LeftNav({ open, navRef }) {
   /* A client-specific module never adopts a client to have something to show.
      With a chart already in context it opens inside that chart; without one it
      opens empty, on a picker scoped to this clinician's caseload. */
-  const openModule = name => {
-    const slug = slugify(name);
-    if (!isClientModule(name)) return guard.go('/' + slug);
-    if (guard.clientId) return guard.go('/chart/' + guard.clientId + '/' + slug, { client: guard.clientId });
-    return guard.go('/module/' + slug);
-  };
+  const openModule = name => openNavItem(guard, name);
 
   const current = NAV_SECTIONS.find(s => s.key === section) || null;
   const toggleCat = label => setCats(c => ({ ...c, [label]: !c[label] }));

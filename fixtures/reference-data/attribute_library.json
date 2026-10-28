@@ -1,0 +1,766 @@
+{
+  "_meta": {
+    "description": "The agency's client attributes: standard entries it turned on (catalog_id) and its own (source custom). Managed by administrators; clinicians apply attributes from it and can't create new ones. `icon` is a glyph key, `image` an uploaded picture (data URI). `suggest` lists ICD-10 prefixes and problem names that make the attribute a suggestion when active on the chart. `removal` is remove | end-date. `note_topic` preselects the topic of a note added from the attribute.",
+    "fictional": true,
+    "fields": [
+      "attribute_id",
+      "catalog_id",
+      "source",
+      "name",
+      "category",
+      "icon",
+      "image",
+      "suggest",
+      "removal",
+      "note_topic",
+      "status"
+    ]
+  },
+  "records": [
+    {
+      "attribute_id": "ATTR-SPANISH",
+      "catalog_id": "STD-SPANISH",
+      "source": "standard",
+      "name": "Spanish Speaking",
+      "category": "Language & Communication",
+      "icon": "flLocalLanguage",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Care coordination",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-INTERPRETER",
+      "catalog_id": "STD-INTERPRETER",
+      "source": "standard",
+      "name": "Requires Interpreter",
+      "category": "Language & Communication",
+      "icon": "flTranslate",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Care coordination",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-DEAF",
+      "catalog_id": "STD-DEAF",
+      "source": "standard",
+      "name": "Deaf / Hard of Hearing",
+      "category": "Language & Communication",
+      "icon": "flHandLeftChat",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Care coordination",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-LOWVISION",
+      "catalog_id": "STD-LOWVISION",
+      "source": "standard",
+      "name": "Blind / Low Vision",
+      "category": "Language & Communication",
+      "icon": "flEyeOff",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Care coordination",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-DONOTMAIL",
+      "catalog_id": "STD-DONOTMAIL",
+      "source": "standard",
+      "name": "Do Not Mail",
+      "category": "Contact Preferences",
+      "icon": "flMailProhibited",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Contact information",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-DONOTCALL",
+      "catalog_id": "STD-DONOTCALL",
+      "source": "standard",
+      "name": "Do Not Call",
+      "category": "Contact Preferences",
+      "icon": "flCallProhibited",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Contact information",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-NOCONTACT",
+      "catalog_id": "STD-NOCONTACT",
+      "source": "standard",
+      "name": "No-Contact Order",
+      "category": "Contact Preferences",
+      "icon": "flPersonProhibited",
+      "image": null,
+      "suggest": {},
+      "removal": "end-date",
+      "note_topic": "Court / legal",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-COURTORDERED",
+      "catalog_id": "STD-COURTORDERED",
+      "source": "standard",
+      "name": "Court Ordered Treatment",
+      "category": "Legal",
+      "icon": "dsGavel",
+      "image": null,
+      "suggest": {},
+      "removal": "end-date",
+      "note_topic": "Court / legal",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-PROBATION",
+      "catalog_id": "STD-PROBATION",
+      "source": "standard",
+      "name": "On Probation/Parole",
+      "category": "Legal",
+      "icon": "dsGavel",
+      "image": null,
+      "suggest": {
+        "problems": [
+          "Involvement with Justice System"
+        ]
+      },
+      "removal": "end-date",
+      "note_topic": "Court / legal",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-MINOR",
+      "catalog_id": "STD-MINOR",
+      "source": "standard",
+      "name": "Minor / Requires Guardian Consent",
+      "category": "Legal",
+      "icon": "flGuardian",
+      "image": null,
+      "suggest": {},
+      "removal": "end-date",
+      "note_topic": "Guardian",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-CONSERVATOR",
+      "catalog_id": "STD-CONSERVATOR",
+      "source": "standard",
+      "name": "Conservatorship",
+      "category": "Legal",
+      "icon": "flScales",
+      "image": null,
+      "suggest": {},
+      "removal": "end-date",
+      "note_topic": "Guardian",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-FOSTERCARE",
+      "catalog_id": "STD-FOSTERCARE",
+      "source": "standard",
+      "name": "Foster Care Involvement",
+      "category": "Legal",
+      "icon": "flHomePerson",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Guardian",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-ALLERGY",
+      "catalog_id": "STD-ALLERGY",
+      "source": "standard",
+      "name": "Known Medication Allergy",
+      "category": "Medical",
+      "icon": "dsSyringe",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Allergies",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-IMMUNO",
+      "catalog_id": "STD-IMMUNO",
+      "source": "standard",
+      "name": "Immune System Compromised",
+      "category": "Medical",
+      "icon": "flShieldError",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "B20",
+          "D80",
+          "D81",
+          "D82",
+          "D83",
+          "D84"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-HIV",
+      "catalog_id": "STD-HIV",
+      "source": "standard",
+      "name": "HIV/AIDS",
+      "category": "Medical",
+      "icon": "flRibbon",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "B20",
+          "Z21"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-DIABETIC",
+      "catalog_id": "STD-DIABETIC",
+      "source": "standard",
+      "name": "Diabetic",
+      "category": "Medical",
+      "icon": "flDrop",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "E10",
+          "E11",
+          "E13"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-SICKLECELL",
+      "catalog_id": "STD-SICKLECELL",
+      "source": "standard",
+      "name": "Sickle Cell Disease",
+      "category": "Medical",
+      "icon": "flStethoscope",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "D57"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-CARDIAC",
+      "catalog_id": "STD-CARDIAC",
+      "source": "standard",
+      "name": "Cardiac Condition",
+      "category": "Medical",
+      "icon": "flHeartPulse",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "I20",
+          "I21",
+          "I25",
+          "I50"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-TBI",
+      "catalog_id": "STD-TBI",
+      "source": "standard",
+      "name": "Traumatic Brain Injury",
+      "category": "Medical",
+      "icon": "flBrain",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "S06"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-PREGNANT",
+      "catalog_id": "STD-PREGNANT",
+      "source": "standard",
+      "name": "Pregnant / Postpartum",
+      "category": "Medical",
+      "icon": "flHeart",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "O",
+          "Z33",
+          "Z34",
+          "Z39"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-SUBSTANCE",
+      "catalog_id": "STD-SUBSTANCE",
+      "source": "standard",
+      "name": "Substance Abuse",
+      "category": "Behavioral Health",
+      "icon": "flPill",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "F10",
+          "F11",
+          "F12",
+          "F13",
+          "F14",
+          "F15",
+          "F16",
+          "F18",
+          "F19"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Substance use",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-TOBACCO",
+      "catalog_id": "STD-TOBACCO",
+      "source": "standard",
+      "name": "Tobacco Use",
+      "category": "Behavioral Health",
+      "icon": "flProhibitedSmoking",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "F17"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Substance use",
+      "status": "Inactive"
+    },
+    {
+      "attribute_id": "ATTR-HIGHRISK",
+      "catalog_id": "STD-HIGHRISK",
+      "source": "standard",
+      "name": "High Risk Flag",
+      "category": "Safety",
+      "icon": "dsWarning",
+      "image": null,
+      "suggest": {
+        "problems": [
+          "Suicidal Ideation",
+          "Homicidal Ideation",
+          "Non-Suicidal Self-Injury"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-AGGRESSION",
+      "catalog_id": "STD-AGGRESSION",
+      "source": "standard",
+      "name": "Aggression",
+      "category": "Safety",
+      "icon": "flPersonWarning",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-VIOLENCE",
+      "catalog_id": "STD-VIOLENCE",
+      "source": "standard",
+      "name": "History of Violence",
+      "category": "Safety",
+      "icon": "flAlertUrgent",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-ELOPEMENT",
+      "catalog_id": "STD-ELOPEMENT",
+      "source": "standard",
+      "name": "Elopement Risk",
+      "category": "Safety",
+      "icon": "flPersonRunning",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-UNHOUSED",
+      "catalog_id": "STD-UNHOUSED",
+      "source": "standard",
+      "name": "Unhoused",
+      "category": "Social Needs",
+      "icon": "flTent",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "Z59.0"
+        ],
+        "problems": [
+          "Housing Instability / Homelessness"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Housing",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-FOOD",
+      "catalog_id": "STD-FOOD",
+      "source": "standard",
+      "name": "Needs Food Assistance",
+      "category": "Social Needs",
+      "icon": "flFood",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "Z59.4"
+        ],
+        "problems": [
+          "Food Insecurity"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-TRANSPORT",
+      "catalog_id": "STD-TRANSPORT",
+      "source": "standard",
+      "name": "Needs Transportation",
+      "category": "Social Needs",
+      "icon": "flVehicleBus",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Transportation",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-FINANCIAL",
+      "catalog_id": "STD-FINANCIAL",
+      "source": "standard",
+      "name": "Financial Assistance",
+      "category": "Social Needs",
+      "icon": "flMoneyHand",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-WHEELCHAIR",
+      "catalog_id": "STD-WHEELCHAIR",
+      "source": "standard",
+      "name": "Requires Wheelchair Access",
+      "category": "Accessibility",
+      "icon": "flWheelchairAccess",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-GUIDEDOG",
+      "catalog_id": "STD-GUIDEDOG",
+      "source": "standard",
+      "name": "Guide Dog",
+      "category": "Accessibility",
+      "icon": "flAnimalDog",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-ACCOMMODATION",
+      "catalog_id": "STD-ACCOMMODATION",
+      "source": "standard",
+      "name": "Disability Accommodation",
+      "category": "Accessibility",
+      "icon": "flAccessibility",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-INPT-TRANSFER",
+      "catalog_id": "STD-INPT-TRANSFER",
+      "source": "standard",
+      "name": "Inpatient Transfer",
+      "category": "Care Coordination",
+      "icon": "flArrowSwap",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Hospital discharge",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-HFW-WAITLIST",
+      "catalog_id": null,
+      "source": "custom",
+      "name": "HFW Waitlist",
+      "category": "Care Coordination",
+      "icon": "flHourglassHalf",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Referrals",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-SCHOOL",
+      "catalog_id": "STD-SCHOOL",
+      "source": "standard",
+      "name": "School-Based Services",
+      "category": "Care Coordination",
+      "icon": "flHatGraduation",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-RESTRICTED",
+      "catalog_id": "STD-RESTRICTED",
+      "source": "standard",
+      "name": "Restricted Record",
+      "category": "Care Coordination",
+      "icon": "flLockClosed",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-VETERAN",
+      "catalog_id": "STD-VETERAN",
+      "source": "standard",
+      "name": "Veteran Status",
+      "category": "Demographic",
+      "icon": "flMedal",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-LGBTQ",
+      "catalog_id": "STD-LGBTQ",
+      "source": "standard",
+      "name": "LGBTQ+ Identified",
+      "category": "Demographic",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2' y='4' width='16' height='2' fill='%23E40303'/><rect x='2' y='6' width='16' height='2' fill='%23FF8C00'/><rect x='2' y='8' width='16' height='2' fill='%23FFED00'/><rect x='2' y='10' width='16' height='2' fill='%23008026'/><rect x='2' y='12' width='16' height='2' fill='%2324408E'/><rect x='2' y='14' width='16' height='2' fill='%23732982'/></g></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-FRENCH",
+      "catalog_id": "STD-FRENCH",
+      "source": "standard",
+      "name": "French Speaking",
+      "category": "Language & Communication",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2.00' y='4' width='4.05' height='12' fill='%23D52B1E'/><rect x='6.00' y='4' width='8.05' height='12' fill='%23FFFFFF'/><rect x='14.00' y='4' width='4.05' height='12' fill='%23D52B1E'/><polygon points='10.00,6.90 10.49,7.89 11.15,7.56 10.99,9.04 11.98,8.38 11.81,8.88 12.80,8.71 12.47,9.71 12.80,10.04 11.48,11.02 11.65,11.52 10.26,11.35 10.26,12.84 9.74,12.84 9.74,11.35 8.35,11.52 8.52,11.02 7.20,10.04 7.53,9.71 7.20,8.71 8.19,8.88 8.02,8.38 9.01,9.04 8.85,7.56 9.51,7.89' fill='%23D52B1E'/></g></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-NAT-HT",
+      "catalog_id": "STD-NAT-HT",
+      "source": "standard",
+      "name": "Nationality: Haiti",
+      "category": "Nationality & Immigration",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2' y='4.00' width='16' height='6.05' fill='%2300209F'/><rect x='2' y='10.00' width='16' height='6.05' fill='%23D21034'/></g></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-NAT-UA",
+      "catalog_id": "STD-NAT-UA",
+      "source": "standard",
+      "name": "Nationality: Ukraine",
+      "category": "Nationality & Immigration",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2' y='4.00' width='16' height='6.05' fill='%230057B7'/><rect x='2' y='10.00' width='16' height='6.05' fill='%23FFD700'/></g></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-NAT-VN",
+      "catalog_id": "STD-NAT-VN",
+      "source": "standard",
+      "name": "Nationality: Vietnam",
+      "category": "Nationality & Immigration",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2' y='4.00' width='16' height='12.05' fill='%23DA251D'/><polygon points='10.00,6.40 10.85,8.83 13.42,8.89 11.38,10.45 12.12,12.91 10.00,11.45 7.88,12.91 8.62,10.45 6.58,8.89 9.15,8.83' fill='%23FFFF00'/></g></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-SCH-LINCOLN",
+      "catalog_id": null,
+      "source": "custom",
+      "name": "Lincoln Elementary",
+      "category": "Education",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M10 1 L18 4 V10 C18 14.5 14.5 17.6 10 19 C5.5 17.6 2 14.5 2 10 V4 Z' fill='%231F3A68'/><text x='10' y='13.1' font-family='Arial,Helvetica,sans-serif' font-weight='700' font-size='8.5' text-anchor='middle' fill='%23F5C518'>LE</text></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-SCH-WESTVIEW",
+      "catalog_id": null,
+      "source": "custom",
+      "name": "Westview Middle Wildcats",
+      "category": "Education",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><circle cx='10' cy='10' r='9' fill='%231C1C1C'/><g fill='%23F28C28'><ellipse cx='10' cy='12.6' rx='3.6' ry='3'/><ellipse cx='5.6' cy='8.6' rx='1.5' ry='1.9'/><ellipse cx='8.3' cy='6.3' rx='1.5' ry='1.9'/><ellipse cx='11.7' cy='6.3' rx='1.5' ry='1.9'/><ellipse cx='14.4' cy='8.6' rx='1.5' ry='1.9'/></g></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-SCH-EASTLAKE",
+      "catalog_id": null,
+      "source": "custom",
+      "name": "Eastlake High Lightning",
+      "category": "Education",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><circle cx='10' cy='10' r='9' fill='%234B2C83'/><polygon points='11.5,3 5.5,11 9.5,11 8,17 14.5,8.6 10.5,8.6' fill='%23FFD23F'/></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-SCH-NORTHSIDE",
+      "catalog_id": null,
+      "source": "custom",
+      "name": "Northside Stars Academy",
+      "category": "Education",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><rect x='1' y='1' width='18' height='18' rx='4' fill='%230B7A75'/><polygon points='10,3.5 11.9,8 16.6,8.2 12.9,11.1 14.2,15.7 10,13 5.8,15.7 7.1,11.1 3.4,8.2 8.1,8' fill='%23FFFFFF'/></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-EDU-IEP",
+      "catalog_id": null,
+      "source": "custom",
+      "name": "IEP in Place",
+      "category": "Education",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><rect x='1' y='1' width='18' height='18' rx='4' fill='%232E6DB4'/><text x='10' y='12.5' font-family='Arial,Helvetica,sans-serif' font-weight='700' font-size='7' text-anchor='middle' fill='%23FFFFFF'>IEP</text></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-EDU-504",
+      "catalog_id": null,
+      "source": "custom",
+      "name": "504 Plan",
+      "category": "Education",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><rect x='1' y='1' width='18' height='18' rx='4' fill='%236A4C93'/><text x='10' y='12.5' font-family='Arial,Helvetica,sans-serif' font-weight='700' font-size='7' text-anchor='middle' fill='%23FFFFFF'>504</text></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-EDU-G4",
+      "catalog_id": null,
+      "source": "custom",
+      "name": "Grade 4",
+      "category": "Education",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><rect x='1' y='1' width='18' height='18' rx='4' fill='%23BFE3F5'/><text x='10' y='13.1' font-family='Arial,Helvetica,sans-serif' font-weight='700' font-size='8.5' text-anchor='middle' fill='%231F3A68'>G4</text></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-EDU-G9",
+      "catalog_id": null,
+      "source": "custom",
+      "name": "Grade 9",
+      "category": "Education",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><rect x='1' y='1' width='18' height='18' rx='4' fill='%23E3D7F5'/><text x='10' y='13.1' font-family='Arial,Helvetica,sans-serif' font-weight='700' font-size='8.5' text-anchor='middle' fill='%234B2C83'>G9</text></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    }
+  ]
+}

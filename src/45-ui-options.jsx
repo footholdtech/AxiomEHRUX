@@ -69,6 +69,21 @@ function PvHeader() {
   );
 }
 
+/* Attribute marks in the header's yellow attribute box. */
+function PvAttrs() {
+  return (
+    <div className="uio-pv uio-pv-header">
+      <div className="uio-pv-hrow">
+        <span className="uio-pv-av" />
+        <span className="uio-pv-stack"><span className="uio-pv-line w70" /><span className="uio-pv-line w40" /></span>
+      </div>
+      <div className="uio-pv-attrs">
+        {['dsPeople', 'flTranslate', 'dsWarning', 'flWheelchairAccess', 'flTent'].map(k => <Icon key={k} name={k} size={14} />)}
+      </div>
+    </div>
+  );
+}
+
 const UI_OPTION_CARDS = [
   {
     key: 'header', title: 'Client Header', Preview: PvHeader, ready: true,
@@ -76,6 +91,13 @@ const UI_OPTION_CARDS = [
     blurb: 'Which quick views appear, in what order, and whether the medical strip and action toolbar show at all. Saved as named headers and assigned to staff roles.',
     meta: cfg => cfg.presets.length + ' header' + (cfg.presets.length === 1 ? '' : 's') + ' · '
       + cfg.presets.reduce((n, p) => n + p.roles.length, 0) + ' of ' + STAFF_ROLE_NAMES.length + ' roles assigned',
+  },
+  {
+    key: 'attributes', title: 'Client Attributes', Preview: PvAttrs, ready: true,
+    to: '/user-interface-options/client-attributes',
+    blurb: 'The attributes staff can add to a client’s chart, shown as icons in the client header. Pick from the standard library or add your own.',
+    meta: () => { const a = agencyAttrs(); const off = a.filter(x => x.status === 'Inactive').length;
+      return (a.length - off) + ' active' + (off ? ' · ' + off + ' inactive' : ''); },
   },
   {
     key: 'logo', title: 'Agency Logo', Preview: PvLogo, ready: false,
@@ -601,7 +623,7 @@ function ClientHeaderEditPage({ id }) {
       return { ...c, presets: exists ? stripped.map(p => (p.id === draft.id ? draft : p)) : stripped.concat([draft]) };
     });
     guard.setToast({
-      icon: 'check', title: isNew ? 'Client header created' : 'Client header saved',
+      status: 'success', title: isNew ? 'Client header created' : 'Client header saved',
       detail: draft.name + ' · ' + draft.roles.length + ' role' + (draft.roles.length === 1 ? '' : 's')
         + ' · ' + (draft.status === 'inactive' ? 'inactive — staff won’t see it yet' : 'active'),
     });
@@ -611,12 +633,12 @@ function ClientHeaderEditPage({ id }) {
 
   const setDefault = () => {
     setConfig(c => ({ ...c, defaultPresetId: draft.id }));
-    guard.setToast({ icon: 'check', title: draft.name + ' set as the default header', detail: 'Any role not explicitly assigned elsewhere now falls back to this one.' });
+    guard.setToast({ status: 'success', title: draft.name + ' set as the default header', detail: 'Any role not explicitly assigned elsewhere now falls back to this one.' });
   };
   const deletePreset = () => {
     if (config.presets.length < 2 || isDefault) return;
     setConfig(c => ({ ...c, presets: c.presets.filter(p => p.id !== draft.id) }));
-    guard.setToast({ icon: 'check', title: draft.name + ' deleted', detail: 'Any role that was assigned to it now falls back to the default header.' });
+    guard.setToast({ status: 'success', title: draft.name + ' deleted', detail: 'Any role that was assigned to it now falls back to the default header.' });
     clearDirtyThenGo('/user-interface-options/client-header');
   };
 

@@ -181,7 +181,114 @@ function deleteNote(noteId) { SESSION.noteDeleted[noteId] = true; touchRecords()
 /* Production's patient-note fields: topic and importance (required), shown in
    the client header (always, for now), plus Notify Care Team — the flag that
    sends it to colleagues' notification centers with a read receipt. */
-function addNote(client, { body, topic, importance, notify }) {
-  addRecord('notes', { note_id: newId('CN'), client_id: client.client_id, author_staff_id: ME.id,
-    timestamp: isoOf(TODAY) + 'T' + new Date().toTimeString().slice(0, 5) + ':00', topic, importance: importance || 'Low', show_in_header: true, notify_team: !!notify, body, read_by: [ME.id] });
+/* `attr` links the note to an attribute on the chart ({ assignment_id,
+   attribute_id }) when it's written from Manage Attributes. Otherwise it's an
+   ordinary note: same thread, same header count, same notification. */
+function addNote(client, { body, topic, importance, notify, attr }) {
+  const note = { note_id: newId('CN'), client_id: client.client_id, author_staff_id: ME.id,
+    timestamp: isoOf(TODAY) + 'T' + new Date().toTimeString().slice(0, 5) + ':00', topic, importance: importance || 'Low', show_in_header: true, notify_team: !!notify, body, read_by: [ME.id],
+    attribute_assignment_id: attr ? attr.assignment_id : null, attribute_id: attr ? attr.attribute_id : null };
+  addRecord('notes', note);
+  return note;
 }
+
+/* ===== Client attributes ===========================================
+   The agency's attribute library and the attributes on each chart.
+
+   - The library is a finite list that administrators manage. Clinicians apply
+     attributes from it; they can't invent new ones, because free-text
+     attributes can't be reported on. Each entry has a glyph (a Fluent or DS
+     icon key) or an uploaded `image`.
+   - An assignment is effective from start_date through end_date, inclusive;
+     no end_date means open-ended. A future start is "scheduled".
+   - Nothing is deleted. Removing an entry made in error sets `removed` and the
+     row stays, with its history, for the audit trail.
+   Fixtures: tools/build-attribute-fixtures.py. Session rules as above: edits
+   live in memory and a reload starts clean.
+   ================================================================ */
+/* The standard library Radicle ships, and the agency's own list. The agency
+   list is admin configuration, so like UI options it persists in this browser
+   (localStorage) while chart edits don't. Inactive attributes stay in the list:
+   they can't be added to a chart any more, but every chart that has one keeps
+   it, with its history. */
+const ATTR_CATALOG = RD.attributeCatalog || [];
+const ATTR_CFG_KEY = 'axiom-attr-config-v2';   // bump when the fixture list changes
+let AGENCY_ATTRS = (() => {
+  try { const s = JSON.parse(localStorage.getItem(ATTR_CFG_KEY) || 'null'); if (s && Array.isArray(s.rows)) return s.rows; } catch (e) {}
+  return (RD.attributeLibrary || []).slice();
+})();
+const persistAttrs = () => { try { localStorage.setItem(ATTR_CFG_KEY, JSON.stringify({ rows: AGENCY_ATTRS })); } catch (e) {} touchRecords(); };
+const agencyAttrs = () => AGENCY_ATTRS;
+const selectableAttrs = () => AGENCY_ATTRS.filter(a => a.status === 'Active');
+const attrById = id => AGENCY_ATTRS.find(a => a.attribute_id === id) || null;
+function saveAgencyAttr(row) {
+  const i = AGENCY_ATTRS.findIndex(a => a.attribute_id === row.attribute_id);
+  AGENCY_ATTRS = i === -1 ? AGENCY_ATTRS.concat([row]) : AGENCY_ATTRS.map((a, j) => (j === i ? row : a));
+  persistAttrs();
+}
+/* Turn standard entries on for the agency, with their library defaults. */
+function addFromCatalog(entries) {
+  AGENCY_ATTRS = AGENCY_ATTRS.concat(entries.map(c => ({ ...c, attribute_id: c.catalog_id.replace('STD-', 'ATTR-'),
+    source: 'standard', status: 'Active' })));
+  persistAttrs();
+}
+function resetAgencyAttrs() { AGENCY_ATTRS = (RD.attributeLibrary || []).slice(); try { localStorage.removeItem(ATTR_CFG_KEY); } catch (e) {} touchRecords(); }
+/* How many charts have it right now, and how many ever have (for the
+   inactive message: "stays on N charts"). */
+function attrUsage(id) {
+  let now = 0, ever = 0;
+  CLIENTS.forEach(c => getAttrAssignments(c).forEach(r => {
+    if (r.attribute_id !== id) return;
+    ever++; if (attrState(r) === 'active' || attrState(r) === 'scheduled') now++;
+  }));
+  return { now, ever };
+}
+const ATTR_FALLBACK = name => ({ attribute_id: null, name, icon: 'dsPeople', category: '' });
+SESSION.attrs = {};     // client_id -> the chart's whole assignment list after a save
+
+/* Assignment rows with their library entry attached as `attribute`. The admin
+   preview's demo client carries plain names; they read as open-ended. */
+function getAttrAssignments(client) {
+  if (client.records) return (client.attrs || []).map((a, i) => ({ assignment_id: 'PREVIEW-A' + i, client_id: client.client_id,
+    attribute_id: null, attribute: ATTR_FALLBACK(a.name), start_date: null, end_date: null, removed: false, history: [] }));
+  const rows = SESSION.attrs[client.client_id] || own(RD.attributeAssignments, client.client_id);
+  return rows.map(r => ({ ...r, attribute: attrById(r.attribute_id) || ATTR_FALLBACK(r.attribute_id) }));
+}
+function saveAttrAssignments(client, rows) {
+  SESSION.attrs[client.client_id] = rows.map(({ attribute, ...r }) => r);
+  touchRecords();
+}
+/* active · scheduled · ended · removed */
+function attrState(r) {
+  if (r.removed) return 'removed';
+  const t = isoOf(TODAY);
+  if (r.start_date && r.start_date > t) return 'scheduled';
+  if (r.end_date && r.end_date < t) return 'ended';
+  /* Ended on purpose (End Today): off the chart now, not at midnight. */
+  if (r.ended_at && r.end_date && r.end_date <= t) return 'ended';
+  return 'active';
+}
+const activeAttrs = client => getAttrAssignments(client).filter(r => attrState(r) === 'active');
+
+/* Library entries the chart itself suggests: an ACTIVE diagnosis whose ICD-10
+   code starts with one of the entry's prefixes, or an ACTIVE problem it names.
+   Offered, never applied. `rows` is the dialog's draft, so a suggestion
+   disappears the moment it's added. */
+function attrSuggestions(client, rows) {
+  const onChart = new Set(rows.filter(r => ['active', 'scheduled'].indexOf(attrState(r)) !== -1).map(r => r.attribute_id));
+  const dx = (client.diagnoses || []).filter(d => d.status === 'Active');
+  const pr = (client.problems || []).filter(p => p.status === 'Active');
+  const out = [];
+  selectableAttrs().forEach(a => {
+    if (onChart.has(a.attribute_id)) return;
+    const s = a.suggest || {};
+    const d = dx.find(x => (s.icd10 || []).some(p => String(x.icd10 || '').indexOf(p) === 0));
+    const p = !d && pr.find(x => (s.problems || []).indexOf(x.name) !== -1);
+    if (d) out.push({ attr: a, why: 'Active diagnosis: ' + d.icd10 + ' ' + d.description });
+    else if (p) out.push({ attr: a, why: 'Active problem: ' + p.name });
+  });
+  return out;
+}
+
+/* Notes written about one attribute on the chart, newest first. */
+const getAttrNotes = (client, assignmentId) => getNotes(client).filter(n => n.attribute_assignment_id === assignmentId && !n.deleted);

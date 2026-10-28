@@ -29,24 +29,30 @@ function TextArea({ value, onChange, placeholder = 'Please input...', rows = 2, 
 /* DateField owns its own label so the Today / 7 / 30 quick-set can sit on the
    label's baseline, right-aligned, the way the product renders it. Nesting it
    inside <Field> pushed the quick-set between the label and the input and left
-   the label floating well above the control. */
-function DateField({ label, required, error, value, onChange }) {
+   the label floating well above the control.
+   The input is the browser's own date picker (it used to be read-only, so the
+   only way to pick a date was the quick-set). Values stay ISO yyyy-mm-dd. */
+/* `quick`: true for Today / 7 / 30, false for none, or [[label, days], …] —
+   a search's start date reads backwards (Today −30 −7). */
+const DATE_QUICK = [['Today', 0], ['7', 7], ['30', 30]];
+function DateField({ label, required, error, value, onChange, min, hint, quick = true }) {
   const setRel = n => onChange(isoOf(addDays(TODAY, n)));
+  const quickSet = quick === true ? DATE_QUICK : (quick || []);
   return (
     <div className="ff">
       <div className="ff-label ff-label--row">
         <span>{label}{required && <span className="ff-req"> * <span className="ff-req-txt">(Required)</span></span>}</span>
-        <span className="date-quick">
-          <button type="button" className="quick" onClick={() => setRel(0)}>Today</button>
-          <button type="button" className="quick" onClick={() => setRel(7)}>7</button>
-          <button type="button" className="quick" onClick={() => setRel(30)}>30</button>
-        </span>
+        {quickSet.length > 0 && (
+          <span className="date-quick">
+            {quickSet.map(([l, n]) => <button key={l} type="button" className="quick" onClick={() => setRel(n)}>{l}</button>)}
+          </span>
+        )}
       </div>
       <div className={'form-input date-input' + (error ? ' invalid' : '')}>
-        <Icon name="calendar" size={15} />
-        <input value={value ? fmtDate(value) : ''} placeholder="MM/DD/YYYY" readOnly onClick={() => setRel(0)} />
-        {value && <button type="button" className="date-clear" aria-label="Clear date" onClick={() => onChange('')}><Icon name="close" size={13} /></button>}
+        <input type="date" value={value || ''} min={min || undefined} aria-label={label} onChange={e => onChange(e.target.value)} />
+        {value && <button type="button" className="date-clear" aria-label={'Clear ' + label} onClick={() => onChange('')}><Icon name="close" size={13} /></button>}
       </div>
+      {hint && !error && <div className="ff-hint">{hint}</div>}
       {error && <div className="ff-error"><Icon name="warn" size={13} /> {error}</div>}
     </div>
   );
@@ -87,7 +93,7 @@ function SignatureField({ value, onChange, signer, invalid }) {
       <button type="button" className="icon-btn" aria-label="Clear signature" onClick={() => onChange(null)}><Icon name="close" size={14} /></button>
     </div>
   );
-  return <Button variant="secondary" size="sm" onClick={() => onChange({ name: signer, date: isoOf(TODAY) })} style={invalid ? { borderColor: 'var(--foreground-system-error, #b3261e)' } : null}>
+  return <Button variant="secondary" size="sm" onClick={() => onChange({ name: signer, date: isoOf(TODAY) })} style={invalid ? { borderColor: 'var(--border-input-control-system-danger-primary)' } : null}>
     <Icon name="pen" size={14} /> Get Signature
   </Button>;
 }
@@ -190,7 +196,7 @@ function DischargePlan({ client, config, onOpenModule }) {
     const e = validate();
     const keys = Object.keys(e);
     if (keys.length) {
-      guard.setToast({ icon: 'warn', title: `${keys.length} required field${keys.length > 1 ? 's' : ''} still need${keys.length > 1 ? '' : 's'} an answer`, detail: 'Highlighted below. Use “Prefill demo answers” in the prototype bar to fill the note quickly.' });
+      guard.setToast({ status: 'warning', title: `${keys.length} required field${keys.length > 1 ? 's' : ''} still need${keys.length > 1 ? '' : 's'} an answer`, detail: 'Highlighted below. Use “Prefill demo answers” in the prototype bar to fill the note quickly.' });
       const first = document.querySelector('.ff-error');
       if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
@@ -213,7 +219,7 @@ function DischargePlan({ client, config, onOpenModule }) {
       setFiled({ at: TODAY, status: config.requiresApproval ? 'Pended to Manager' : 'Complete', selection });
       guard.clearDirty();
       guard.setToast({
-        icon: 'check',
+        status: 'success',
         title: config.requiresApproval ? 'Discharge Plan pended to manager' : 'Discharge Plan saved as complete',
         detail: `${selection.diagnoses.length + selection.problems.length} item${selection.diagnoses.length + selection.problems.length === 1 ? '' : 's'} included on the summary. No diagnosis or problem status was changed.`,
       });
@@ -423,7 +429,7 @@ function DischargePlan({ client, config, onOpenModule }) {
           ) : (
             <React.Fragment>
               <Button variant="primary" onClick={onPrimary}>{primaryLabel}</Button>
-              <Button variant="secondary" onClick={() => { guard.clearDirty(); guard.setToast({ icon: 'check', title: 'Draft Saved', detail: 'Nothing has been filed to the chart yet.' }); }}>Save Draft</Button>
+              <Button variant="secondary" onClick={() => { guard.clearDirty(); guard.setToast({ status: 'success', title: 'Draft Saved', detail: 'Nothing has been filed to the chart yet.' }); }}>Save Draft</Button>
               <span className="spacer" />
               <Button variant="ghost" onClick={() => { setForm(initialForm(client)); setErrors({}); guard.clearDirty(); }}>Reset</Button>
             </React.Fragment>
@@ -828,7 +834,10 @@ function ClientSummary({ client, onOpenTab }) {
 /* ---- Chart page -------------------------------------------------- */
 function ChartPage({ id, module, config }) {
   const guard = useGuard();
-  const [tab, setTab] = useState(() => (module && CLIENT_MODULES[module]) || CHART_HOME_TAB);
+  /* `doc-…` opens one document from the Documents list as its own tab. */
+  const doc = findDoc(id, module);
+  const tabFor = () => (doc ? docTab(doc) : (module && CLIENT_MODULES[module]) || CHART_HOME_TAB);
+  const [tab, setTab] = useState(tabFor);
   const client = CLIENT_BY_ID[id];
   /* The URL names the module, so a chart reached from the left nav opens on it
      rather than always on the overview. */
@@ -837,7 +846,7 @@ function ChartPage({ id, module, config }) {
      happened to be standing — so every switch resets to the overview. The
      same goes for leaving a module URL for the bare chart URL (the client
      breadcrumb): that means the summary. */
-  useEffect(() => { setTab((module && CLIENT_MODULES[module]) || CHART_HOME_TAB); }, [id, module]);
+  useEffect(() => { setTab(tabFor()); }, [id, module]);
   /* Publish the active tab so the breadcrumb in the app shell can name it, and
      clear it on the way out so a stale tab never trails a different page. */
   const { setChartTab } = guard;
@@ -856,7 +865,9 @@ function ChartPage({ id, module, config }) {
     const live = window.location.hash.replace(/^#/, '') || '/';
     if (live.indexOf('/chart/' + id) !== 0) return;
     if (guard.clientId == null) guard.adopt(id);
-    else guard.request({ to: '/chart/' + id, client: id, onCancel: () => guard.go('/chart/' + guard.clientId, { client: guard.clientId }) });
+    /* Keep the whole URL, so the switch lands on the module or document that
+       was asked for rather than the summary. */
+    else guard.request({ to: live, client: id, onCancel: () => guard.go('/chart/' + guard.clientId, { client: guard.clientId }) });
   }, [id, client, guard.clientId]);
 
   /* The client breadcrumb, pressed while on another tab of this chart. A ref,
@@ -898,13 +909,12 @@ function ChartPage({ id, module, config }) {
         ? <ClientSummary client={client} onOpenTab={switchTab} />
         : tab === 'Discharge Plan'
         ? <DischargePlan client={client} config={config} onOpenModule={switchTab} />
+        : doc && tab === docTab(doc)
+        ? <DocumentView client={client} doc={doc} />
         : START_NOTE_TYPES.indexOf(tab) !== -1 || getNoteCtx(id, tab)
         ? <NotePage key={id + tab} client={client} doc={tab} />
-        : <Panel title={tab}>
-            <div className="stub"><Icon name="info" size={20} />
-              <div>{tab} is out of scope for this prototype. It is here so you can try switching notes with unsaved work in the Discharge Plan.</div>
-            </div>
-          </Panel>}
+        /* Every other module: its records and a form to add one. */
+        : <ClientModulePage key={id + tab} client={client} module={tab} />}
     </div>
   );
 }

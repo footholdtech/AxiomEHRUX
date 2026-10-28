@@ -4,19 +4,9 @@
    somewhere real, without pretending to be the module. Each carries its own
    trail so these pages are not the one place the breadcrumb disappears. */
 const STUBS = {
-  '/reports': { title: 'Reports', blurb: 'Agency-level reporting. Not tied to any client record.',
-    crumbs: [{ label: 'Reports' }] },
-  '/billing': { title: 'Billing', blurb: 'Claims, invoices and payments. Not tied to any client record.',
-    crumbs: [{ label: 'Billing' }] },
-  '/admin': { title: 'Admin', blurb: 'Users, roles and agency settings. Not tied to any client record.',
-    crumbs: [{ label: 'Admin' }] },
   '/client-medical-area': { title: 'Client Medical Area',
     blurb: 'The clinical modules for a single client — vitals, allergies, diagnoses, problem list, medications. Open a client to work inside one; nothing here is filed until you do.',
     crumbs: [{ label: 'Clients', to: '/clients' }, { label: 'Client Medical Area' }] },
-  '/analytics': { title: 'Analytics', blurb: 'Reporting dashboards. Not tied to any client record.',
-    crumbs: [{ label: 'Reports', to: '/reports' }, { label: 'Analytics' }] },
-  '/client-list': { title: 'Client List', blurb: 'Every client at the agency, not just this clinician’s caseload.',
-    crumbs: [{ label: 'Clients', to: '/clients' }, { label: 'Client List' }] },
   '/foster-home': { title: 'Foster Home', blurb: 'Program shell. Not tied to any client record.',
     crumbs: [{ label: 'Foster Home' }] },
   '/inpatient-module': { title: 'Inpatient Module', blurb: 'Program shell. Not tied to any client record.',
@@ -50,8 +40,17 @@ function Routes({ config }) {
   if ((m = match('/notifications/:tab', path))) return <NotificationsPage tab={m.tab} />;
   if (match('/user-interface-options', path)) return <UIOptionsIndex />;
   if (match('/user-interface-options/client-header', path)) return <ClientHeaderListPage />;
+  if (match('/user-interface-options/client-attributes', path)) return <ClientAttributesPage />;
   if ((m = match('/user-interface-options/client-header/:id', path))) return <ClientHeaderEditPage id={m.id} />;
+  /* Section pages, so a section breadcrumb is never a dead end. */
+  if (match('/documents', path) || match('/clinical-forms-search', path)) return <DocumentsPage />;
+  if (match('/reports', path)) return <SectionIndexPage sectionKey="reports" />;
+  if (match('/billing', path)) return <SectionIndexPage sectionKey="billing" />;
+  if (match('/admin', path)) return <SectionIndexPage sectionKey="admin" />;
+  if (match('/client-list', path)) return <AllClients crumbs={navTrail('Client List')} />;
   if (STUBS[path]) return <NonClientPage {...STUBS[path]} />;
+  /* Any other nav destination: client-agnostic, with its section trail. */
+  if (NAV_BY_SLUG[path.slice(1)] && !isClientModule(NAV_BY_SLUG[path.slice(1)])) return <AgencyPage label={NAV_BY_SLUG[path.slice(1)]} />;
   if (match('/signin', path)) return <SignIn />;
   if (path && path !== '/') {
     const title = titleFromPath(path);

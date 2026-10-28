@@ -116,7 +116,7 @@ function AddAllergyOverlay({ client, onClose }) {
     if (missing) return;
     addRecord('allergies', { allergy_id: newId('ALG'), client_id: client.client_id, allergen: f.allergen.trim(),
       allergen_category: f.category, reaction: f.reaction.trim() || null, severity_flag: f.severity, status: f.status });
-    guard.setToast({ icon: 'check', title: 'Allergy added', detail: f.allergen.trim() + ' · ' + f.severity + ' severity' });
+    guard.setToast({ status: 'success', title: 'Allergy added', detail: f.allergen.trim() + ' · ' + f.severity + ' severity' });
     onClose();
   };
   return (
@@ -201,7 +201,7 @@ function RecordVitalsOverlay({ client, last, onClose }) {
       weight_lbs: parseFloat(f.weight) || null, bmi, temp_f: parseFloat(f.temp) || null, pulse_bpm: parseFloat(f.pulse),
       resp_rate: parseFloat(f.resp) || null, bp_systolic: parseFloat(f.sys), bp_diastolic: parseFloat(f.dia),
       o2_sat_pct: parseFloat(f.o2) || null, pain_scale: parseFloat(f.pain) || 0 });
-    guard.setToast({ icon: 'check', title: 'Vitals recorded', detail: 'BP ' + f.sys + '/' + f.dia + ' · pulse ' + f.pulse });
+    guard.setToast({ status: 'success', title: 'Vitals recorded', detail: 'BP ' + f.sys + '/' + f.dia + ' · pulse ' + f.pulse });
     onClose();
   };
   const num = (k, label, suffix, req) => (
@@ -268,7 +268,7 @@ function AddImmunizationOverlay({ client, onClose }) {
     addRecord('immunizations', { immunization_id: newId('IMM'), client_id: client.client_id, vaccine: f.vaccine, dose: f.dose,
       date: f.date, site_route: given ? f.site : null, lot: given ? (f.lot || null) : null,
       administered_by_staff_id: given ? ME.id : null, status: f.status, source: f.status === 'Historical' ? 'Reported by client' : null });
-    guard.setToast({ icon: 'check', title: 'Immunization added', detail: f.vaccine + ' · ' + f.status.toLowerCase() });
+    guard.setToast({ status: 'success', title: 'Immunization added', detail: f.vaccine + ' · ' + f.status.toLowerCase() });
     onClose();
   };
   return (
@@ -345,7 +345,7 @@ function RecordInjectionOverlay({ client, onClose, suggested }) {
     addRecord('injections', { injection_id: newId('INJ'), client_id: client.client_id, medication: f.med, dose: f.dose,
       schedule: opt.schedule || null, date_given: f.date, next_due: next, interval_days: opt.every, site: f.site,
       given_by_staff_id: ME.id, lot: f.lot || null });
-    guard.setToast({ icon: 'check', title: 'Injection recorded', detail: f.med + ' · next due ' + fmtDate(next) });
+    guard.setToast({ status: 'success', title: 'Injection recorded', detail: f.med + ' · next due ' + fmtDate(next) });
     onClose();
   };
   return (
@@ -458,7 +458,7 @@ function NewAssessmentOverlay({ form, client, onClose }) {
     const flagged = !!(form.flag_item && resp[form.flag_item - 1] > 0);
     addRecord('admins', { administration_id: newId('ADM'), client_id: client.client_id, form_id: form.form_id, date,
       administered_by_staff_id: ME.id, responses: resp, score, band: b.label, flagged });
-    guard.setToast({ icon: 'check', title: form.name + ' saved', detail: 'Score ' + score + ' · ' + b.label });
+    guard.setToast({ status: 'success', title: form.name + ' saved', detail: 'Score ' + score + ' · ' + b.label });
     onClose();
   };
   return (
@@ -627,7 +627,7 @@ function RefillOverlay({ client, meds, onClose, onDone }) {
         rx_status: m.schedule ? 'PENDING EPCS SIGNATURE' : 'E-PRESCRIBED',
       };
     });
-    guard.setToast({ icon: 'check', title: ok.length + ' refill' + (ok.length === 1 ? '' : 's') + ' sent',
+    guard.setToast({ status: 'success', title: ok.length + ' refill' + (ok.length === 1 ? '' : 's') + ' sent',
       detail: (destinations > 1 ? 'Routed to ' + destinations + ' pharmacies. ' : '') + (controlled ? 'Controlled substances are pending your two-factor signature.' : 'Sent via Surescripts.') });
     onDone();
   };
@@ -699,7 +699,7 @@ function DiscontinueOverlay({ client, meds, onClose, onDone }) {
     setTried(true);
     if (!reason || !date) return;
     patchMeds(meds.map(m => m.med_rx_id), () => ({ status: 'Discontinued', discontinued_date: date, discontinued_reason: reason, refills_remaining: 0, rx_status: 'DISCONTINUED' }));
-    guard.setToast({ icon: 'check', title: meds.length + ' medication' + (meds.length === 1 ? '' : 's') + ' discontinued', detail: reason + ' · effective ' + fmtDate(date) });
+    guard.setToast({ status: 'success', title: meds.length + ' medication' + (meds.length === 1 ? '' : 's') + ' discontinued', detail: reason + ' · effective ' + fmtDate(date) });
     onDone();
   };
   return (
@@ -787,7 +787,7 @@ function AddMedicationOverlay({ client, onClose }) {
       end_date: isoOf(addDays(TODAY, (parseInt(f.duration, 10) || 30) * (1 + (parseInt(f.refills, 10) || 0)))), last_filled: isoOf(TODAY),
       status: 'Active', rx_status: sched ? 'PENDING EPCS SIGNATURE' : (f.manual ? 'PAPER/FAX' : 'E-PRESCRIBED'),
       discontinued_date: null, discontinued_reason: null, sensitivity: f.sensitivity });
-    guard.setToast({ icon: 'check', title: 'Medication added', detail: med.name + ' ' + f.strength + (sched ? ' · pending your two-factor signature' : ' · sent to ' + f.pharmacy) });
+    guard.setToast({ status: 'success', title: 'Medication added', detail: med.name + ' ' + f.strength + (sched ? ' · pending your two-factor signature' : ' · sent to ' + f.pharmacy) });
     onClose();
   };
 
@@ -1014,7 +1014,7 @@ function NoteFields({ draft, client, preview, onSubmit, rows = 2, trailing }) {
 function AddInternalNoteOverlay({ client, onClose }) {
   const guard = useGuard();
   const draft = useNoteDraft(client);
-  const submit = () => { if (draft.post()) { guard.setToast({ icon: 'check', title: 'Internal note added', detail: draft.d.notify ? 'The care team was notified.' : 'Saved to ' + client.name.split(' ')[0] + '’s chart.' }); onClose(); } };
+  const submit = () => { if (draft.post()) { guard.setToast({ status: 'success', title: 'Internal note added', detail: draft.d.notify ? 'The care team was notified.' : 'Saved to ' + client.name.split(' ')[0] + '’s chart.' }); onClose(); } };
   return (
     <Overlay size="md" title="Add Internal Note" subtitle={client.displayName} onClose={onClose} bodyClassName="cn-add-body"
       footer={<React.Fragment><Button variant="secondary" onClick={onClose}>Cancel</Button><Button variant="primary" onClick={submit}>Post Note</Button></React.Fragment>}>
@@ -1089,6 +1089,8 @@ function ClientNotesThread({ client, preview, className, composer = true }) {
                           {n.topic && <b className="cn-subj">{n.topic}</b>}
                           <NTag tone={importanceTone(n.importance)}>{(n.importance || 'Low') + ' priority'}</NTag>
                           {n.notify_team && <NTag>Care team notified</NTag>}
+                          {/* Written from Manage Attributes: say which attribute it's about. */}
+                          {n.attribute_id && attrById(n.attribute_id) && <NTag><AttrGlyph attr={attrById(n.attribute_id)} size={14} />{attrById(n.attribute_id).name}</NTag>}
                         </div>
                         <p>{n.body}</p>
                       </div>
