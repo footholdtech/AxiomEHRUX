@@ -402,13 +402,13 @@ function Home() {
   );
 }
 
-function AllClients() {
+function AllClients({ crumbs }) {
   const guard = useGuard();
   const [q, setQ] = useState('');
   const rows = CLIENTS.filter(c => !q || (c.name + ' ' + c.mrn + ' ' + c.program).toLowerCase().indexOf(q.toLowerCase()) !== -1);
   return (
     <div className="page">
-      <Breadcrumbs items={[{ label: 'Clients' }]} />
+      <Breadcrumbs items={crumbs || [{ label: 'Clients' }]} />
       <div className="page-head-row">
         <div><h1 className="page-title">All Clients</h1><div className="page-sub">{rows.length} of {CLIENTS.length} clients</div></div>
       </div>
@@ -503,7 +503,8 @@ function ModulePage({ slug }) {
 
   return (
     <div className="page">
-      <Breadcrumbs items={[{ label: 'Clients', to: '/clients' }, { label: name }]} />
+      {/* The nav's own trail: Documents › PHQ, Clients › Allergy. */}
+      <Breadcrumbs items={navTrail(name)} />
       <div className="page-head-row">
         <div><h1 className="page-title">{name}</h1><div className="page-sub">No client selected</div></div>
       </div>

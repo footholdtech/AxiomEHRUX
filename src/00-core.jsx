@@ -60,6 +60,21 @@ function match(pattern, path) {
    navigation is desktop > 1184, tablet 850–1184, mobile < 850; the client
    header compacts below 540. */
 const BP = { tablet: '(max-width: 1184px)', mobile: '(max-width: 850px)', compact: '(max-width: 540px)' };
+/* The width an element actually has. Breakpoints on the viewport are wrong
+   for anything that sits beside the left nav: with the nav open on a tablet
+   the client header gets ~500px of a 1024px screen, and it has to lay itself
+   out for the 500. Returns [ref, width]. */
+function useElementWidth() {
+  const ref = useRef(null);
+  const [w, setW] = useState(null);
+  useEffect(() => {
+    const el = ref.current; if (!el || !window.ResizeObserver) return;
+    const ro = new ResizeObserver(([e]) => setW(Math.round(e.contentRect.width)));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  return [ref, w];
+}
 function useMedia(query) {
   const [m, setM] = useState(() => window.matchMedia(query).matches);
   useEffect(() => {
@@ -158,6 +173,13 @@ const ICONS = {
    20px lands its 2px strokes on fractional pixels and renders soft next to
    them — this is the same construction as the DS vectors, so it stays sharp. */
 const ICONS20 = {
+  /* RDS ↪ Alerts & Toasts: the four status icons and the dismiss glyph,
+     exported from the alert component (584:5592). Used by Toast. */
+  alertSuccess: 'M10 2C14.4183 2 18 5.58172 18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10C2 5.58172 5.58172 2 10 2ZM13.3584 7.64645C13.1849 7.47288 12.9154 7.4536 12.7206 7.58859L12.6513 7.64645L9 11.298L7.35355 9.65131L7.28431 9.59346C7.08944 9.45846 6.82001 9.47775 6.64645 9.65131C6.47288 9.82488 6.4536 10.0943 6.58859 10.2892L6.64645 10.3584L8.64645 12.3584L8.71569 12.4163C8.8862 12.5344 9.1138 12.5344 9.28431 12.4163L9.35355 12.3584L13.3584 8.35355L13.4163 8.28431C13.5513 8.08944 13.532 7.82001 13.3584 7.64645Z',
+  alertDanger: 'M10 2C14.4183 2 18 5.58172 18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10C2 5.58172 5.58172 2 10 2ZM10 12.5C9.58579 12.5 9.25 12.8358 9.25 13.25C9.25 13.6642 9.58579 14 10 14C10.4142 14 10.75 13.6642 10.75 13.25C10.75 12.8358 10.4142 12.5 10 12.5ZM10 6C9.75454 6 9.55039 6.17688 9.50806 6.41012L9.5 6.5V11L9.50806 11.0899C9.55039 11.3231 9.75454 11.5 10 11.5C10.2455 11.5 10.4496 11.3231 10.4919 11.0899L10.5 11V6.5L10.4919 6.41012C10.4496 6.17688 10.2455 6 10 6Z',
+  alertInfo: 'M18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18C14.4183 18 18 14.4183 18 10ZM9.50806 8.91012C9.55039 8.67687 9.75454 8.49999 10 8.49999C10.2455 8.49999 10.4496 8.67687 10.4919 8.91012L10.5 8.99999V13.5021L10.4919 13.592C10.4496 13.8253 10.2455 14.0021 10 14.0021C9.75454 14.0021 9.55039 13.8253 9.50806 13.592L9.5 13.5021V8.99999L9.50806 8.91012ZM9.25 6.74999C9.25 6.33578 9.58579 5.99999 10 5.99999C10.4142 5.99999 10.75 6.33578 10.75 6.74999C10.75 7.16421 10.4142 7.49999 10 7.49999C9.58579 7.49999 9.25 7.16421 9.25 6.74999Z',
+  alertWarning: 'M8.68149 2.78544C9.24892 1.73813 10.752 1.73821 11.3193 2.78557L17.8198 14.7865C18.3612 15.786 17.6375 17.0009 16.5009 17.0009H3.4982C2.36147 17.0009 1.63783 15.7858 2.17934 14.7864L8.68149 2.78544ZM10.5 7.5C10.5 7.22386 10.2761 7 10 7C9.72386 7 9.5 7.22386 9.5 7.5V11.5C9.5 11.7761 9.72386 12 10 12C10.2761 12 10.5 11.7761 10.5 11.5V7.5ZM10.75 13.75C10.75 13.3358 10.4142 13 10 13C9.58579 13 9.25 13.3358 9.25 13.75C9.25 14.1642 9.58579 14.5 10 14.5C10.4142 14.5 10.75 14.1642 10.75 13.75Z',
+  dismiss20: 'M4.08859 4.21569L4.14645 4.14645C4.32001 3.97288 4.58944 3.9536 4.78431 4.08859L4.85355 4.14645L10 9.293L15.1464 4.14645C15.32 3.97288 15.5894 3.9536 15.7843 4.08859L15.8536 4.14645C16.0271 4.32001 16.0464 4.58944 15.9114 4.78431L15.8536 4.85355L10.707 10L15.8536 15.1464C16.0271 15.32 16.0464 15.5894 15.9114 15.7843L15.8536 15.8536C15.68 16.0271 15.4106 16.0464 15.2157 15.9114L15.1464 15.8536L10 10.707L4.85355 15.8536C4.67999 16.0271 4.41056 16.0464 4.21569 15.9114L4.14645 15.8536C3.97288 15.68 3.9536 15.4106 4.08859 15.2157L4.14645 15.1464L9.293 10L4.14645 4.85355C3.97288 4.67999 3.9536 4.41056 4.08859 4.21569Z',
   /* Sticky note: page with a folded bottom-right corner and two text lines. */
   clientNote: 'M5.5 3h9A2.5 2.5 0 0 1 17 5.5v6.09a1 1 0 0 1-.29.7l-4.42 4.42a1 1 0 0 1-.7.29H5.5A2.5 2.5 0 0 1 3 14.5v-9A2.5 2.5 0 0 1 5.5 3Z'
     + 'M5.5 4A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H11v-2.5a2.5 2.5 0 0 1 2.5-2.5H16V5.5A1.5 1.5 0 0 0 14.5 4Z'
@@ -475,19 +497,52 @@ function Panel({ title, action, children, defaultOpen = true, id }) {
     </section>
   );
 }
+/* ===== Toast — RDS ↪ Alerts & Toasts, `alert` type=toast (584:5592) =====
+   From the component and its documentation:
+   - 320 wide, the status's light fill, a neutral hairline, shadow/xl, 12px
+     padding; 20px status icon; semibold title over a regular description,
+     both 14/20 in foreground-primary; 20px dismiss button.
+   - Status: success (it worked), danger (it failed), warning (non-blocking
+     problem), info (neutral update). Pass `status`; it defaults to success.
+   - Top-right of the viewport. Here it sits just under the top bar, so it never
+     covers the bell or the avatar, and above dialogs so a dialog can't hide it.
+   - Auto-dismisses after 5 s, except danger, which stays until dismissed.
+     Hovering or focusing pauses the timer so it can be read.
+   - Optional `action: { label, onClick }` renders the DS's secondary button
+     (e.g. Try Again). The progress-bar variant isn't built; ask a designer.
+   Usage: guard.setToast({ status: 'success', title: 'Report exported', detail: 'Check your downloads.' }) */
+const TOAST_STATUS = {
+  success: { icon: 'alertSuccess', label: 'Success' },
+  danger:  { icon: 'alertDanger',  label: 'Error' },
+  warning: { icon: 'alertWarning', label: 'Warning' },
+  info:    { icon: 'alertInfo',    label: 'Info' },
+};
 function Toast({ toast, onClose }) {
-  useEffect(() => { if (!toast) return; const t = setTimeout(onClose, 6000); return () => clearTimeout(t); }, [toast, onClose]);
-  if (!toast) return null;
+  const status = toast && TOAST_STATUS[toast.status] ? toast.status : 'success';
+  const [paused, setPaused] = useState(false);
+  const closeRef = useRef(onClose); closeRef.current = onClose;
+  useEffect(() => { setPaused(false); }, [toast]);
+  useEffect(() => {
+    if (!toast || status === 'danger' || paused) return;
+    const t = setTimeout(() => closeRef.current(), 5000); return () => clearTimeout(t);
+  }, [toast, status, paused]);
+  const s = TOAST_STATUS[status];
+  /* The live region stays mounted so screen readers announce what lands in it. */
   return (
     <div className="toast-wrap" role="status" aria-live="polite">
-      <div className="toast">
-        <span className="toast-ico"><Icon name={toast.icon || 'check'} size={16} /></span>
-        <div>
-          <div className="toast-title">{toast.title}</div>
-          {toast.detail && <div className="toast-detail">{toast.detail}</div>}
+      {toast && (
+        <div className={'toast toast--' + status} role={status === 'danger' ? 'alert' : undefined}
+          onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}
+          onFocus={() => setPaused(true)} onBlur={() => setPaused(false)}>
+          <Icon name={s.icon} size={20} className="toast-ico" />
+          <div className="toast-body">
+            <div className="toast-title"><span className="sr-only">{s.label}: </span>{toast.title}</div>
+            {toast.detail && <div className="toast-detail">{toast.detail}</div>}
+            {toast.action && <Button size="sm" variant="secondary" onClick={() => { toast.action.onClick(); onClose(); }}>{toast.action.label}</Button>}
+          </div>
+          <button type="button" className="icon-btn toast-close" aria-label="Dismiss" onClick={onClose}><Icon name="dismiss20" size={20} /></button>
         </div>
-        <button className="icon-btn" aria-label="Dismiss" onClick={onClose}><Icon name="close" size={15} /></button>
-      </div>
+      )}
     </div>
   );
 }

@@ -145,7 +145,7 @@ function SpRow({ k, children }) {
 
 function ServicePlanOverlay({ plan, client, preview, onClose, onOpenModule }) {
   const guard = useGuard();
-  const copy = (text, what) => copyText(text).then(() => guard.setToast({ icon: 'check', title: what + ' copied', detail: 'Paste it into your note.' }));
+  const copy = (text, what) => copyText(text).then(() => guard.setToast({ status: 'success', title: what + ' copied', detail: 'Paste it into your note.' }));
   return (
     <Overlay size="lg" title={planTitle(plan)} subtitle={client.displayName} onClose={onClose}
       footer={<React.Fragment>

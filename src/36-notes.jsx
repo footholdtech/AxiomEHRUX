@@ -76,7 +76,7 @@ function NoteEditor({ client, doc, ctx }) {
       resolveNotif(ctx.n.notification_id, 'note-signed', { doc });
       clearNoteCtx(client.client_id, doc);
     }
-    guard.setToast({ icon: 'check', title: doc + ' signed',
+    guard.setToast({ status: 'success', title: doc + ' signed',
       detail: ctx ? (ctx.n.urgent ? 'Follow-up documented — the alert is closed.' : 'Cleared from your notifications.') : 'Added to ' + client.name.split(' ')[0] + '’s chart.' });
     back();
   };
@@ -108,7 +108,7 @@ function NoteEditor({ client, doc, ctx }) {
         <div className="note-foot">
           <Button variant="ghost" onClick={back}>Cancel</Button>
           <span className="spacer" />
-          <Button variant="secondary" onClick={() => { guard.clearDirty(); guard.setToast({ icon: 'check', title: 'Draft saved', detail: ctx ? 'The notification stays open until the note is signed.' : 'Not filed to the chart yet.' }); }}>Save Draft</Button>
+          <Button variant="secondary" onClick={() => { guard.clearDirty(); guard.setToast({ status: 'success', title: 'Draft saved', detail: ctx ? 'The notification stays open until the note is signed.' : 'Not filed to the chart yet.' }); }}>Save Draft</Button>
           <Button variant="primary" onClick={sign}>Sign Note</Button>
         </div>
       </div>
@@ -144,7 +144,7 @@ function DocReview({ client, doc, ctx }) {
   const finish = (action, title, detail) => {
     resolveNotif(n.notification_id, action, { doc });
     clearNoteCtx(client.client_id, doc);
-    guard.setToast({ icon: 'check', title, detail });
+    guard.setToast({ status: 'success', title, detail });
     back();
   };
   return (

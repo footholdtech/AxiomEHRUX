@@ -43,21 +43,29 @@ Rendered on every client-specific page, full width, directly under the breadcrum
 
 - **Collapsed by default** unless the user's preference says otherwise (§8). The expanded header is ~410px, a lot of chart to spend before anything is read.
 - **Nothing collapses the header automatically.** An earlier version folded it on scroll; that was removed because a header moving by itself while you read is worse than the height it saves.
-- **Opening a different client** resets the header to the user's default collapsed/expanded state and to the first quick view, and discards local attribute edits.
+- **Opening a different client** resets the header to the user's default collapsed/expanded state and to the first quick view.
 - **If an admin removes the quick view a user is looking at**, the header falls back to the first remaining one rather than rendering an empty detail row.
-- **Attributes box** (in the General quick view): attribute chips plus a pencil icon *inside* the box, opening **Manage Client Attributes** (pick from the agency vocabulary or name a new one with an icon).
+- **Attributes box** (in the General quick view): the chart's *active* attributes plus a pencil icon *inside* the box, opening **Manage Attributes** (§2a).
+- **Attribute indicator.** Whenever the box isn't on screen (collapsed, or another quick view), every active attribute's mark sits beside the status badge (on the pronouns line on phones) in the same container as the box: `system/warning/light`, radius-md, spacing/xs. **Never truncated**: a hidden "+2" could be the attribute a clinical decision depends on, so marks wrap instead. Hover or focus lists the names in a tooltip; click or tap opens Manage Attributes. States: hover and pressed draw a ring in the warning border tokens (the warning ramp has no hover fill); focus uses the standard focus outline.
 - **Action buttons** are icon-only and each has an accessible name ("Add Note", "Call Client"…). The toolbar is the one exception to the app-wide icon-button style: bordered circles, because so many sit side by side.
 
 ---
 
-### 2b. On phones (viewport < 540px)
+### 2b. Narrow and phone layouts
+
+**The header lays itself out for its own width, not the viewport's.** Beside an open left nav on a tablet it may get ~500px of a 1024px screen, and a viewport breakpoint would let the action row overflow onto the name. So:
+
+- **Wide (header ≥ 860px), name and actions on one row:** the attribute marks sit after the status only while name + status + every mark fits on that line beside the action buttons. When they don't, the marks move to their own line **below DOB**, about where the expanded header keeps them. This is measured (a hidden one-line copy of the name line against the action buttons' own width), not a fixed breakpoint, because it depends on the name and how many attributes the client has. The action row is held at its full width, so nothing can overlap it; a long name wraps instead.
+- **Narrow (header < 860px):** the identity stacks above the actions, and the actions wrap onto more lines instead of overlapping.
+- **Phone layout (header < 540px, or a phone viewport):** everything below.
 
 The same component, made denser so it doesn't take half the screen even when collapsed (collapsed: ~160px, down from ~400px):
 
 - **Avatar:** size **M** (28px), the size used for avatars in notes and the top bar. Desktop and tablet use L (44px).
 - **Client name:** still the display face, at 17/24 instead of 20/32. The demographic lines drop to 13/18.
 - **Status pill:** moves onto the pronouns line, so a long name never pushes it onto a line of its own.
-- **Chat With Chart:** a smaller button (12px label, 16px icon), pinned to the header's top-right corner and taken out of the action row.
+- **Chat With Chart:** a smaller button (12px label, 16px icon), pinned to the header's top-right corner and taken out of the action row. Its label shortens to **Chat** — the one place a label changes by breakpoint, because this pinned space can't grow. Its accessible name stays "Chat With Chart".
+- **Attribute indicator:** 16px marks (from 20px) in a 28px-tall button, still above the 24px minimum target.
 - **Round action buttons:** 32px (18px icons), down from 34px. Still well above the 24px minimum target size (WCAG 2.5.8), and they fit on one line.
 - **Expand / collapse toggle:** sits on the DOB line and reads **Expand** / **Collapse**, so a collapsed header has no extra row for it. Its accessible name keeps "details".
 - **Quick-view pills:** one row with the previous/next arrows on the same line. The "1 of N" count is hidden.
@@ -68,6 +76,35 @@ The top bar follows the DS sizing spec:
 - **Desktop (above 1184px):** the full bar.
 - **Tablet (850–1184px):** Notifications, Calendar and Messages fold into a **More (…)** menu, which carries the notification badge.
 - **Mobile (below 850px):** the agency name and wordmark hide too, and search becomes an icon that opens a full-width search sheet under the bar.
+
+## 2a. Client attributes
+
+Built to inform direction for attributes across Radicle EHRs, not just AxiomEHR.
+
+- **A finite, admin-managed library.** Clinicians apply attributes from the agency's list; they can't type new ones, because free-text attributes can't be reported on. The dialog says so and points them to an administrator. The prototype ships 39 (`fixtures/reference-data/attribute_library.json`), grouped by category.
+- **Every attribute has a mark**: a glyph from the DS or the Fluent attribute set (36 icons, `assets/fluent-attr-icons.js`, regenerated by `tools/fetch-attribute-icons.py`), or an **image an admin uploaded**. LGBTQ+ Identified shows the uploaded-image path (a pride flag; Fluent's flag is colour-only). The admin upload screen is next.
+- **Effective dates.** Each attribute on a chart has a start date and an optional end date, inclusive. A future start is *Scheduled*; a past end is *Ended*. Only active attributes show in the header.
+- **Audit trail.** Every assignment records who added it and when, and every later change: dates changed, ended, removed. Nothing is deleted: *Remove, Entered in Error* marks the entry removed and it stays, with its history, under "Ended and Removed".
+- **Suggested from the chart.** An attribute is suggested when the client has an **active** diagnosis whose ICD-10 code starts with one of the attribute's prefixes, or an **active** problem it names. Suggestions are offered, never applied. Dee Carter shows three: Substance Abuse (F10.20), Unhoused and On Probation/Parole (problem list).
+- **Manage Attributes dialog** (`AttributesOverlay`, lg): client name in the header like every other dialog.
+  - *Add Attributes* (left): search by name, *Suggested From the Chart*, then *All Attributes* **alphabetically**, with checkboxes. Categories organise the list for administrators and aren't shown here.
+  - *On This Chart* (right): each attribute is a **card** with its dates, who added it, its notes, Edit Dates, Add Internal Note and History.
+  - **Taking one off is deliberate.** Only an attribute added in this session and not yet saved has a ×, which drops it. A saved one has an explicit **Remove** (pending, with Undo, until Save Changes; it stays in the audit trail). If the library entry's `removal` is `end-date`, set by an admin, the card has no Remove and says the agency requires an end date; Edit Dates is the way off. The prototype sets that for the legal attributes (court order, probation, conservatorship, guardian consent, no-contact order).
+  - **Internal notes from an attribute.** Add Internal Note opens the standard note fields (Importance, Topic, Note, Display in Client Header, Notify Care Team) inside the card, with the topic preselected from the library entry's `note_topic`. The note posts with Save Changes and is linked to the attribute: it shows on the card, as an entry in the attribute's history, and in the Client Notes thread (header and Client Summary widget) tagged with the attribute. Notify Care Team works exactly as for any note: it reaches colleagues' notification bells with a read receipt.
+  - Start date defaults to today; end date is optional. No Today/7/30 shortcuts on these fields.
+  - The footer shows the same amber **unsaved changes** badge as the Discharge Plan. Nothing saves until **Save Changes**; changes are attributed to the signed-in user. On phones the columns stack with *On This Chart* first.
+
+## 2b. Admin › User Interface Options › Client Attributes
+
+`/user-interface-options/client-attributes` (`src/46-attributes-admin.jsx`), reached from a new **Client Attributes** card on the User Interface Options index.
+
+- **What an attribute is, for now:** an icon and a name in the client header, a reminder of what to consider in clinical and administrative decisions. It does nothing on its own. A later iteration could apply or end attributes automatically from other workflows; nothing here depends on that.
+- **The agency's list** is a table: attribute, category, a check for **Custom** (made by the agency) and for **End Date on Removal**, how many charts have it now, status, Edit. Checks instead of repeated words, to keep text on screen down. Filter by Active / Inactive / All and search by name or category.
+- **Add From Library:** Radicle's standard library (`attribute_catalog.json`, 70 entries), grouped by category, with default names and icons. Entries already in the list show as such. The library now covers nationality flags (images, since flags are colour), immigration, transient stays, special learning needs, low literacy, nonverbal, amputee, fall risk, seizures, severe mental distress, grief, trauma-informed approach, common phobias (needles, dogs, enclosed spaces, heights), domestic violence, no phone or internet, dietary needs and more, plus French Speaking (Canadian flag). The agency list also carries eight **custom uploaded images** for the school-based case: fictional schools and mascots (Lincoln Elementary, Westview Middle Wildcats, Eastlake High Lightning, Northside Stars Academy), IEP in Place, 504 Plan, and grade levels.
+- **New Attribute / Edit** (no subtitle; dialog subtitles are for client-specific dialogs): name (unique in the agency), category, an icon from the 63-glyph set or a standard image (flags) **or an uploaded image**, a live preview in the header's attribute box, **Require End Date on Removal**, the default note topic, read-only suggestion rules, and Active/Inactive.
+- **Uploads:** PNG, JPG or SVG only, up to 100 KB; anything else is refused with a reason. Shown at 20 × 20. SVGs are only rendered through `<img>`, which doesn't run scripts.
+- **Inactive:** staff can't select it any more. No historical data is removed: charts that have it keep it (the dialog says how many), with its history, and its card in Manage Attributes says the agency no longer offers it.
+- **Persistence:** the agency list is admin configuration, so like the other UI options it persists in this browser (`localStorage`, key `axiom-attr-config-v2`). Chart edits are still session-only. Clear that key to return to the prototype's defaults.
 
 ## 3. Quick-view catalogue
 

@@ -1,6 +1,6 @@
 # Intercept Modals — Interaction Design Spec
 
-**Product:** AxiomEHR · **Prototype:** `axiom-discharge-prototype` (Discharge Plan)
+**Product:** AxiomEHR · **Prototype:** `axiom-discharge-prototype` (AxiomEHR interaction prototype)
 **Author of the prototype behaviour:** Lisa Ward, Radicle Health
 **Date:** 2026-09-24
 **Purpose of this file:** source material for drafting a development user story. It is a

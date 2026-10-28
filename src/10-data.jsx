@@ -103,7 +103,6 @@ const CLIENTS = (RD.clients || []).map(c => {
     lastVisit: lastVisit(c.client_id),
     nextAppt: nextAppt(c.client_id),
     funding: FUND.length ? FUND[seed(c.client_id) % FUND.length].name : '—',
-    attrs: pick(RD.attributes, c.client_id + 'a', 1 + seed(c.client_id) % 3),
     diagnoses: dx,
     problems: probs,
     allergies: ALLERGY_BY_CLIENT[c.client_id] || [],
@@ -225,6 +224,7 @@ function clientDocs(cid, count = 6) {
         : isAssess ? (cat.length ? cat[s % cat.length].name : 'Assessment')
         : docPool[s % docPool.length],
       kind: isScan ? 'Upload' : isAssess ? 'Assessment' : 'Note',
+      byId: staff[s % Math.max(1, staff.length)]?.staff_id,
       by: sName(staff[s % Math.max(1, staff.length)]?.staff_id),
       at: addDays(TODAY, -(i * 3 + (s % 3))),
       status: s % 6 === 0 ? 'Draft' : s % 6 === 1 ? 'Pending co-sign' : 'Signed',

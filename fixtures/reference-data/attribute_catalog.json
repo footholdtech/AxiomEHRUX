@@ -1,0 +1,834 @@
+{
+  "_meta": {
+    "description": "Radicle's standard client attribute library: default names, icons, categories, suggestion rules, removal rule and note topic. Agency admins turn entries on for their staff (see attribute_library.json). `image` is used where a glyph can't work (flags).",
+    "fictional": true,
+    "fields": [
+      "catalog_id",
+      "name",
+      "category",
+      "icon",
+      "image",
+      "suggest",
+      "removal",
+      "note_topic"
+    ]
+  },
+  "records": [
+    {
+      "catalog_id": "STD-AMPUTEE",
+      "name": "Amputee / Limb Difference",
+      "category": "Accessibility",
+      "icon": "flHandRightOff",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "Z89"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-ACCOMMODATION",
+      "name": "Disability Accommodation",
+      "category": "Accessibility",
+      "icon": "flAccessibility",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-ESA",
+      "name": "Emotional Support Animal",
+      "category": "Accessibility",
+      "icon": "flAnimalCat",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-GUIDEDOG",
+      "name": "Guide Dog",
+      "category": "Accessibility",
+      "icon": "flAnimalDog",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-WHEELCHAIR",
+      "name": "Requires Wheelchair Access",
+      "category": "Accessibility",
+      "icon": "flWheelchairAccess",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-SOUND",
+      "name": "Sound Sensitivity",
+      "category": "Accessibility",
+      "icon": "flSpeakerOff",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-LEARNING",
+      "name": "Special Learning Needs",
+      "category": "Accessibility",
+      "icon": "flBookOpenLightbulb",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-GRIEF",
+      "name": "Grief / Bereavement",
+      "category": "Behavioral Health",
+      "icon": "flHeartBroken",
+      "image": null,
+      "suggest": {
+        "problems": [
+          "Unresolved Grief / Bereavement"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-DISTRESS",
+      "name": "Severe Mental Distress",
+      "category": "Behavioral Health",
+      "icon": "flWeatherThunderstorm",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-SUBSTANCE",
+      "name": "Substance Abuse",
+      "category": "Behavioral Health",
+      "icon": "flPill",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "F10",
+          "F11",
+          "F12",
+          "F13",
+          "F14",
+          "F15",
+          "F16",
+          "F18",
+          "F19"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Substance use"
+    },
+    {
+      "catalog_id": "STD-TOBACCO",
+      "name": "Tobacco Use",
+      "category": "Behavioral Health",
+      "icon": "flProhibitedSmoking",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "F17"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Substance use"
+    },
+    {
+      "catalog_id": "STD-TRAUMA",
+      "name": "Trauma-Informed Approach",
+      "category": "Behavioral Health",
+      "icon": "flHeartCircle",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "F43.1"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-INPT-TRANSFER",
+      "name": "Inpatient Transfer",
+      "category": "Care Coordination",
+      "icon": "flArrowSwap",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Hospital discharge"
+    },
+    {
+      "catalog_id": "STD-RESIDENTIAL",
+      "name": "Residential Placement",
+      "category": "Care Coordination",
+      "icon": "flBed",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-RESTRICTED",
+      "name": "Restricted Record",
+      "category": "Care Coordination",
+      "icon": "flLockClosed",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-SCHOOL",
+      "name": "School-Based Services",
+      "category": "Care Coordination",
+      "icon": "flHatGraduation",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-DONOTCALL",
+      "name": "Do Not Call",
+      "category": "Contact Preferences",
+      "icon": "flCallProhibited",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Contact information"
+    },
+    {
+      "catalog_id": "STD-DONOTMAIL",
+      "name": "Do Not Mail",
+      "category": "Contact Preferences",
+      "icon": "flMailProhibited",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Contact information"
+    },
+    {
+      "catalog_id": "STD-NOINTERNET",
+      "name": "No Internet Access",
+      "category": "Contact Preferences",
+      "icon": "flWiFiOff",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-NOPHONE",
+      "name": "No Phone Access",
+      "category": "Contact Preferences",
+      "icon": "flPhoneDismiss",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-NOCONTACT",
+      "name": "No-Contact Order",
+      "category": "Contact Preferences",
+      "icon": "flPersonProhibited",
+      "image": null,
+      "suggest": {},
+      "removal": "end-date",
+      "note_topic": "Court / legal"
+    },
+    {
+      "catalog_id": "STD-LGBTQ",
+      "name": "LGBTQ+ Identified",
+      "category": "Demographic",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2' y='4' width='16' height='2' fill='%23E40303'/><rect x='2' y='6' width='16' height='2' fill='%23FF8C00'/><rect x='2' y='8' width='16' height='2' fill='%23FFED00'/><rect x='2' y='10' width='16' height='2' fill='%23008026'/><rect x='2' y='12' width='16' height='2' fill='%2324408E'/><rect x='2' y='14' width='16' height='2' fill='%23732982'/></g></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-VETERAN",
+      "name": "Veteran Status",
+      "category": "Demographic",
+      "icon": "flMedal",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-LOWVISION",
+      "name": "Blind / Low Vision",
+      "category": "Language & Communication",
+      "icon": "flEyeOff",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Care coordination"
+    },
+    {
+      "catalog_id": "STD-DEAF",
+      "name": "Deaf / Hard of Hearing",
+      "category": "Language & Communication",
+      "icon": "flHandLeftChat",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Care coordination"
+    },
+    {
+      "catalog_id": "STD-FRENCH",
+      "name": "French Speaking",
+      "category": "Language & Communication",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2.00' y='4' width='4.05' height='12' fill='%23D52B1E'/><rect x='6.00' y='4' width='8.05' height='12' fill='%23FFFFFF'/><rect x='14.00' y='4' width='4.05' height='12' fill='%23D52B1E'/><polygon points='10.00,6.90 10.49,7.89 11.15,7.56 10.99,9.04 11.98,8.38 11.81,8.88 12.80,8.71 12.47,9.71 12.80,10.04 11.48,11.02 11.65,11.52 10.26,11.35 10.26,12.84 9.74,12.84 9.74,11.35 8.35,11.52 8.52,11.02 7.20,10.04 7.53,9.71 7.20,8.71 8.19,8.88 8.02,8.38 9.01,9.04 8.85,7.56 9.51,7.89' fill='%23D52B1E'/></g></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-LITERACY",
+      "name": "Low Literacy",
+      "category": "Language & Communication",
+      "icon": "flBookExclamationMark",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-NONVERBAL",
+      "name": "Nonverbal / Limited Speech",
+      "category": "Language & Communication",
+      "icon": "flMicOff",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-INTERPRETER",
+      "name": "Requires Interpreter",
+      "category": "Language & Communication",
+      "icon": "flTranslate",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Care coordination"
+    },
+    {
+      "catalog_id": "STD-SPANISH",
+      "name": "Spanish Speaking",
+      "category": "Language & Communication",
+      "icon": "flLocalLanguage",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Care coordination"
+    },
+    {
+      "catalog_id": "STD-CONSERVATOR",
+      "name": "Conservatorship",
+      "category": "Legal",
+      "icon": "flScales",
+      "image": null,
+      "suggest": {},
+      "removal": "end-date",
+      "note_topic": "Guardian"
+    },
+    {
+      "catalog_id": "STD-COURTORDERED",
+      "name": "Court Ordered Treatment",
+      "category": "Legal",
+      "icon": "dsGavel",
+      "image": null,
+      "suggest": {},
+      "removal": "end-date",
+      "note_topic": "Court / legal"
+    },
+    {
+      "catalog_id": "STD-FOSTERCARE",
+      "name": "Foster Care Involvement",
+      "category": "Legal",
+      "icon": "flHomePerson",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Guardian"
+    },
+    {
+      "catalog_id": "STD-MINOR",
+      "name": "Minor / Requires Guardian Consent",
+      "category": "Legal",
+      "icon": "flGuardian",
+      "image": null,
+      "suggest": {},
+      "removal": "end-date",
+      "note_topic": "Guardian"
+    },
+    {
+      "catalog_id": "STD-PROBATION",
+      "name": "On Probation/Parole",
+      "category": "Legal",
+      "icon": "dsGavel",
+      "image": null,
+      "suggest": {
+        "problems": [
+          "Involvement with Justice System"
+        ]
+      },
+      "removal": "end-date",
+      "note_topic": "Court / legal"
+    },
+    {
+      "catalog_id": "STD-CARDIAC",
+      "name": "Cardiac Condition",
+      "category": "Medical",
+      "icon": "flHeartPulse",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "I20",
+          "I21",
+          "I25",
+          "I50"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-DIABETIC",
+      "name": "Diabetic",
+      "category": "Medical",
+      "icon": "flDrop",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "E10",
+          "E11",
+          "E13"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-DIET",
+      "name": "Dietary Restrictions",
+      "category": "Medical",
+      "icon": "flFoodApple",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-HIV",
+      "name": "HIV/AIDS",
+      "category": "Medical",
+      "icon": "flRibbon",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "B20",
+          "Z21"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-IMMUNO",
+      "name": "Immune System Compromised",
+      "category": "Medical",
+      "icon": "flShieldError",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "B20",
+          "D80",
+          "D81",
+          "D82",
+          "D83",
+          "D84"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-ALLERGY",
+      "name": "Known Medication Allergy",
+      "category": "Medical",
+      "icon": "dsSyringe",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Allergies"
+    },
+    {
+      "catalog_id": "STD-PREGNANT",
+      "name": "Pregnant / Postpartum",
+      "category": "Medical",
+      "icon": "flHeart",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "O",
+          "Z33",
+          "Z34",
+          "Z39"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-SEIZURE",
+      "name": "Seizure Disorder",
+      "category": "Medical",
+      "icon": "flFlash",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "G40"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-SICKLECELL",
+      "name": "Sickle Cell Disease",
+      "category": "Medical",
+      "icon": "flStethoscope",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "D57"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-TIMEDMED",
+      "name": "Time-Critical Medication",
+      "category": "Medical",
+      "icon": "flClockAlarm",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-TBI",
+      "name": "Traumatic Brain Injury",
+      "category": "Medical",
+      "icon": "flBrain",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "S06"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-IMMIGRANT",
+      "name": "Immigrant / Refugee",
+      "category": "Nationality & Immigration",
+      "icon": "flGlobePerson",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-NAT-CO",
+      "name": "Nationality: Colombia",
+      "category": "Nationality & Immigration",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2' y='4.00' width='16' height='6.05' fill='%23FCD116'/><rect x='2' y='10.00' width='16' height='3.05' fill='%23003893'/><rect x='2' y='13.00' width='16' height='3.05' fill='%23CE1126'/></g></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-NAT-SV",
+      "name": "Nationality: El Salvador",
+      "category": "Nationality & Immigration",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2' y='4.00' width='16' height='4.05' fill='%230F47AF'/><rect x='2' y='8.00' width='16' height='4.05' fill='%23FFFFFF'/><rect x='2' y='12.00' width='16' height='4.05' fill='%230F47AF'/></g></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-NAT-GT",
+      "name": "Nationality: Guatemala",
+      "category": "Nationality & Immigration",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2.00' y='4' width='5.38' height='12' fill='%234997D0'/><rect x='7.33' y='4' width='5.38' height='12' fill='%23FFFFFF'/><rect x='12.67' y='4' width='5.38' height='12' fill='%234997D0'/></g></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-NAT-HT",
+      "name": "Nationality: Haiti",
+      "category": "Nationality & Immigration",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2' y='4.00' width='16' height='6.05' fill='%2300209F'/><rect x='2' y='10.00' width='16' height='6.05' fill='%23D21034'/></g></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-NAT-NG",
+      "name": "Nationality: Nigeria",
+      "category": "Nationality & Immigration",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2.00' y='4' width='5.38' height='12' fill='%23008751'/><rect x='7.33' y='4' width='5.38' height='12' fill='%23FFFFFF'/><rect x='12.67' y='4' width='5.38' height='12' fill='%23008751'/></g></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-NAT-SO",
+      "name": "Nationality: Somalia",
+      "category": "Nationality & Immigration",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2' y='4.00' width='16' height='12.05' fill='%234189DD'/><polygon points='10.00,6.40 10.85,8.83 13.42,8.89 11.38,10.45 12.12,12.91 10.00,11.45 7.88,12.91 8.62,10.45 6.58,8.89 9.15,8.83' fill='%23FFFFFF'/></g></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-NAT-UA",
+      "name": "Nationality: Ukraine",
+      "category": "Nationality & Immigration",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2' y='4.00' width='16' height='6.05' fill='%230057B7'/><rect x='2' y='10.00' width='16' height='6.05' fill='%23FFD700'/></g></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-NAT-VN",
+      "name": "Nationality: Vietnam",
+      "category": "Nationality & Immigration",
+      "icon": null,
+      "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2' y='4.00' width='16' height='12.05' fill='%23DA251D'/><polygon points='10.00,6.40 10.85,8.83 13.42,8.89 11.38,10.45 12.12,12.91 10.00,11.45 7.88,12.91 8.62,10.45 6.58,8.89 9.15,8.83' fill='%23FFFF00'/></g></svg>",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-FEAR-DOGS",
+      "name": "Fear of Dogs",
+      "category": "Phobias",
+      "icon": "flAnimalPawPrint",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-FEAR-ENCLOSED",
+      "name": "Fear of Enclosed Spaces",
+      "category": "Phobias",
+      "icon": "flDoor",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-FEAR-HEIGHTS",
+      "name": "Fear of Heights",
+      "category": "Phobias",
+      "icon": "flBuildingSkyscraper",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-FEAR-NEEDLES",
+      "name": "Fear of Needles",
+      "category": "Phobias",
+      "icon": "flSyringe",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-AGGRESSION",
+      "name": "Aggression",
+      "category": "Safety",
+      "icon": "flPersonWarning",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-DV",
+      "name": "Domestic Violence Survivor",
+      "category": "Safety",
+      "icon": "flShieldPerson",
+      "image": null,
+      "suggest": {
+        "problems": [
+          "Domestic Violence Exposure"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-ELOPEMENT",
+      "name": "Elopement Risk",
+      "category": "Safety",
+      "icon": "flPersonRunning",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-FALLRISK",
+      "name": "Fall Risk",
+      "category": "Safety",
+      "icon": "flPersonWalking",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-HIGHRISK",
+      "name": "High Risk Flag",
+      "category": "Safety",
+      "icon": "dsWarning",
+      "image": null,
+      "suggest": {
+        "problems": [
+          "Suicidal Ideation",
+          "Homicidal Ideation",
+          "Non-Suicidal Self-Injury"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-VIOLENCE",
+      "name": "History of Violence",
+      "category": "Safety",
+      "icon": "flAlertUrgent",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-FINANCIAL",
+      "name": "Financial Assistance",
+      "category": "Social Needs",
+      "icon": "flMoneyHand",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-FOOD",
+      "name": "Needs Food Assistance",
+      "category": "Social Needs",
+      "icon": "flFood",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "Z59.4"
+        ],
+        "problems": [
+          "Food Insecurity"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-TRANSPORT",
+      "name": "Needs Transportation",
+      "category": "Social Needs",
+      "icon": "flVehicleBus",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Transportation"
+    },
+    {
+      "catalog_id": "STD-CAREGIVER",
+      "name": "Primary Caregiver",
+      "category": "Social Needs",
+      "icon": "flPersonHeart",
+      "image": null,
+      "suggest": {
+        "problems": [
+          "Caregiver Strain"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-TRANSIENT",
+      "name": "Transient / Temporary Stay",
+      "category": "Social Needs",
+      "icon": "flLuggage",
+      "image": null,
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other"
+    },
+    {
+      "catalog_id": "STD-UNHOUSED",
+      "name": "Unhoused",
+      "category": "Social Needs",
+      "icon": "flTent",
+      "image": null,
+      "suggest": {
+        "icd10": [
+          "Z59.0"
+        ],
+        "problems": [
+          "Housing Instability / Homelessness"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Housing"
+    }
+  ]
+}
