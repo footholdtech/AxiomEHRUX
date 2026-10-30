@@ -41,6 +41,8 @@ function Routes({ config }) {
   if (match('/user-interface-options', path)) return <UIOptionsIndex />;
   if (match('/user-interface-options/client-header', path)) return <ClientHeaderListPage />;
   if (match('/user-interface-options/client-attributes', path)) return <ClientAttributesPage />;
+  if (match('/user-interface-options/communications', path)) return <CommunicationsPage />;
+  if ((m = match('/user-interface-options/communications/:area', path))) return <CommsAreaPage area={m.area} />;
   if ((m = match('/user-interface-options/client-header/:id', path))) return <ClientHeaderEditPage id={m.id} />;
   /* Section pages, so a section breadcrumb is never a dead end. */
   if (match('/documents', path) || match('/clinical-forms-search', path)) return <DocumentsPage />;

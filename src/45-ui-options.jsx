@@ -84,6 +84,17 @@ function PvAttrs() {
   );
 }
 
+/* An email, a text and a call, in the agency's voice. */
+function PvComms() {
+  return (
+    <div className="uio-pv uio-pv-comms">
+      <div className="uio-pv-hrow"><Icon name="mail" size={14} /><span className="uio-pv-line w60" /></div>
+      <div className="uio-pv-bubble"><span className="uio-pv-line w80" /><span className="uio-pv-line w50" /></div>
+      <div className="uio-pv-hrow"><Icon name="phone" size={14} /><span className="uio-pv-line w40" /></div>
+    </div>
+  );
+}
+
 const UI_OPTION_CARDS = [
   {
     key: 'header', title: 'Client Header', Preview: PvHeader, ready: true,
@@ -98,6 +109,12 @@ const UI_OPTION_CARDS = [
     blurb: 'The attributes staff can add to a client’s chart, shown as icons in the client header. Pick from the standard library or add your own.',
     meta: () => { const a = agencyAttrs(); const off = a.filter(x => x.status === 'Inactive').length;
       return (a.length - off) + ' active' + (off ? ' · ' + off + ' inactive' : ''); },
+  },
+  {
+    key: 'comms', title: 'Communications', Preview: PvComms, ready: true,
+    to: '/user-interface-options/communications',
+    blurb: 'How the agency appears when staff email, text and call clients: signatures, text templates and the agency’s name, and automated calls.',
+    meta: () => 'Email · Texting · Phone Calls',
   },
   {
     key: 'logo', title: 'Agency Logo', Preview: PvLogo, ready: false,

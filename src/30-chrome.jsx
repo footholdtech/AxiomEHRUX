@@ -220,7 +220,7 @@ function GlobalSearch({ autoFocus, onDone }) {
                   <Avatar name={x.name} size="S" />
                   <span className="gsearch-item-text">
                     <span className="gsearch-item-name">{x.name}</span>
-                    <span className="gsearch-item-meta">DOB {fmtDate(x.dob)} · MRN {x.mrn} · {x.program}</span>
+                    <span className="gsearch-item-meta">DOB {fmtDate(x.dob)} · MRN {x.mrn} · {x.program}{needsAccessRequest(x.client_id) ? (x.access.scope === 'restricted' ? ' · Restricted record' : ' · Outside your caseload') : ''}</span>
                   </span>
                   {x.client_id === guard.clientId && <span className="badge status-active">In context</span>}
                 </button>
@@ -377,6 +377,26 @@ function TopNav({ onHamburger, navOpen, onPrefs }) {
    attrState, attrSuggestions). */
 
 /* An attribute's mark: its library glyph, or the image an admin uploaded. */
+/* High priority: a red flag after the name, or on the corner of the mark
+   where there's no name (the collapsed header). Red is reserved for this
+   among attributes, so the few that warrant it stand apart. */
+const isHighPriority = attr => !!attr && attr.priority === 'high';
+function AttrFlag({ attr }) {
+  if (!isHighPriority(attr)) return null;
+  return <span className="attr-flag" role="img" aria-label="High priority"><Icon name="uiFlagFilled" size={14} /></span>;
+}
+/* The admin's description of when the attribute applies, as an info tooltip.
+   Inside a clickable row it must not toggle the row. */
+function AttrInfo({ attr }) {
+  if (!attr || !attr.description) return null;
+  const stop = e => e.stopPropagation();
+  return (
+    <Tooltip label={attr.description} wide>
+      <button type="button" className="icon-btn attr-info" aria-label={'About ' + attr.name + ': ' + attr.description}
+        onClick={stop} onKeyDown={stop} onMouseDown={stop}><Icon name="info" size={15} /></button>
+    </Tooltip>
+  );
+}
 function AttrGlyph({ attr, size = 20 }) {
   if (attr && attr.image) return <img className="attr-img" src={attr.image} width={size} height={size} alt="" />;
   return <Icon name={(attr && attr.icon) || 'dsPeople'} size={size} />;
@@ -394,12 +414,16 @@ function AttrIndicator({ rows, onOpen }) {
     <span className="tip-anchor cph-attrind-wrap" onMouseEnter={() => setTip(true)} onMouseLeave={() => setTip(false)}>
       <button type="button" className="cph-attrind" aria-label={'Manage attributes. On this chart: ' + names}
         onClick={onOpen} onFocus={() => setTip(true)} onBlur={() => setTip(false)}>
-        {rows.map(r => <AttrGlyph key={r.assignment_id} attr={r.attribute} />)}
+        {rows.map(r => (
+          <span key={r.assignment_id} className={'attr-mark' + (isHighPriority(r.attribute) ? ' is-high' : '')}>
+            <AttrGlyph attr={r.attribute} />{isHighPriority(r.attribute) && <span className="attr-mark-flag" aria-hidden="true"><Icon name="uiFlagFilled" size={11} /></span>}
+          </span>
+        ))}
       </button>
       {tip && (
         <span className="tip tip--bottom tip--list" role="tooltip">
           <span className="tip-list-head">Attributes ({rows.length})</span>
-          {rows.map(r => <span key={r.assignment_id} className="tip-list-row"><AttrGlyph attr={r.attribute} size={16} />{r.attribute.name}</span>)}
+          {rows.map(r => <span key={r.assignment_id} className="tip-list-row"><AttrGlyph attr={r.attribute} size={16} />{r.attribute.name}<AttrFlag attr={r.attribute} /></span>)}
         </span>
       )}
     </span>
@@ -451,6 +475,8 @@ function AttrChartRow({ client, r, orig, editing, onEdit, onDone, onChange, onDr
         <div className="attrm-row-text">
           <div className="attrm-row-name">
             <span>{r.attribute.name}</span>
+            <AttrFlag attr={r.attribute} />
+            <AttrInfo attr={r.attribute} />
             {isNew && <span className="ntag ntag--info">New</span>}
             {pending && <span className="ntag">Will Be Removed</span>}
             {changed && <span className="ntag ntag--info">Edited</span>}
@@ -631,7 +657,7 @@ function AttributesOverlay({ client, onClose }) {
         <Checkbox checked={checked} disabled={on} onChange={() => {}} ariaLabel={a.name} />
         <span className="attrm-glyph"><AttrGlyph attr={a} /></span>
         <span className="attrmodal-opt-text">
-          <span className="attrmodal-opt-name">{a.name}</span>
+          <span className="attrmodal-opt-name">{a.name}<AttrFlag attr={a} /><AttrInfo attr={a} /></span>
           {(why || on) && <span className="attrmodal-opt-why">{on ? 'On this chart' : why}</span>}
         </span>
       </div>
@@ -767,7 +793,7 @@ function AttrBox({ shown, onEdit }) {
   return (
     <div className="cph-flags">
       <div className="cph-flags-list">
-        {shown.map(r => <span key={r.assignment_id} className="cph-attr"><AttrGlyph attr={r.attribute} />{r.attribute.name}</span>)}
+        {shown.map(r => <span key={r.assignment_id} className="cph-attr"><AttrGlyph attr={r.attribute} />{r.attribute.name}<AttrFlag attr={r.attribute} /></span>)}
         {!shown.length && <span className="cph-attr cph-attr--none">No attributes on this chart</span>}
       </div>
       {/* Inside the box, per the design. */}
@@ -1277,7 +1303,7 @@ function ClientPageHeader({ client, preset, preview }) {
         {wide && attrInd && shown.length > 0 && (
           <div className="cph-nameline cph-mirror" ref={mirrorRef} aria-hidden="true">
             <span className="cph-name">{client.displayName}</span>{status}
-            <span className="cph-attrind">{shown.map(r => <AttrGlyph key={r.assignment_id} attr={r.attribute} />)}</span>
+            <span className="cph-attrind">{shown.map(r => <span key={r.assignment_id} className="attr-mark"><AttrGlyph attr={r.attribute} /></span>)}</span>
           </div>
         )}
         <div className="cph-identity">
@@ -1308,15 +1334,12 @@ function ClientPageHeader({ client, preset, preview }) {
             {header.showActions && (
               <React.Fragment>
                 <span className="cph-divider" aria-hidden="true" />
+                {/* Each opens its own interaction — see 48-quick-actions.jsx. */}
                 {QUICK_ACTIONS_CATALOG.filter(a => (header.actions || DEFAULT_ACTIONS).indexOf(a.key) !== -1).map(a => (
-                  <Tooltip key={a.key} label={a.label}>
-                    <button className="cph-icon-btn" aria-label={a.label}><Icon name={a.icon} size={20} /></button>
-                  </Tooltip>
+                  <QuickAction key={a.key} a={a} client={client} preview={preview} />
                 ))}
                 <span className="cph-divider" aria-hidden="true" />
-                <Tooltip label="More Actions">
-                  <button className="cph-icon-btn cph-icon-btn--sq" aria-label="More Actions"><Icon name="dsUtil6" size={20} /></button>
-                </Tooltip>
+                <MoreActionsButton client={client} preview={preview} />
                 {!compact && <span className="cph-divider" aria-hidden="true" />}
                 {!compact && <ChatWithChartButton />}
               </React.Fragment>

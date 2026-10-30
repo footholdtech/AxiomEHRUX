@@ -58,18 +58,18 @@
     {
       "assignment_id": "CA-0003",
       "client_id": "CL-100234",
-      "attribute_id": "ATTR-COURTORDERED",
-      "start_date": "2024-05-09",
+      "attribute_id": "ATTR-ALLERGY",
+      "start_date": "2024-02-11",
       "end_date": null,
-      "added_by_staff_id": "ST-2010",
-      "added_at": "2024-05-09T11:40",
+      "added_by_staff_id": "ST-2008",
+      "added_at": "2024-02-11T13:02",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2024-05-09T11:40",
-          "by_staff_id": "ST-2010",
-          "start_date": "2024-05-09",
+          "at": "2024-02-11T13:02",
+          "by_staff_id": "ST-2008",
+          "start_date": "2024-02-11",
           "end_date": null,
           "reason": null
         }
@@ -78,18 +78,18 @@
     {
       "assignment_id": "CA-0004",
       "client_id": "CL-100234",
-      "attribute_id": "ATTR-PROBATION",
-      "start_date": "2024-07-26",
+      "attribute_id": "ATTR-TRANSPORT",
+      "start_date": "2024-02-20",
       "end_date": null,
-      "added_by_staff_id": "ST-2008",
-      "added_at": "2024-07-26T13:30",
+      "added_by_staff_id": "ST-2001",
+      "added_at": "2024-02-20T14:37",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2024-07-26T13:30",
-          "by_staff_id": "ST-2008",
-          "start_date": "2024-07-26",
+          "at": "2024-02-20T14:37",
+          "by_staff_id": "ST-2001",
+          "start_date": "2024-02-20",
           "end_date": null,
           "reason": null
         }
@@ -98,18 +98,18 @@
     {
       "assignment_id": "CA-0005",
       "client_id": "CL-100234",
-      "attribute_id": "ATTR-CONSERVATOR",
-      "start_date": "2024-05-19",
+      "attribute_id": "ATTR-FINANCIAL",
+      "start_date": "2024-06-29",
       "end_date": null,
-      "added_by_staff_id": "ST-2010",
-      "added_at": "2024-05-19T09:02",
+      "added_by_staff_id": "ST-2001",
+      "added_at": "2024-06-29T12:27",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2024-05-19T09:02",
-          "by_staff_id": "ST-2010",
-          "start_date": "2024-05-19",
+          "at": "2024-06-29T12:27",
+          "by_staff_id": "ST-2001",
+          "start_date": "2024-06-29",
           "end_date": null,
           "reason": null
         }
@@ -118,17 +118,37 @@
     {
       "assignment_id": "CA-0006",
       "client_id": "CL-100234",
-      "attribute_id": "ATTR-DONOTMAIL",
-      "start_date": "2025-10-08",
-      "end_date": "2026-06-03",
-      "added_by_staff_id": "ST-2009",
-      "added_at": "2025-10-08T10:13",
+      "attribute_id": "ATTR-WHEELCHAIR",
+      "start_date": "2024-03-30",
+      "end_date": null,
+      "added_by_staff_id": "ST-2010",
+      "added_at": "2024-03-30T11:52",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2025-10-08T10:13",
-          "by_staff_id": "ST-2009",
+          "at": "2024-03-30T11:52",
+          "by_staff_id": "ST-2010",
+          "start_date": "2024-03-30",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0007",
+      "client_id": "CL-100234",
+      "attribute_id": "ATTR-GUIDEDOG",
+      "start_date": "2025-10-08",
+      "end_date": "2026-06-03",
+      "added_by_staff_id": "ST-2008",
+      "added_at": "2025-10-08T09:46",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2025-10-08T09:46",
+          "by_staff_id": "ST-2008",
           "start_date": "2025-10-08",
           "end_date": "2026-06-03",
           "reason": null
@@ -144,7 +164,7 @@
       ]
     },
     {
-      "assignment_id": "CA-0007",
+      "assignment_id": "CA-0008",
       "client_id": "CL-100235",
       "attribute_id": "ATTR-COURTORDERED",
       "start_date": "2025-11-03",
@@ -172,9 +192,9 @@
       ]
     },
     {
-      "assignment_id": "CA-0008",
+      "assignment_id": "CA-0009",
       "client_id": "CL-100235",
-      "attribute_id": "ATTR-ALLERGY",
+      "attribute_id": "ATTR-WHEELCHAIR",
       "start_date": "2024-06-12",
       "end_date": null,
       "added_by_staff_id": "ST-2008",
@@ -192,7 +212,7 @@
       ]
     },
     {
-      "assignment_id": "CA-0009",
+      "assignment_id": "CA-0010",
       "client_id": "CL-100235",
       "attribute_id": "ATTR-INPT-TRANSFER",
       "start_date": "2026-09-28",
@@ -212,7 +232,7 @@
       ]
     },
     {
-      "assignment_id": "CA-0010",
+      "assignment_id": "CA-0011",
       "client_id": "CL-100235",
       "attribute_id": "ATTR-DONOTCALL",
       "start_date": "2025-01-15",
@@ -240,7 +260,7 @@
       ]
     },
     {
-      "assignment_id": "CA-0011",
+      "assignment_id": "CA-0012",
       "client_id": "CL-100235",
       "attribute_id": "ATTR-VETERAN",
       "start_date": "2026-05-04",
@@ -268,40 +288,20 @@
       ]
     },
     {
-      "assignment_id": "CA-0012",
-      "client_id": "CL-100236",
-      "attribute_id": "ATTR-VETERAN",
-      "start_date": "2024-09-07",
-      "end_date": null,
-      "added_by_staff_id": "ST-2009",
-      "added_at": "2024-09-07T10:25",
-      "removed": false,
-      "history": [
-        {
-          "action": "added",
-          "at": "2024-09-07T10:25",
-          "by_staff_id": "ST-2009",
-          "start_date": "2024-09-07",
-          "end_date": null,
-          "reason": null
-        }
-      ]
-    },
-    {
       "assignment_id": "CA-0013",
       "client_id": "CL-100236",
-      "attribute_id": "ATTR-HIV",
-      "start_date": "2024-11-26",
+      "attribute_id": "ATTR-ALLERGY",
+      "start_date": "2024-07-30",
       "end_date": null,
-      "added_by_staff_id": "ST-2009",
-      "added_at": "2024-11-26T10:29",
+      "added_by_staff_id": "ST-2008",
+      "added_at": "2024-07-30T15:12",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2024-11-26T10:29",
-          "by_staff_id": "ST-2009",
-          "start_date": "2024-11-26",
+          "at": "2024-07-30T15:12",
+          "by_staff_id": "ST-2008",
+          "start_date": "2024-07-30",
           "end_date": null,
           "reason": null
         }
@@ -310,17 +310,57 @@
     {
       "assignment_id": "CA-0014",
       "client_id": "CL-100236",
-      "attribute_id": "ATTR-NOCONTACT",
-      "start_date": "2025-09-24",
-      "end_date": "2026-08-12",
-      "added_by_staff_id": "ST-2007",
-      "added_at": "2025-09-24T08:51",
+      "attribute_id": "ATTR-ACCOMMODATION",
+      "start_date": "2024-07-16",
+      "end_date": null,
+      "added_by_staff_id": "ST-2006",
+      "added_at": "2024-07-16T11:24",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2025-09-24T08:51",
-          "by_staff_id": "ST-2007",
+          "at": "2024-07-16T11:24",
+          "by_staff_id": "ST-2006",
+          "start_date": "2024-07-16",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0015",
+      "client_id": "CL-100236",
+      "attribute_id": "ATTR-RESTRICTED",
+      "start_date": "2024-07-21",
+      "end_date": null,
+      "added_by_staff_id": "ST-2001",
+      "added_at": "2024-07-21T10:05",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2024-07-21T10:05",
+          "by_staff_id": "ST-2001",
+          "start_date": "2024-07-21",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0016",
+      "client_id": "CL-100236",
+      "attribute_id": "ATTR-FOOD",
+      "start_date": "2025-09-24",
+      "end_date": "2026-08-12",
+      "added_by_staff_id": "ST-2010",
+      "added_at": "2025-09-24T13:34",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2025-09-24T13:34",
+          "by_staff_id": "ST-2010",
           "start_date": "2025-09-24",
           "end_date": "2026-08-12",
           "reason": null
@@ -336,60 +376,20 @@
       ]
     },
     {
-      "assignment_id": "CA-0015",
-      "client_id": "CL-100237",
-      "attribute_id": "ATTR-CARDIAC",
-      "start_date": "2022-11-17",
-      "end_date": null,
-      "added_by_staff_id": "ST-2008",
-      "added_at": "2022-11-17T09:10",
-      "removed": false,
-      "history": [
-        {
-          "action": "added",
-          "at": "2022-11-17T09:10",
-          "by_staff_id": "ST-2008",
-          "start_date": "2022-11-17",
-          "end_date": null,
-          "reason": null
-        }
-      ]
-    },
-    {
-      "assignment_id": "CA-0016",
-      "client_id": "CL-100237",
-      "attribute_id": "ATTR-SPANISH",
-      "start_date": "2022-11-28",
-      "end_date": null,
-      "added_by_staff_id": "ST-2009",
-      "added_at": "2022-11-28T10:21",
-      "removed": false,
-      "history": [
-        {
-          "action": "added",
-          "at": "2022-11-28T10:21",
-          "by_staff_id": "ST-2009",
-          "start_date": "2022-11-28",
-          "end_date": null,
-          "reason": null
-        }
-      ]
-    },
-    {
       "assignment_id": "CA-0017",
       "client_id": "CL-100237",
-      "attribute_id": "ATTR-TBI",
-      "start_date": "2022-09-10",
+      "attribute_id": "ATTR-FOOD",
+      "start_date": "2022-10-19",
       "end_date": null,
-      "added_by_staff_id": "ST-2010",
-      "added_at": "2022-09-10T13:54",
+      "added_by_staff_id": "ST-2009",
+      "added_at": "2022-10-19T10:25",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2022-09-10T13:54",
-          "by_staff_id": "ST-2010",
-          "start_date": "2022-09-10",
+          "at": "2022-10-19T10:25",
+          "by_staff_id": "ST-2009",
+          "start_date": "2022-10-19",
           "end_date": null,
           "reason": null
         }
@@ -397,19 +397,19 @@
     },
     {
       "assignment_id": "CA-0018",
-      "client_id": "CL-100238",
-      "attribute_id": "ATTR-PREGNANT",
-      "start_date": "2024-07-06",
+      "client_id": "CL-100237",
+      "attribute_id": "ATTR-COURTORDERED",
+      "start_date": "2022-06-01",
       "end_date": null,
-      "added_by_staff_id": "ST-2001",
-      "added_at": "2024-07-06T12:31",
+      "added_by_staff_id": "ST-2009",
+      "added_at": "2022-06-01T14:49",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2024-07-06T12:31",
-          "by_staff_id": "ST-2001",
-          "start_date": "2024-07-06",
+          "at": "2022-06-01T14:49",
+          "by_staff_id": "ST-2009",
+          "start_date": "2022-06-01",
           "end_date": null,
           "reason": null
         }
@@ -417,19 +417,19 @@
     },
     {
       "assignment_id": "CA-0019",
-      "client_id": "CL-100238",
-      "attribute_id": "ATTR-RESTRICTED",
-      "start_date": "2024-05-07",
+      "client_id": "CL-100237",
+      "attribute_id": "ATTR-LOWVISION",
+      "start_date": "2022-08-14",
       "end_date": null,
-      "added_by_staff_id": "ST-2001",
-      "added_at": "2024-05-07T08:39",
+      "added_by_staff_id": "ST-2003",
+      "added_at": "2022-08-14T12:31",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2024-05-07T08:39",
-          "by_staff_id": "ST-2001",
-          "start_date": "2024-05-07",
+          "at": "2022-08-14T12:31",
+          "by_staff_id": "ST-2003",
+          "start_date": "2022-08-14",
           "end_date": null,
           "reason": null
         }
@@ -438,18 +438,18 @@
     {
       "assignment_id": "CA-0020",
       "client_id": "CL-100238",
-      "attribute_id": "ATTR-IMMUNO",
-      "start_date": "2024-07-24",
+      "attribute_id": "ATTR-ALLERGY",
+      "start_date": "2024-01-09",
       "end_date": null,
-      "added_by_staff_id": "ST-2009",
-      "added_at": "2024-07-24T10:33",
+      "added_by_staff_id": "ST-2010",
+      "added_at": "2024-01-09T09:34",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2024-07-24T10:33",
-          "by_staff_id": "ST-2009",
-          "start_date": "2024-07-24",
+          "at": "2024-01-09T09:34",
+          "by_staff_id": "ST-2010",
+          "start_date": "2024-01-09",
           "end_date": null,
           "reason": null
         }
@@ -458,17 +458,77 @@
     {
       "assignment_id": "CA-0021",
       "client_id": "CL-100238",
-      "attribute_id": "ATTR-DONOTMAIL",
-      "start_date": "2025-08-09",
-      "end_date": "2026-06-03",
-      "added_by_staff_id": "ST-2007",
-      "added_at": "2025-08-09T14:33",
+      "attribute_id": "ATTR-VETERAN",
+      "start_date": "2024-06-08",
+      "end_date": null,
+      "added_by_staff_id": "ST-2003",
+      "added_at": "2024-06-08T08:15",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2025-08-09T14:33",
-          "by_staff_id": "ST-2007",
+          "at": "2024-06-08T08:15",
+          "by_staff_id": "ST-2003",
+          "start_date": "2024-06-08",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0022",
+      "client_id": "CL-100238",
+      "attribute_id": "ATTR-DEAF",
+      "start_date": "2024-06-09",
+      "end_date": null,
+      "added_by_staff_id": "ST-2004",
+      "added_at": "2024-06-09T11:28",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2024-06-09T11:28",
+          "by_staff_id": "ST-2004",
+          "start_date": "2024-06-09",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0023",
+      "client_id": "CL-100238",
+      "attribute_id": "ATTR-LOWVISION",
+      "start_date": "2024-04-30",
+      "end_date": null,
+      "added_by_staff_id": "ST-2004",
+      "added_at": "2024-04-30T11:56",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2024-04-30T11:56",
+          "by_staff_id": "ST-2004",
+          "start_date": "2024-04-30",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0024",
+      "client_id": "CL-100238",
+      "attribute_id": "ATTR-PROBATION",
+      "start_date": "2025-08-09",
+      "end_date": "2026-06-03",
+      "added_by_staff_id": "ST-2010",
+      "added_at": "2025-08-09T09:02",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2025-08-09T09:02",
+          "by_staff_id": "ST-2010",
           "start_date": "2025-08-09",
           "end_date": "2026-06-03",
           "reason": null
@@ -484,27 +544,27 @@
       ]
     },
     {
-      "assignment_id": "CA-0022",
+      "assignment_id": "CA-0025",
       "client_id": "CL-100239",
-      "attribute_id": "ATTR-FOOD",
-      "start_date": "2022-03-18",
+      "attribute_id": "ATTR-WHEELCHAIR",
+      "start_date": "2022-03-14",
       "end_date": null,
-      "added_by_staff_id": "ST-2009",
-      "added_at": "2022-03-18T12:35",
+      "added_by_staff_id": "ST-2005",
+      "added_at": "2022-03-14T08:35",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2022-03-18T12:35",
-          "by_staff_id": "ST-2009",
-          "start_date": "2022-03-18",
+          "at": "2022-03-14T08:35",
+          "by_staff_id": "ST-2005",
+          "start_date": "2022-03-14",
           "end_date": null,
           "reason": null
         }
       ]
     },
     {
-      "assignment_id": "CA-0023",
+      "assignment_id": "CA-0026",
       "client_id": "CL-100240",
       "attribute_id": "ATTR-INTERPRETER",
       "start_date": "2024-03-19",
@@ -524,79 +584,99 @@
       ]
     },
     {
-      "assignment_id": "CA-0024",
-      "client_id": "CL-100240",
-      "attribute_id": "ATTR-ACCOMMODATION",
-      "start_date": "2024-03-27",
-      "end_date": null,
-      "added_by_staff_id": "ST-2009",
-      "added_at": "2024-03-27T08:35",
-      "removed": false,
-      "history": [
-        {
-          "action": "added",
-          "at": "2024-03-27T08:35",
-          "by_staff_id": "ST-2009",
-          "start_date": "2024-03-27",
-          "end_date": null,
-          "reason": null
-        }
-      ]
-    },
-    {
-      "assignment_id": "CA-0025",
-      "client_id": "CL-100240",
-      "attribute_id": "ATTR-SICKLECELL",
-      "start_date": "2024-04-29",
-      "end_date": null,
-      "added_by_staff_id": "ST-2002",
-      "added_at": "2024-04-29T11:16",
-      "removed": false,
-      "history": [
-        {
-          "action": "added",
-          "at": "2024-04-29T11:16",
-          "by_staff_id": "ST-2002",
-          "start_date": "2024-04-29",
-          "end_date": null,
-          "reason": null
-        }
-      ]
-    },
-    {
-      "assignment_id": "CA-0026",
-      "client_id": "CL-100241",
-      "attribute_id": "ATTR-FINANCIAL",
-      "start_date": "2023-12-19",
-      "end_date": null,
-      "added_by_staff_id": "ST-2009",
-      "added_at": "2023-12-19T08:39",
-      "removed": false,
-      "history": [
-        {
-          "action": "added",
-          "at": "2023-12-19T08:39",
-          "by_staff_id": "ST-2009",
-          "start_date": "2023-12-19",
-          "end_date": null,
-          "reason": null
-        }
-      ]
-    },
-    {
       "assignment_id": "CA-0027",
+      "client_id": "CL-100240",
+      "attribute_id": "ATTR-PROBATION",
+      "start_date": "2024-08-02",
+      "end_date": null,
+      "added_by_staff_id": "ST-2007",
+      "added_at": "2024-08-02T08:15",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2024-08-02T08:15",
+          "by_staff_id": "ST-2007",
+          "start_date": "2024-08-02",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0028",
+      "client_id": "CL-100240",
+      "attribute_id": "ATTR-COURTORDERED",
+      "start_date": "2024-07-13",
+      "end_date": null,
+      "added_by_staff_id": "ST-2007",
+      "added_at": "2024-07-13T12:23",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2024-07-13T12:23",
+          "by_staff_id": "ST-2007",
+          "start_date": "2024-07-13",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0029",
       "client_id": "CL-100241",
-      "attribute_id": "ATTR-NOCONTACT",
+      "attribute_id": "ATTR-ALLERGY",
+      "start_date": "2023-08-26",
+      "end_date": null,
+      "added_by_staff_id": "ST-2004",
+      "added_at": "2023-08-26T09:38",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2023-08-26T09:38",
+          "by_staff_id": "ST-2004",
+          "start_date": "2023-08-26",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0030",
+      "client_id": "CL-100241",
+      "attribute_id": "ATTR-CONSERVATOR",
+      "start_date": "2023-11-08",
+      "end_date": null,
+      "added_by_staff_id": "ST-2008",
+      "added_at": "2023-11-08T13:50",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2023-11-08T13:50",
+          "by_staff_id": "ST-2008",
+          "start_date": "2023-11-08",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0031",
+      "client_id": "CL-100241",
+      "attribute_id": "ATTR-DEAF",
       "start_date": "2025-07-16",
       "end_date": "2026-08-18",
-      "added_by_staff_id": "ST-2001",
-      "added_at": "2025-07-16T10:41",
+      "added_by_staff_id": "ST-2010",
+      "added_at": "2025-07-16T11:00",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2025-07-16T10:41",
-          "by_staff_id": "ST-2001",
+          "at": "2025-07-16T11:00",
+          "by_staff_id": "ST-2010",
           "start_date": "2025-07-16",
           "end_date": "2026-08-18",
           "reason": null
@@ -612,7 +692,7 @@
       ]
     },
     {
-      "assignment_id": "CA-0028",
+      "assignment_id": "CA-0032",
       "client_id": "CL-100242",
       "attribute_id": "ATTR-INTERPRETER",
       "start_date": "2024-05-02",
@@ -632,7 +712,7 @@
       ]
     },
     {
-      "assignment_id": "CA-0029",
+      "assignment_id": "CA-0033",
       "client_id": "CL-100242",
       "attribute_id": "ATTR-SPANISH",
       "start_date": "2024-05-02",
@@ -652,87 +732,115 @@
       ]
     },
     {
-      "assignment_id": "CA-0030",
+      "assignment_id": "CA-0034",
       "client_id": "CL-100242",
-      "attribute_id": "ATTR-SUBSTANCE",
-      "start_date": "2024-05-02",
-      "end_date": null,
-      "added_by_staff_id": "ST-2001",
-      "added_at": "2024-05-02T08:35",
-      "removed": false,
-      "history": [
-        {
-          "action": "added",
-          "at": "2024-05-02T08:35",
-          "by_staff_id": "ST-2001",
-          "start_date": "2024-05-02",
-          "end_date": null,
-          "reason": null
-        }
-      ]
-    },
-    {
-      "assignment_id": "CA-0031",
-      "client_id": "CL-100243",
-      "attribute_id": "ATTR-SUBSTANCE",
-      "start_date": "2020-12-13",
+      "attribute_id": "ATTR-NOCONTACT",
+      "start_date": "2024-06-10",
       "end_date": null,
       "added_by_staff_id": "ST-2010",
-      "added_at": "2020-12-13T09:42",
+      "added_at": "2024-06-10T13:30",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2020-12-13T09:42",
+          "at": "2024-06-10T13:30",
           "by_staff_id": "ST-2010",
-          "start_date": "2020-12-13",
+          "start_date": "2024-06-10",
           "end_date": null,
           "reason": null
         }
       ]
     },
     {
-      "assignment_id": "CA-0032",
+      "assignment_id": "CA-0035",
       "client_id": "CL-100243",
-      "attribute_id": "ATTR-INTERPRETER",
-      "start_date": "2020-12-17",
+      "attribute_id": "ATTR-WHEELCHAIR",
+      "start_date": "2021-02-07",
       "end_date": null,
-      "added_by_staff_id": "ST-2004",
-      "added_at": "2020-12-17T13:42",
+      "added_by_staff_id": "ST-2006",
+      "added_at": "2021-02-07T09:02",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2020-12-17T13:42",
-          "by_staff_id": "ST-2004",
-          "start_date": "2020-12-17",
+          "at": "2021-02-07T09:02",
+          "by_staff_id": "ST-2006",
+          "start_date": "2021-02-07",
           "end_date": null,
           "reason": null
         }
       ]
     },
     {
-      "assignment_id": "CA-0033",
+      "assignment_id": "CA-0036",
       "client_id": "CL-100243",
-      "attribute_id": "ATTR-HIGHRISK",
-      "start_date": "2021-02-28",
+      "attribute_id": "ATTR-VETERAN",
+      "start_date": "2020-11-18",
       "end_date": null,
-      "added_by_staff_id": "ST-2007",
-      "added_at": "2021-02-28T08:47",
+      "added_by_staff_id": "ST-2005",
+      "added_at": "2020-11-18T14:01",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2021-02-28T08:47",
-          "by_staff_id": "ST-2007",
-          "start_date": "2021-02-28",
+          "at": "2020-11-18T14:01",
+          "by_staff_id": "ST-2005",
+          "start_date": "2020-11-18",
           "end_date": null,
           "reason": null
         }
       ]
     },
     {
-      "assignment_id": "CA-0034",
+      "assignment_id": "CA-0037",
+      "client_id": "CL-100243",
+      "attribute_id": "ATTR-NOCONTACT",
+      "start_date": "2020-11-28",
+      "end_date": null,
+      "added_by_staff_id": "ST-2005",
+      "added_at": "2020-11-28T12:31",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2020-11-28T12:31",
+          "by_staff_id": "ST-2005",
+          "start_date": "2020-11-28",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0038",
+      "client_id": "CL-100243",
+      "attribute_id": "ATTR-UNHOUSED",
+      "start_date": "2025-07-10",
+      "end_date": "2026-07-07",
+      "added_by_staff_id": "ST-2009",
+      "added_at": "2025-07-10T12:43",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2025-07-10T12:43",
+          "by_staff_id": "ST-2009",
+          "start_date": "2025-07-10",
+          "end_date": "2026-07-07",
+          "reason": null
+        },
+        {
+          "action": "ended",
+          "at": "2026-07-07T10:00",
+          "by_staff_id": "ST-2006",
+          "start_date": "2025-07-10",
+          "end_date": "2026-07-07",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0039",
       "client_id": "CL-100244",
       "attribute_id": "ATTR-INTERPRETER",
       "start_date": "2024-04-27",
@@ -752,87 +860,335 @@
       ]
     },
     {
-      "assignment_id": "CA-0035",
+      "assignment_id": "CA-0040",
       "client_id": "CL-100244",
-      "attribute_id": "ATTR-AGGRESSION",
-      "start_date": "2024-06-30",
+      "attribute_id": "ATTR-ALLERGY",
+      "start_date": "2024-05-09",
       "end_date": null,
       "added_by_staff_id": "ST-2005",
-      "added_at": "2024-06-30T08:31",
+      "added_at": "2024-05-09T08:39",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2024-06-30T08:31",
+          "at": "2024-05-09T08:39",
           "by_staff_id": "ST-2005",
-          "start_date": "2024-06-30",
+          "start_date": "2024-05-09",
           "end_date": null,
           "reason": null
         }
       ]
     },
     {
-      "assignment_id": "CA-0036",
-      "client_id": "CL-100245",
-      "attribute_id": "ATTR-SICKLECELL",
-      "start_date": "2024-11-03",
+      "assignment_id": "CA-0041",
+      "client_id": "CL-100244",
+      "attribute_id": "ATTR-PROBATION",
+      "start_date": "2024-05-09",
       "end_date": null,
-      "added_by_staff_id": "ST-2007",
-      "added_at": "2024-11-03T08:43",
+      "added_by_staff_id": "ST-2003",
+      "added_at": "2024-05-09T12:03",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2024-11-03T08:43",
-          "by_staff_id": "ST-2007",
-          "start_date": "2024-11-03",
+          "at": "2024-05-09T12:03",
+          "by_staff_id": "ST-2003",
+          "start_date": "2024-05-09",
           "end_date": null,
           "reason": null
         }
       ]
     },
     {
-      "assignment_id": "CA-0037",
+      "assignment_id": "CA-0042",
       "client_id": "CL-100245",
-      "attribute_id": "ATTR-RESTRICTED",
-      "start_date": "2024-12-25",
+      "attribute_id": "ATTR-ALLERGY",
+      "start_date": "2024-08-16",
+      "end_date": null,
+      "added_by_staff_id": "ST-2008",
+      "added_at": "2024-08-16T13:26",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2024-08-16T13:26",
+          "by_staff_id": "ST-2008",
+          "start_date": "2024-08-16",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0043",
+      "client_id": "CL-100245",
+      "attribute_id": "ATTR-DONOTMAIL",
+      "start_date": "2024-10-16",
       "end_date": null,
       "added_by_staff_id": "ST-2009",
-      "added_at": "2024-12-25T12:35",
+      "added_at": "2024-10-16T10:17",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2024-12-25T12:35",
+          "at": "2024-10-16T10:17",
           "by_staff_id": "ST-2009",
-          "start_date": "2024-12-25",
+          "start_date": "2024-10-16",
           "end_date": null,
           "reason": null
         }
       ]
     },
     {
-      "assignment_id": "CA-0038",
+      "assignment_id": "CA-0044",
       "client_id": "CL-100245",
-      "attribute_id": "ATTR-DIABETIC",
-      "start_date": "2025-01-10",
+      "attribute_id": "ATTR-PROBATION",
+      "start_date": "2024-10-17",
+      "end_date": null,
+      "added_by_staff_id": "ST-2010",
+      "added_at": "2024-10-17T13:10",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2024-10-17T13:10",
+          "by_staff_id": "ST-2010",
+          "start_date": "2024-10-17",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0045",
+      "client_id": "CL-100245",
+      "attribute_id": "ATTR-TRANSPORT",
+      "start_date": "2024-09-02",
       "end_date": null,
       "added_by_staff_id": "ST-2005",
-      "added_at": "2025-01-10T12:11",
+      "added_at": "2024-09-02T14:49",
       "removed": false,
       "history": [
         {
           "action": "added",
-          "at": "2025-01-10T12:11",
+          "at": "2024-09-02T14:49",
           "by_staff_id": "ST-2005",
-          "start_date": "2025-01-10",
+          "start_date": "2024-09-02",
           "end_date": null,
           "reason": null
         }
       ]
     },
     {
-      "assignment_id": "CA-0039",
+      "assignment_id": "CA-0046",
+      "client_id": "CL-100245",
+      "attribute_id": "ATTR-FOOD",
+      "start_date": "2025-07-28",
+      "end_date": "2026-07-01",
+      "added_by_staff_id": "ST-2008",
+      "added_at": "2025-07-28T11:48",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2025-07-28T11:48",
+          "by_staff_id": "ST-2008",
+          "start_date": "2025-07-28",
+          "end_date": "2026-07-01",
+          "reason": null
+        },
+        {
+          "action": "ended",
+          "at": "2026-07-01T10:00",
+          "by_staff_id": "ST-2008",
+          "start_date": "2025-07-28",
+          "end_date": "2026-07-01",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0047",
+      "client_id": "CL-100240",
+      "attribute_id": "ATTR-SI",
+      "start_date": "2026-08-13",
+      "end_date": null,
+      "added_by_staff_id": "ST-2003",
+      "added_at": "2026-08-13T08:47",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2026-08-13T08:47",
+          "by_staff_id": "ST-2003",
+          "start_date": "2026-08-13",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0048",
+      "client_id": "CL-100240",
+      "attribute_id": "ATTR-CANNABIS",
+      "start_date": "2026-05-25",
+      "end_date": null,
+      "added_by_staff_id": "ST-2002",
+      "added_at": "2026-05-25T09:10",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2026-05-25T09:10",
+          "by_staff_id": "ST-2002",
+          "start_date": "2026-05-25",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0049",
+      "client_id": "CL-100242",
+      "attribute_id": "ATTR-OPIOID",
+      "start_date": "2026-03-06",
+      "end_date": null,
+      "added_by_staff_id": "ST-2007",
+      "added_at": "2026-03-06T12:11",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2026-03-06T12:11",
+          "by_staff_id": "ST-2007",
+          "start_date": "2026-03-06",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0050",
+      "client_id": "CL-100242",
+      "attribute_id": "ATTR-OVERDOSE",
+      "start_date": "2026-06-24",
+      "end_date": null,
+      "added_by_staff_id": "ST-2008",
+      "added_at": "2026-06-24T11:32",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2026-06-24T11:32",
+          "by_staff_id": "ST-2008",
+          "start_date": "2026-06-24",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0051",
+      "client_id": "CL-100243",
+      "attribute_id": "ATTR-ALCOHOL",
+      "start_date": "2026-04-15",
+      "end_date": null,
+      "added_by_staff_id": "ST-2002",
+      "added_at": "2026-04-15T09:14",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2026-04-15T09:14",
+          "by_staff_id": "ST-2002",
+          "start_date": "2026-04-15",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0052",
+      "client_id": "CL-100238",
+      "attribute_id": "ATTR-SELFHARM",
+      "start_date": "2026-08-23",
+      "end_date": null,
+      "added_by_staff_id": "ST-2010",
+      "added_at": "2026-08-23T11:04",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2026-08-23T11:04",
+          "by_staff_id": "ST-2010",
+          "start_date": "2026-08-23",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0053",
+      "client_id": "CL-100244",
+      "attribute_id": "ATTR-HI",
+      "start_date": "2026-09-08",
+      "end_date": null,
+      "added_by_staff_id": "ST-2002",
+      "added_at": "2026-09-08T13:14",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2026-09-08T13:14",
+          "by_staff_id": "ST-2002",
+          "start_date": "2026-09-08",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0054",
+      "client_id": "CL-100244",
+      "attribute_id": "ATTR-VIOLENCE",
+      "start_date": "2025-11-26",
+      "end_date": null,
+      "added_by_staff_id": "ST-2002",
+      "added_at": "2025-11-26T15:08",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2025-11-26T15:08",
+          "by_staff_id": "ST-2002",
+          "start_date": "2025-11-26",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0055",
+      "client_id": "CL-100236",
+      "attribute_id": "ATTR-ELOPEMENT",
+      "start_date": "2026-07-24",
+      "end_date": null,
+      "added_by_staff_id": "ST-2001",
+      "added_at": "2026-07-24T08:19",
+      "removed": false,
+      "history": [
+        {
+          "action": "added",
+          "at": "2026-07-24T08:19",
+          "by_staff_id": "ST-2001",
+          "start_date": "2026-07-24",
+          "end_date": null,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "assignment_id": "CA-0056",
       "client_id": "CL-100243",
       "attribute_id": "ATTR-TOBACCO",
       "start_date": "2025-03-18",

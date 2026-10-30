@@ -223,20 +223,19 @@ const STAFF_ROLE_NAMES = (RD.roles || []).map(r => r.name);
    overflow control, the other an AI entry point — neither is a contact action,
    and both stay fixed chrome whenever the row itself is on. */
 const QUICK_ACTIONS_CATALOG = [
-  { key: 'note', icon: 'dsUtil1', label: 'Add Note' },
+  /* Add Note was on dsUtil1, which is a calendar with a plus — the DS's
+     schedule glyph. It moves to Schedule Appointment; Add Note takes
+     Fluent's Document Add. */
+  { key: 'note', icon: 'uiDocumentAdd', label: 'Add Note' },
   { key: 'call', icon: 'dsUtil2', label: 'Call Client' },
   { key: 'text', icon: 'dsUtil3', label: 'Send Text Message' },
   { key: 'email', icon: 'dsUtil4', label: 'Send Email' },
   { key: 'chat', icon: 'dsUtil5', label: 'Start Chat' },
-  /* No DS-authored glyph exists for this one yet — it borrows the generic
-     Fluent calendar icon rather than inventing a vector, which is why it reads
-     at a slightly different weight than the other five in the row. */
-  { key: 'appointment', icon: 'calendar', label: 'Schedule Appointment' },
+  { key: 'appointment', icon: 'dsUtil1', label: 'Schedule Appointment' },
 ];
 const QUICK_ACTIONS_BY_KEY = Object.fromEntries(QUICK_ACTIONS_CATALOG.map(a => [a.key, a]));
-/* The five the header shipped with, before "Schedule Appointment" existed —
-   the default for any header that predates this option. */
-const DEFAULT_ACTIONS = ['note', 'call', 'text', 'email', 'chat'];
+/* Every quick action is on by default; an admin can remove any per header. */
+const DEFAULT_ACTIONS = ['note', 'call', 'text', 'email', 'chat', 'appointment'];
 
 /* ---- Seed presets ------------------------------------------------
    Three, because three is enough to show the argument: a general clinical
@@ -287,7 +286,7 @@ const SEED_CONFIG = {
    instead of an older saved copy that predates them. */
 /* v3: the seeds gained Service Plans — bumped so reviewers see them (earlier
    in-browser header edits reset). */
-const UI_CONFIG_KEY = 'axiom-ui-config-v3';
+const UI_CONFIG_KEY = 'axiom-ui-config-v4';   // v4: Schedule Appointment on by default
 const UI_PREFS_KEY = 'axiom-ui-prefs';
 const DEFAULT_PREFS = { headerPreset: 'auto', collapsedByDefault: true };
 const clone = o => JSON.parse(JSON.stringify(o));

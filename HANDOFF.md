@@ -524,6 +524,7 @@ Also outstanding from the "next set" Lisa mentioned but has not sent yet.
 python3 tools/build-clinical-fixtures.py   # per-client diagnosis + problem tables
 python3 tools/build-header-fixtures.py     # header quick-view tables (run before build-refdata)
 python3 tools/build-attribute-fixtures.py  # attribute catalog, agency list, per-chart assignments (run before build-refdata)
+python3 tools/build-agency-clients.py      # clients outside the caseload, for Client Access Requests (run before build-refdata)
 python3 tools/fetch-attribute-icons.py     # only when adding Fluent glyphs; needs network
 python3 tools/build-notification-fixtures.py  # notification center (run before build-refdata)
 python3 tools/build-refdata.py             # fixtures -> assets/refdata.js

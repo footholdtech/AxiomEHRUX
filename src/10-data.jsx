@@ -83,7 +83,10 @@ const CIN_ALPHA = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
 const RESIDENCES = ['Holt House', 'Cedar Court', 'Maple Grove Hall', 'Riverton Commons', 'Larkspur Place', 'Bayview Residence'];
 const HOUSING_TYPES = ['Intermediate', 'Independent', 'Supportive', 'Transitional', 'Board and Care'];
 
-const CLIENTS = (RD.clients || []).map(c => {
+/* The clinician's own clients plus the rest of the agency's. The rest carry
+   `access` (other-program | restricted): opening their chart needs a Client
+   Access Request first — see 20-context.jsx. */
+const CLIENTS = (RD.clients || []).concat(RD.agencyClients || []).map(c => {
   const dx = (DX_BY_CLIENT[c.client_id] || []).slice().sort((a, b) =>
     (PRECEDENCE_ORDER[a.precedence] ?? 9) - (PRECEDENCE_ORDER[b.precedence] ?? 9));
   const probs = (PROB_BY_CLIENT[c.client_id] || []).slice().sort((a, b) =>
@@ -139,7 +142,7 @@ const DEMO_CLIENT_ID = 'CL-100235';
 
 /* My caseload — the Home screen list. No client is in context on Home; this is
    how a clinician deliberately picks one. */
-const MY_CASELOAD = CLIENTS.filter(c => c.status === 'Active').slice(0, 8);
+const MY_CASELOAD = CLIENTS.filter(c => !c.access && c.status === 'Active').slice(0, 8);
 
 /* Caseload scoping. A client-specific module opened with no client in context
    shows a picker, and that picker is pre-filtered to these two groups — a
@@ -148,7 +151,7 @@ const MY_CASELOAD = CLIENTS.filter(c => c.status === 'Active').slice(0, 8);
    led (shared program, same site, or a chart they have been granted). */
 const CASELOAD = {
   direct: MY_CASELOAD,
-  indirect: CLIENTS.filter(c => MY_CASELOAD.indexOf(c) === -1),
+  indirect: CLIENTS.filter(c => !c.access && MY_CASELOAD.indexOf(c) === -1),
 };
 const slugify = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
@@ -172,6 +175,8 @@ const CLIENT_MODULE_NAMES = [
      see START_NOTE_TYPES and the "Start Note" chooser. */
   'CANS', 'Case Management Note', 'Care Coordination Note', 'Crisis Follow-Up Note', 'Engagement Session Note',
   'Hospital Discharge Follow-Up', 'Peer Support Note', 'Residential Check-In', 'Therapy Note',
+  /* Reached from the header's Send Text dialog (Open Messages). */
+  'Text Messages',
 ];
 const CLIENT_MODULES = Object.fromEntries(CLIENT_MODULE_NAMES.map(n => [slugify(n), n]));
 const isClientModule = name => CLIENT_MODULE_NAMES.indexOf(name) !== -1;

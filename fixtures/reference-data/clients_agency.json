@@ -1,0 +1,260 @@
+{
+  "_meta": {
+    "description": "Agency clients outside the signed-in clinician's caseload, for the Client Access Request ('break the glass') intercept. access.scope is other-program or restricted.",
+    "fictional": true,
+    "fields": [
+      "client_id",
+      "mrn",
+      "first_name",
+      "last_name",
+      "preferred_name",
+      "dob",
+      "gender",
+      "race",
+      "ethnicity",
+      "primary_language",
+      "email",
+      "phone",
+      "address",
+      "program_ids",
+      "site_id",
+      "enrollment_date",
+      "status",
+      "access"
+    ]
+  },
+  "records": [
+    {
+      "client_id": "CL-100301",
+      "mrn": "MRN0001301",
+      "first_name": "Elena",
+      "last_name": "Vasquez",
+      "preferred_name": null,
+      "dob": "1988-06-02",
+      "gender": "Female",
+      "race": null,
+      "ethnicity": null,
+      "primary_language": "Spanish",
+      "email": "elena.vasquez.demo@example.com",
+      "phone": "555-020-0301",
+      "address": {
+        "line1": "100 Example Ave",
+        "city": "Springfield",
+        "state": "OH",
+        "zip": "45501"
+      },
+      "program_ids": [
+        "PRG-RES-01"
+      ],
+      "site_id": "SITE-MAIN-02",
+      "enrollment_date": "2025-01-10",
+      "status": "Active",
+      "access": {
+        "scope": "other-program"
+      }
+    },
+    {
+      "client_id": "CL-100302",
+      "mrn": "MRN0001302",
+      "first_name": "Kofi",
+      "last_name": "Mensah",
+      "preferred_name": null,
+      "dob": "1995-01-17",
+      "gender": "Male",
+      "race": null,
+      "ethnicity": null,
+      "primary_language": "English",
+      "email": "kofi.mensah.demo@example.com",
+      "phone": "555-020-0302",
+      "address": {
+        "line1": "137 Example Ave",
+        "city": "Springfield",
+        "state": "OH",
+        "zip": "45501"
+      },
+      "program_ids": [
+        "PRG-IOP-01"
+      ],
+      "site_id": "SITE-RES-A",
+      "enrollment_date": "2025-02-11",
+      "status": "Active",
+      "access": {
+        "scope": "other-program"
+      }
+    },
+    {
+      "client_id": "CL-100303",
+      "mrn": "MRN0001303",
+      "first_name": "Wren",
+      "last_name": "Calloway",
+      "preferred_name": null,
+      "dob": "2001-09-30",
+      "gender": "Non-binary",
+      "race": null,
+      "ethnicity": null,
+      "primary_language": "English",
+      "email": "wren.calloway.demo@example.com",
+      "phone": "555-020-0303",
+      "address": {
+        "line1": "174 Example Ave",
+        "city": "Springfield",
+        "state": "OH",
+        "zip": "45501"
+      },
+      "program_ids": [
+        "PRG-COUNSEL"
+      ],
+      "site_id": "SITE-MAIN-01",
+      "enrollment_date": "2025-03-12",
+      "status": "Active",
+      "access": {
+        "scope": "other-program"
+      }
+    },
+    {
+      "client_id": "CL-100304",
+      "mrn": "MRN0001304",
+      "first_name": "Thomas",
+      "last_name": "Nakamura",
+      "preferred_name": "Tom",
+      "dob": "1979-12-11",
+      "gender": "Male",
+      "race": null,
+      "ethnicity": null,
+      "primary_language": "English",
+      "email": "thomas.nakamura.demo@example.com",
+      "phone": "555-020-0304",
+      "address": {
+        "line1": "211 Example Ave",
+        "city": "Springfield",
+        "state": "OH",
+        "zip": "45501"
+      },
+      "program_ids": [
+        "PRG-CRISIS-01"
+      ],
+      "site_id": "SITE-RES-B",
+      "enrollment_date": "2025-04-13",
+      "status": "Active",
+      "access": {
+        "scope": "other-program"
+      }
+    },
+    {
+      "client_id": "CL-100305",
+      "mrn": "MRN0001305",
+      "first_name": "Priscilla",
+      "last_name": "Duarte",
+      "preferred_name": null,
+      "dob": "1966-04-25",
+      "gender": "Female",
+      "race": null,
+      "ethnicity": null,
+      "primary_language": "Portuguese",
+      "email": "priscilla.duarte.demo@example.com",
+      "phone": "555-020-0305",
+      "address": {
+        "line1": "248 Example Ave",
+        "city": "Springfield",
+        "state": "OH",
+        "zip": "45501"
+      },
+      "program_ids": [
+        "PRG-OUTP-01"
+      ],
+      "site_id": "SITE-CRISIS-01",
+      "enrollment_date": "2025-05-14",
+      "status": "Discharged",
+      "access": {
+        "scope": "other-program"
+      }
+    },
+    {
+      "client_id": "CL-100306",
+      "mrn": "MRN0001306",
+      "first_name": "Mateo",
+      "last_name": "Ibarra",
+      "preferred_name": null,
+      "dob": "1999-07-08",
+      "gender": "Male",
+      "race": null,
+      "ethnicity": null,
+      "primary_language": "Spanish",
+      "email": "mateo.ibarra.demo@example.com",
+      "phone": "555-020-0306",
+      "address": {
+        "line1": "285 Example Ave",
+        "city": "Springfield",
+        "state": "OH",
+        "zip": "45501"
+      },
+      "program_ids": [
+        "PRG-GEN-THX"
+      ],
+      "site_id": "SITE-RES-A",
+      "enrollment_date": "2025-06-15",
+      "status": "Active",
+      "access": {
+        "scope": "other-program"
+      }
+    },
+    {
+      "client_id": "CL-100307",
+      "mrn": "MRN0001307",
+      "first_name": "Hannah",
+      "last_name": "Lindqvist",
+      "preferred_name": null,
+      "dob": "1984-03-19",
+      "gender": "Female",
+      "race": null,
+      "ethnicity": null,
+      "primary_language": "English",
+      "email": "hannah.lindqvist.demo@example.com",
+      "phone": "555-020-0307",
+      "address": {
+        "line1": "322 Example Ave",
+        "city": "Springfield",
+        "state": "OH",
+        "zip": "45501"
+      },
+      "program_ids": [
+        "PRG-COUNSEL"
+      ],
+      "site_id": "SITE-MAIN-02",
+      "enrollment_date": "2025-07-16",
+      "status": "Active",
+      "access": {
+        "scope": "restricted"
+      }
+    },
+    {
+      "client_id": "CL-100308",
+      "mrn": "MRN0001308",
+      "first_name": "Desmond",
+      "last_name": "Achebe",
+      "preferred_name": "Dez",
+      "dob": "1972-10-05",
+      "gender": "Male",
+      "race": null,
+      "ethnicity": null,
+      "primary_language": "English",
+      "email": "desmond.achebe.demo@example.com",
+      "phone": "555-020-0308",
+      "address": {
+        "line1": "359 Example Ave",
+        "city": "Springfield",
+        "state": "OH",
+        "zip": "45501"
+      },
+      "program_ids": [
+        "PRG-IOP-01"
+      ],
+      "site_id": "SITE-MAIN-01",
+      "enrollment_date": "2025-08-17",
+      "status": "Active",
+      "access": {
+        "scope": "restricted"
+      }
+    }
+  ]
+}

@@ -10,6 +10,8 @@
       "category",
       "icon",
       "image",
+      "description",
+      "priority",
       "suggest",
       "removal",
       "note_topic",
@@ -25,6 +27,8 @@
       "category": "Language & Communication",
       "icon": "flLocalLanguage",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Care coordination",
@@ -38,6 +42,8 @@
       "category": "Language & Communication",
       "icon": "flTranslate",
       "image": null,
+      "description": "Use a qualified interpreter, not family members, for clinical conversations.",
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Care coordination",
@@ -51,6 +57,8 @@
       "category": "Language & Communication",
       "icon": "flHandLeftChat",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Care coordination",
@@ -64,6 +72,8 @@
       "category": "Language & Communication",
       "icon": "flEyeOff",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Care coordination",
@@ -77,6 +87,8 @@
       "category": "Contact Preferences",
       "icon": "flMailProhibited",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Contact information",
@@ -90,6 +102,8 @@
       "category": "Contact Preferences",
       "icon": "flCallProhibited",
       "image": null,
+      "description": "The client asked not to be called. Text or email instead, if those are allowed.",
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Contact information",
@@ -103,6 +117,8 @@
       "category": "Contact Preferences",
       "icon": "flPersonProhibited",
       "image": null,
+      "description": "A court or protective order limits contact with someone. Check the order before sharing information or scheduling.",
+      "priority": "normal",
       "suggest": {},
       "removal": "end-date",
       "note_topic": "Court / legal",
@@ -116,6 +132,8 @@
       "category": "Legal",
       "icon": "dsGavel",
       "image": null,
+      "description": "Treatment ordered by a court. Attendance and progress may need to be reported; check the order for terms.",
+      "priority": "normal",
       "suggest": {},
       "removal": "end-date",
       "note_topic": "Court / legal",
@@ -129,6 +147,8 @@
       "category": "Legal",
       "icon": "dsGavel",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {
         "problems": [
           "Involvement with Justice System"
@@ -146,6 +166,8 @@
       "category": "Legal",
       "icon": "flGuardian",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "end-date",
       "note_topic": "Guardian",
@@ -159,6 +181,8 @@
       "category": "Legal",
       "icon": "flScales",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "end-date",
       "note_topic": "Guardian",
@@ -172,6 +196,8 @@
       "category": "Legal",
       "icon": "flHomePerson",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Guardian",
@@ -185,6 +211,8 @@
       "category": "Medical",
       "icon": "dsSyringe",
       "image": null,
+      "description": "A medication allergy confirmed on the allergy list. Check it before any order.",
+      "priority": "high",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Allergies",
@@ -198,6 +226,8 @@
       "category": "Medical",
       "icon": "flShieldError",
       "image": null,
+      "description": "Diagnosed or treatment-related immune suppression. Reschedule in-person visits if staff are sick.",
+      "priority": "normal",
       "suggest": {
         "icd10": [
           "B20",
@@ -220,6 +250,8 @@
       "category": "Medical",
       "icon": "flRibbon",
       "image": null,
+      "description": "Diagnosed by a provider. Share only with staff who need to know; HIV status has extra disclosure protections.",
+      "priority": "normal",
       "suggest": {
         "icd10": [
           "B20",
@@ -238,6 +270,8 @@
       "category": "Medical",
       "icon": "flDrop",
       "image": null,
+      "description": "Diagnosed by a provider and on the problem list \u2014 not just reported by the client.",
+      "priority": "normal",
       "suggest": {
         "icd10": [
           "E10",
@@ -257,6 +291,8 @@
       "category": "Medical",
       "icon": "flStethoscope",
       "image": null,
+      "description": "Diagnosed by a provider. Pain crises can be sudden; follow the client's pain plan.",
+      "priority": "normal",
       "suggest": {
         "icd10": [
           "D57"
@@ -274,6 +310,8 @@
       "category": "Medical",
       "icon": "flHeartPulse",
       "image": null,
+      "description": "Diagnosed by a provider. Check medications before prescribing anything that affects heart rhythm.",
+      "priority": "normal",
       "suggest": {
         "icd10": [
           "I20",
@@ -294,6 +332,8 @@
       "category": "Medical",
       "icon": "flBrain",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {
         "icd10": [
           "S06"
@@ -311,6 +351,8 @@
       "category": "Medical",
       "icon": "flHeart",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {
         "icd10": [
           "O",
@@ -327,25 +369,145 @@
       "attribute_id": "ATTR-SUBSTANCE",
       "catalog_id": "STD-SUBSTANCE",
       "source": "standard",
-      "name": "Substance Abuse",
+      "name": "Substance Use (General)",
       "category": "Behavioral Health",
       "icon": "flPill",
       "image": null,
+      "description": "Retired. Use the specific substance attributes instead.",
+      "priority": "normal",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Substance use",
+      "status": "Inactive"
+    },
+    {
+      "attribute_id": "ATTR-ALCOHOL",
+      "catalog_id": "STD-ALCOHOL",
+      "source": "standard",
+      "name": "Alcohol Use",
+      "category": "Behavioral Health",
+      "icon": "flDrinkWine",
+      "image": null,
+      "description": "Alcohol use that affects treatment, from assessment or a diagnosis. Not for occasional use reported in passing.",
+      "priority": "normal",
       "suggest": {
         "icd10": [
-          "F10",
-          "F11",
-          "F12",
-          "F13",
+          "F10"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Alcohol use",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-OPIOID",
+      "catalog_id": "STD-OPIOID",
+      "source": "standard",
+      "name": "Opioid Use",
+      "category": "Behavioral Health",
+      "icon": "flPill",
+      "image": null,
+      "description": "Opioid use that affects treatment, from assessment or a diagnosis. Consider naloxone and MAT referral.",
+      "priority": "normal",
+      "suggest": {
+        "icd10": [
+          "F11"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Opioids",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-CANNABIS",
+      "catalog_id": "STD-CANNABIS",
+      "source": "standard",
+      "name": "Cannabis Use",
+      "category": "Behavioral Health",
+      "icon": "flLeafThree",
+      "image": null,
+      "description": "Cannabis use that affects treatment, from assessment or a diagnosis.",
+      "priority": "normal",
+      "suggest": {
+        "icd10": [
+          "F12"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Illicit drug use",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-SEDATIVE",
+      "catalog_id": "STD-SEDATIVE",
+      "source": "standard",
+      "name": "Sedative Use",
+      "category": "Behavioral Health",
+      "icon": "flWeatherMoon",
+      "image": null,
+      "description": "Sedative, hypnotic or benzodiazepine misuse, from assessment or a diagnosis. Check before prescribing.",
+      "priority": "normal",
+      "suggest": {
+        "icd10": [
+          "F13"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Benzodiazepines",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-STIMULANT",
+      "catalog_id": "STD-STIMULANT",
+      "source": "standard",
+      "name": "Stimulant Use",
+      "category": "Behavioral Health",
+      "icon": "flPulse",
+      "image": null,
+      "description": "Cocaine, methamphetamine or other stimulant use, from assessment or a diagnosis.",
+      "priority": "normal",
+      "suggest": {
+        "icd10": [
           "F14",
-          "F15",
-          "F16",
-          "F18",
+          "F15"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Stimulants",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-POLYSUB",
+      "catalog_id": "STD-POLYSUB",
+      "source": "standard",
+      "name": "Polysubstance Use",
+      "category": "Behavioral Health",
+      "icon": "flBeaker",
+      "image": null,
+      "description": "Use of more than one substance that affects treatment.",
+      "priority": "normal",
+      "suggest": {
+        "icd10": [
           "F19"
         ]
       },
       "removal": "remove",
       "note_topic": "Substance use",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-OVERDOSE",
+      "catalog_id": "STD-OVERDOSE",
+      "source": "standard",
+      "name": "Overdose History",
+      "category": "Behavioral Health",
+      "icon": "flHeartPulseError",
+      "image": null,
+      "description": "At least one overdose on record. Make sure naloxone is on hand and the client knows where it is.",
+      "priority": "high",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Overdose",
       "status": "Active"
     },
     {
@@ -356,6 +518,8 @@
       "category": "Behavioral Health",
       "icon": "flProhibitedSmoking",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {
         "icd10": [
           "F17"
@@ -373,10 +537,63 @@
       "category": "Safety",
       "icon": "dsWarning",
       "image": null,
+      "description": "Clinically assessed as high risk. See the most recent risk assessment for why.",
+      "priority": "normal",
+      "suggest": {},
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-SI",
+      "catalog_id": "STD-SI",
+      "source": "standard",
+      "name": "Suicidal Ideation",
+      "category": "Safety",
+      "icon": "flPersonAlert",
+      "image": null,
+      "description": "Current suicidal ideation, documented by a clinician. Follow the safety plan and the agency's suicide-risk protocol.",
+      "priority": "high",
       "suggest": {
         "problems": [
-          "Suicidal Ideation",
-          "Homicidal Ideation",
+          "Suicidal Ideation"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-HI",
+      "catalog_id": "STD-HI",
+      "source": "standard",
+      "name": "Homicidal Ideation",
+      "category": "Safety",
+      "icon": "flShieldProhibited",
+      "image": null,
+      "description": "Current homicidal ideation, documented by a clinician. Follow the agency's duty-to-warn protocol.",
+      "priority": "high",
+      "suggest": {
+        "problems": [
+          "Homicidal Ideation"
+        ]
+      },
+      "removal": "remove",
+      "note_topic": "Other",
+      "status": "Active"
+    },
+    {
+      "attribute_id": "ATTR-SELFHARM",
+      "catalog_id": "STD-SELFHARM",
+      "source": "standard",
+      "name": "Self-Harm",
+      "category": "Safety",
+      "icon": "flErrorCircle",
+      "image": null,
+      "description": "Recent non-suicidal self-injury. Ask about it at each contact and keep the safety plan current.",
+      "priority": "normal",
+      "suggest": {
+        "problems": [
           "Non-Suicidal Self-Injury"
         ]
       },
@@ -392,6 +609,8 @@
       "category": "Safety",
       "icon": "flPersonWarning",
       "image": null,
+      "description": "Recent verbal or physical aggression during services. Check the latest incident notes before a visit.",
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -405,6 +624,8 @@
       "category": "Safety",
       "icon": "flAlertUrgent",
       "image": null,
+      "description": "Documented violence toward others in the last 5 years. Plan visits with a second staff member and review the safety plan first.",
+      "priority": "high",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -418,6 +639,8 @@
       "category": "Safety",
       "icon": "flPersonRunning",
       "image": null,
+      "description": "Has left a supervised setting without notice. Confirm whereabouts at each shift change.",
+      "priority": "high",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -431,6 +654,8 @@
       "category": "Social Needs",
       "icon": "flTent",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {
         "icd10": [
           "Z59.0"
@@ -451,6 +676,8 @@
       "category": "Social Needs",
       "icon": "flFood",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {
         "icd10": [
           "Z59.4"
@@ -471,6 +698,8 @@
       "category": "Social Needs",
       "icon": "flVehicleBus",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Transportation",
@@ -484,6 +713,8 @@
       "category": "Social Needs",
       "icon": "flMoneyHand",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -497,6 +728,8 @@
       "category": "Accessibility",
       "icon": "flWheelchairAccess",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -510,6 +743,8 @@
       "category": "Accessibility",
       "icon": "flAnimalDog",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -523,6 +758,8 @@
       "category": "Accessibility",
       "icon": "flAccessibility",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -536,6 +773,8 @@
       "category": "Care Coordination",
       "icon": "flArrowSwap",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Hospital discharge",
@@ -549,6 +788,8 @@
       "category": "Care Coordination",
       "icon": "flHourglassHalf",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Referrals",
@@ -562,6 +803,8 @@
       "category": "Care Coordination",
       "icon": "flHatGraduation",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -575,6 +818,8 @@
       "category": "Care Coordination",
       "icon": "flLockClosed",
       "image": null,
+      "description": "Access to this record is limited. Share only with staff directly involved in care.",
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -588,6 +833,8 @@
       "category": "Demographic",
       "icon": "flMedal",
       "image": null,
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -601,6 +848,8 @@
       "category": "Demographic",
       "icon": null,
       "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2' y='4' width='16' height='2' fill='%23E40303'/><rect x='2' y='6' width='16' height='2' fill='%23FF8C00'/><rect x='2' y='8' width='16' height='2' fill='%23FFED00'/><rect x='2' y='10' width='16' height='2' fill='%23008026'/><rect x='2' y='12' width='16' height='2' fill='%2324408E'/><rect x='2' y='14' width='16' height='2' fill='%23732982'/></g></svg>",
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -614,6 +863,8 @@
       "category": "Language & Communication",
       "icon": null,
       "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2.00' y='4' width='4.05' height='12' fill='%23D52B1E'/><rect x='6.00' y='4' width='8.05' height='12' fill='%23FFFFFF'/><rect x='14.00' y='4' width='4.05' height='12' fill='%23D52B1E'/><polygon points='10.00,6.90 10.49,7.89 11.15,7.56 10.99,9.04 11.98,8.38 11.81,8.88 12.80,8.71 12.47,9.71 12.80,10.04 11.48,11.02 11.65,11.52 10.26,11.35 10.26,12.84 9.74,12.84 9.74,11.35 8.35,11.52 8.52,11.02 7.20,10.04 7.53,9.71 7.20,8.71 8.19,8.88 8.02,8.38 9.01,9.04 8.85,7.56 9.51,7.89' fill='%23D52B1E'/></g></svg>",
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -627,6 +878,8 @@
       "category": "Nationality & Immigration",
       "icon": null,
       "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2' y='4.00' width='16' height='6.05' fill='%2300209F'/><rect x='2' y='10.00' width='16' height='6.05' fill='%23D21034'/></g></svg>",
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -640,6 +893,8 @@
       "category": "Nationality & Immigration",
       "icon": null,
       "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2' y='4.00' width='16' height='6.05' fill='%230057B7'/><rect x='2' y='10.00' width='16' height='6.05' fill='%23FFD700'/></g></svg>",
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -653,6 +908,8 @@
       "category": "Nationality & Immigration",
       "icon": null,
       "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><clipPath id='r'><rect x='2' y='4' width='16' height='12' rx='2'/></clipPath><g clip-path='url(%23r)'><rect x='2' y='4.00' width='16' height='12.05' fill='%23DA251D'/><polygon points='10.00,6.40 10.85,8.83 13.42,8.89 11.38,10.45 12.12,12.91 10.00,11.45 7.88,12.91 8.62,10.45 6.58,8.89 9.15,8.83' fill='%23FFFF00'/></g></svg>",
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -666,6 +923,8 @@
       "category": "Education",
       "icon": null,
       "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M10 1 L18 4 V10 C18 14.5 14.5 17.6 10 19 C5.5 17.6 2 14.5 2 10 V4 Z' fill='%231F3A68'/><text x='10' y='13.1' font-family='Arial,Helvetica,sans-serif' font-weight='700' font-size='8.5' text-anchor='middle' fill='%23F5C518'>LE</text></svg>",
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -679,6 +938,8 @@
       "category": "Education",
       "icon": null,
       "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><circle cx='10' cy='10' r='9' fill='%231C1C1C'/><g fill='%23F28C28'><ellipse cx='10' cy='12.6' rx='3.6' ry='3'/><ellipse cx='5.6' cy='8.6' rx='1.5' ry='1.9'/><ellipse cx='8.3' cy='6.3' rx='1.5' ry='1.9'/><ellipse cx='11.7' cy='6.3' rx='1.5' ry='1.9'/><ellipse cx='14.4' cy='8.6' rx='1.5' ry='1.9'/></g></svg>",
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -692,6 +953,8 @@
       "category": "Education",
       "icon": null,
       "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><circle cx='10' cy='10' r='9' fill='%234B2C83'/><polygon points='11.5,3 5.5,11 9.5,11 8,17 14.5,8.6 10.5,8.6' fill='%23FFD23F'/></svg>",
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -705,6 +968,8 @@
       "category": "Education",
       "icon": null,
       "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><rect x='1' y='1' width='18' height='18' rx='4' fill='%230B7A75'/><polygon points='10,3.5 11.9,8 16.6,8.2 12.9,11.1 14.2,15.7 10,13 5.8,15.7 7.1,11.1 3.4,8.2 8.1,8' fill='%23FFFFFF'/></svg>",
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -718,6 +983,8 @@
       "category": "Education",
       "icon": null,
       "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><rect x='1' y='1' width='18' height='18' rx='4' fill='%232E6DB4'/><text x='10' y='12.5' font-family='Arial,Helvetica,sans-serif' font-weight='700' font-size='7' text-anchor='middle' fill='%23FFFFFF'>IEP</text></svg>",
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -731,6 +998,8 @@
       "category": "Education",
       "icon": null,
       "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><rect x='1' y='1' width='18' height='18' rx='4' fill='%236A4C93'/><text x='10' y='12.5' font-family='Arial,Helvetica,sans-serif' font-weight='700' font-size='7' text-anchor='middle' fill='%23FFFFFF'>504</text></svg>",
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -744,6 +1013,8 @@
       "category": "Education",
       "icon": null,
       "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><rect x='1' y='1' width='18' height='18' rx='4' fill='%23BFE3F5'/><text x='10' y='13.1' font-family='Arial,Helvetica,sans-serif' font-weight='700' font-size='8.5' text-anchor='middle' fill='%231F3A68'>G4</text></svg>",
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",
@@ -757,6 +1028,8 @@
       "category": "Education",
       "icon": null,
       "image": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><rect x='1' y='1' width='18' height='18' rx='4' fill='%23E3D7F5'/><text x='10' y='13.1' font-family='Arial,Helvetica,sans-serif' font-weight='700' font-size='8.5' text-anchor='middle' fill='%234B2C83'>G9</text></svg>",
+      "description": null,
+      "priority": "normal",
       "suggest": {},
       "removal": "remove",
       "note_topic": "Other",

@@ -552,6 +552,9 @@ const CONSENTS = [
 const PROGRESS_PROGRAMS = ['Recovery Today', 'New Foundations', 'Back on Track'];
 
 function useClientSummaryData(client) {
+  /* Re-derive when session records change (a portal message sent from the
+     header's Start Chat dialog, say). */
+  const rv = useRecordsVersion();
   return useMemo(() => {
     const cid = client.client_id;
     const today = TODAY;
@@ -591,22 +594,9 @@ function useClientSummaryData(client) {
     const docs = clientDocs(cid, 6);
 
     /* 3. Correspondence ------------------------------------------- */
-    const real = (RD.clientMessages || []).filter(m => m.recipient_id === cid || m.sender_id === cid);
-    const msgs = (real.length ? real : Array.from({ length: 4 }).map((_, i) => {
-      const s = seed(cid + 'msg' + i);
-      return {
-        message_id: cid + '-m' + i,
-        sender_type: i % 2 === 0 ? 'client' : 'staff',
-        sender_id: i % 2 === 0 ? cid : ME.id,
-        timestamp: addDays(today, -(i * 2 + 1)).toISOString(),
-        body: [
-          'Can I move my Thursday appointment to the afternoon?',
-          'Of course — I have 3:30 open. I have moved it and sent a confirmation.',
-          'The new prescription is making me drowsy in the mornings.',
-          'Thanks for telling me. I have flagged it for the prescriber to review this week.',
-        ][i % 4],
-      };
-    })).slice(0, 5);
+    /* Shared with the header's Start Chat dialog (portalMessages in
+       48-quick-actions.jsx), so a message sent there shows here too. */
+    const msgs = portalMessages(client).slice(-5);
 
     /* 4. Appointments --------------------------------------------- */
     const appts = (RD.appointments || []).filter(a => a.client_id === cid)
@@ -643,7 +633,7 @@ function useClientSummaryData(client) {
     ].filter(t => t.at && t.what);
 
     return { attention, docs, msgs, appts, past, attended, noShows, tracksProgress, scores, recorded, recordedInstrument, goalsTotal, goalsOnTrack, timeline };
-  }, [client.client_id]);
+  }, [client.client_id, rv]);
 }
 
 /* ---- Month calendar ---------------------------------------------- */
@@ -832,6 +822,25 @@ function ClientSummary({ client, onOpenTab }) {
 }
 
 /* ---- Chart page -------------------------------------------------- */
+/* A chart that needs a Client Access Request, before one is given. */
+function AccessGate({ client }) {
+  const guard = useGuard();
+  return (
+    <div className="page">
+      <Breadcrumbs items={[{ label: 'Clients', to: '/clients' }, { label: 'Client Access Request' }]} />
+      <Panel title="Access Request Needed">
+        <div className="btg-gate">
+          <Icon name="uiLockClosed" size={28} />
+          <div>
+            <p>{client.access && client.access.scope === 'restricted' ? client.name + '’s record is restricted.' : client.name + ' isn’t in your caseload.'} Give a reason to open the chart.</p>
+            <Button variant="primary" onClick={() => guard.request({ to: '/chart/' + client.client_id, client: client.client_id })}>Request Access</Button>
+          </div>
+        </div>
+      </Panel>
+    </div>
+  );
+}
+
 function ChartPage({ id, module, config }) {
   const guard = useGuard();
   /* `doc-…` opens one document from the Documents list as its own tab. */
@@ -864,7 +873,10 @@ function ChartPage({ id, module, config }) {
        location.hash synchronously, so the live URL is the honest source. */
     const live = window.location.hash.replace(/^#/, '') || '/';
     if (live.indexOf('/chart/' + id) !== 0) return;
-    if (guard.clientId == null) guard.adopt(id);
+    /* A chart outside the caseload is never adopted silently, even from a
+       direct link: it asks for the access reason first. */
+    if (needsAccessRequest(id)) guard.request({ to: live, client: id, onCancel: () => guard.go('/clients', { client: guard.clientId }) });
+    else if (guard.clientId == null) guard.adopt(id);
     /* Keep the whole URL, so the switch lands on the module or document that
        was asked for rather than the summary. */
     else guard.request({ to: live, client: id, onCancel: () => guard.go('/chart/' + guard.clientId, { client: guard.clientId }) });
@@ -884,6 +896,10 @@ function ChartPage({ id, module, config }) {
       <p className="page-sub">No client matches <code>{id}</code>.</p>
       <Button variant="secondary" onClick={() => guard.go('/clients')}>Back to All Clients</Button></div>
   );
+
+  /* No chart content until access is granted: the request dialog sits over a
+     locked page, never over the record it protects. */
+  if (needsAccessRequest(id)) return <AccessGate client={client} />;
 
   const v = client.vitals;
   const switchTab = t => {

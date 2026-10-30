@@ -402,41 +402,53 @@ function Home() {
   );
 }
 
+/* Every client the agency lets this clinician find. Those outside the
+   caseload show a lock; opening one asks for a Client Access Request. */
 function AllClients({ crumbs }) {
   const guard = useGuard();
   const [q, setQ] = useState('');
   const rows = CLIENTS.filter(c => !q || (c.name + ' ' + c.mrn + ' ' + c.program).toLowerCase().indexOf(q.toLowerCase()) !== -1);
+  const open = c => guard.setClient(c.client_id);
   return (
     <div className="page">
       <Breadcrumbs items={crumbs || [{ label: 'Clients' }]} />
       <div className="page-head-row">
         <div><h1 className="page-title">All Clients</h1><div className="page-sub">{rows.length} of {CLIENTS.length} clients</div></div>
       </div>
-      <Panel title="Client Roster" action={
-        <span className="ln-search" style={{ width: 280 }}>
-          <Icon name="search" size={16} />
-          <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search name, MRN or program…" aria-label="Search clients" />
-        </span>
-      }>
+      <Panel title="Client Roster">
+        <div className="roster-search"><MiniSearch value={q} onChange={setQ} placeholder="Search by name, MRN or program" /></div>
         <div className="table-wrap">
           <table className="data-table">
             <thead><tr><th>Client</th><th>MRN</th><th>DOB</th><th>Program</th><th>Site</th><th>Status</th><th /></tr></thead>
             <tbody>
-              {rows.map(c => (
-                <tr key={c.client_id} className={c.client_id === guard.clientId ? 'row-current' : ''}>
-                  <td><span className="cell-user"><Avatar name={c.name} size="S" /> {c.name}</span></td>
-                  <td>{c.mrn}</td>
-                  <td>{fmtDate(c.dob)} ({c.age})</td>
-                  <td>{c.program}</td>
-                  <td>{c.siteName}</td>
-                  <td><span className={'badge ' + (c.status === 'Active' ? 'status-active' : 'status-neutral')}>{c.status}</span></td>
-                  <td style={{ textAlign: 'right' }}>
-                    {c.client_id === guard.clientId
-                      ? <span className="badge status-info">In context</span>
-                      : <Button size="sm" variant="secondary" onClick={() => guard.setClient(c.client_id)}>Open Chart</Button>}
-                  </td>
-                </tr>
-              ))}
+              {rows.map(c => {
+                const locked = needsAccessRequest(c.client_id);
+                const current = c.client_id === guard.clientId;
+                return (
+                  <tr key={c.client_id} className={current ? 'row-current' : ''}>
+                    <td>
+                      <span className="cell-user"><Avatar name={c.name} size="S" />
+                        {current ? <span>{c.name}</span> : <button className="lnk" onClick={() => open(c)}>{c.name}</button>}
+                        {locked && (
+                          <Tooltip label={(c.access.scope === 'restricted' ? 'Restricted record.' : 'Outside your caseload.') + ' Opening asks for a reason.'} wide>
+                            <span className="roster-lock" aria-label={c.access.scope === 'restricted' ? 'Restricted record' : 'Outside your caseload'}><Icon name="uiLockClosed" size={14} /></span>
+                          </Tooltip>
+                        )}
+                      </span>
+                    </td>
+                    <td>{c.mrn}</td>
+                    <td>{fmtDate(c.dob)} ({c.age})</td>
+                    <td>{c.program}</td>
+                    <td>{c.siteName}</td>
+                    <td><span className={'badge ' + (c.status === 'Active' ? 'status-active' : 'status-neutral')}>{c.status}</span></td>
+                    <td style={{ textAlign: 'right' }}>
+                      {current ? <span className="badge status-info">In context</span>
+                        : <Button size="sm" variant="secondary" onClick={() => open(c)}>{locked ? 'Request Access' : 'Open Chart'}</Button>}
+                    </td>
+                  </tr>
+                );
+              })}
+              {!rows.length && <tr><td colSpan={7} className="cam-empty">No clients match “{q.trim()}”.</td></tr>}
             </tbody>
           </table>
         </div>
@@ -499,6 +511,9 @@ function ModulePage({ slug }) {
   const matches = c => !q || (c.name + ' ' + c.mrn + ' ' + c.client_id + ' ' + c.program).toLowerCase().indexOf(q.toLowerCase()) !== -1;
   const direct = CASELOAD.direct.filter(matches);
   const indirect = CASELOAD.indirect.filter(matches);
+  /* The rest of the agency only appears when searched for, and opening one
+     asks for a Client Access Request. */
+  const others = q.trim() ? CLIENTS.filter(c => c.access && matches(c)) : [];
   const open = c => guard.setClient(c.client_id, { to: '/chart/' + c.client_id + '/' + slug });
 
   return (
@@ -519,6 +534,7 @@ function ModulePage({ slug }) {
           <div className="picker-scope">Showing your assigned clients only — {CASELOAD.direct.length} direct, {CASELOAD.indirect.length} indirect.</div>
           <ClientPicker heading="Direct Caseload" clients={direct} onPick={open} emptyText={`No direct-caseload clients match “${q}”.`} />
           <ClientPicker heading="Indirect Caseload" clients={indirect} onPick={open} emptyText={`No indirect-caseload clients match “${q}”.`} />
+          {others.length > 0 && <ClientPicker heading="Outside Your Caseload · Access Request Needed" clients={others} onPick={open} emptyText="" />}
         </div>
       </Panel>
     </div>

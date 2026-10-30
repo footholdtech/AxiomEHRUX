@@ -252,14 +252,33 @@ function Toggle({ checked, onChange, id, disabled }) {
    says what it does; this is the sighted-mouse equivalent of that name. */
 /* `wide` wraps the label to a short paragraph, for the few tips that explain
    behaviour rather than name a control. */
+/* Portalled to <body> and positioned against its anchor, so no scrolling
+   list, dialog or dropdown can clip it — and, being outside them, it can't
+   change their size either (a tooltip inside a menu used to widen the menu
+   while it showed). It flips below when there's no room above, and stays
+   inside the viewport horizontally. */
 function Tooltip({ label, children, placement = 'top', wide }) {
   const [show, setShow] = useState(false);
+  const [pos, setPos] = useState(null);
+  const anchor = useRef(null), tip = useRef(null);
+  React.useLayoutEffect(() => {
+    if (!show || !anchor.current) { setPos(null); return; }
+    const a = anchor.current.getBoundingClientRect();
+    const tw = tip.current ? tip.current.offsetWidth : 0, th = tip.current ? tip.current.offsetHeight : 0;
+    const side = placement === 'bottom' || a.top - th - 10 < 0 ? 'bottom' : 'top';
+    const left = Math.max(8 + tw / 2, Math.min(window.innerWidth - 8 - tw / 2, a.left + a.width / 2));
+    setPos({ side, left, top: side === 'top' ? a.top - 8 : a.bottom + 8, nudge: a.left + a.width / 2 - left });
+  }, [show, placement, label]);
   if (!label) return children;
   return (
-    <span className="tip-anchor" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}
+    <span ref={anchor} className="tip-anchor" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}
       onFocus={() => setShow(true)} onBlur={() => setShow(false)}>
       {children}
-      {show && <span className={'tip tip--' + placement + (wide ? ' tip--wide' : '')} role="tooltip">{label}</span>}
+      {show && ReactDOM.createPortal(
+        <span ref={tip} role="tooltip" className={'tip tip--float tip--' + (pos ? pos.side : placement) + (wide ? ' tip--wide' : '')}
+          style={{ left: pos ? pos.left : -9999, top: pos ? pos.top : 0, visibility: pos ? 'visible' : 'hidden', '--tip-nudge': (pos ? pos.nudge : 0) + 'px' }}>
+          {label}
+        </span>, document.body)}
     </span>
   );
 }

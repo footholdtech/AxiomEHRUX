@@ -190,6 +190,21 @@ const MODULE_SPECS = {
       ['Prescriber', r => sName(r.prescriber_staff_id)]],
   },
 };
+/* Texts sent to the client, newest first: what the header's Send Text dialog
+   sends, plus a couple of earlier ones. Fictional. */
+MODULE_SPECS['Text Messages'] = {
+  noun: 'Text',
+  rows: c => pageRows(c.client_id, 'Text Messages').concat([
+    { at: isoOf(addDays(TODAY, -6)) + 'T10:15', by_staff_id: ME.id, body: 'Hi ' + c.shortName + ', reminder that we’re meeting Thursday. Text me back if you need to move it.', status: 'Delivered' },
+    { at: isoOf(addDays(TODAY, -19)) + 'T15:40', by_staff_id: ME.id, body: 'Thanks for coming in today, ' + c.shortName + '.', status: 'Delivered' },
+  ]),
+  cols: [['Sent', r => fmtDate(r.at) + ' ' + noteTime(r.at)], ['From', r => sName(r.by_staff_id)], ['Message', r => r.body], ['Status', r => r.status]],
+  fields: [{ key: 'body', label: 'Message', type: 'textarea', required: true, wide: true }],
+  save: (c, f) => {
+    addPageRow(c.client_id, 'Text Messages', { id: newId('SMS'), at: nowIso(), by_staff_id: ME.id, body: f.body.trim(), status: 'Delivered' });
+    return { title: 'Text sent', detail: 'To ' + c.shortName + '.' };
+  },
+};
 const PAYORS = ((RD.funding && RD.funding.providers) || []);
 const payorName = id => (PAYORS.find(p => p.provider_id === id) || {}).name || id || '—';
 
@@ -401,7 +416,9 @@ function DocumentsPage() {
   const guard = useGuard();
   const [f, setF] = useState(DOC_FILTERS);
   const set = (k, v) => setF(x => ({ ...x, [k]: v }));
-  const all = useMemo(() => CLIENTS.flatMap(c => docsFor(c.client_id).map(d => ({ ...d, client: c })))
+  /* Only charts the user can already open: outside-caseload documents appear
+     once access has been requested. */
+  const all = useMemo(() => CLIENTS.filter(c => !needsAccessRequest(c.client_id)).flatMap(c => docsFor(c.client_id).map(d => ({ ...d, client: c })))
     .sort((a, b) => b.at - a.at), []);
   const types = [...new Set(all.map(d => d.name))].sort();
   const authors = [...new Set(all.map(d => d.by))].sort();
@@ -425,7 +442,7 @@ function DocumentsPage() {
       </div>
       <Panel title="Filters" action={changed && <button className="lnk" onClick={() => setF(DOC_FILTERS())}>Reset Filters</button>}>
         <div className="docs-filters">
-          <Field label="Client"><Dropdown value={f.client} options={[ANY].concat(CLIENTS.map(c => c.name).sort())} onChange={v => set('client', v)} /></Field>
+          <Field label="Client"><Dropdown value={f.client} options={[ANY].concat([...new Set(all.map(d => d.client.name))].sort())} onChange={v => set('client', v)} /></Field>
           <Field label="Author"><Dropdown value={f.author} options={[ANY, 'Me'].concat(authors)} onChange={v => set('author', v)} /></Field>
           <Field label="Document Type"><Dropdown value={f.type} options={[ANY].concat(types)} onChange={v => set('type', v)} menuMinWidth={280} /></Field>
           <Field label="Status"><Dropdown value={f.status} options={[ANY].concat(DOC_STATUS)} onChange={v => set('status', v)} /></Field>

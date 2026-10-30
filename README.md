@@ -144,6 +144,7 @@ fixtures with anything that is not clearly fictional.
 python3 tools/build-clinical-fixtures.py   # regenerate the two per-client tables
 python3 tools/build-header-fixtures.py     # meds, immunizations, injections, vitals, assessments, client notes
 python3 tools/build-attribute-fixtures.py  # attribute catalog, agency list, per-chart assignments (run before build-refdata)
+python3 tools/build-agency-clients.py      # clients outside the caseload, for Client Access Requests (run before build-refdata)
 python3 tools/fetch-attribute-icons.py     # only when adding Fluent glyphs; needs network
 python3 tools/build-notification-fixtures.py  # notification center items (run before build-refdata)
 python3 tools/build-refdata.py             # bundle fixtures -> assets/refdata.js

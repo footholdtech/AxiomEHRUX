@@ -14,6 +14,15 @@
    content of documents under review is fictional.
    ================================================================ */
 
+/* Drafts saved from the note editor, so Add Note can offer "pick up where
+   you left off". cid|doc -> { fields, saved }. Session only, like the rest. */
+const NOTE_DRAFTS = {};
+const noteDraftKey = (cid, doc) => cid + '|' + doc;
+function saveNoteDraft(cid, doc, fields) { NOTE_DRAFTS[noteDraftKey(cid, doc)] = { doc, fields, saved: new Date() }; touchRecords(); }
+function clearNoteDraft(cid, doc) { delete NOTE_DRAFTS[noteDraftKey(cid, doc)]; touchRecords(); }
+const getNoteDraft = (cid, doc) => NOTE_DRAFTS[noteDraftKey(cid, doc)] || null;
+const noteDraftsFor = cid => Object.keys(NOTE_DRAFTS).filter(k => k.indexOf(cid + '|') === 0).map(k => NOTE_DRAFTS[k]);
+
 const NOTE_TIMES = ['8:00 AM', '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM'];
 const NOTE_PLACES = ['Clinic office', 'Client’s home', 'Community', 'Hospital', 'Residential site', 'Telehealth', 'Phone'];
 
@@ -56,7 +65,8 @@ function NoteEditor({ client, doc, ctx }) {
   const back = useBackToSummary(client);
   const draft = ctx && ctx.mode === 'draft';
   const template = NOTE_TEMPLATES[doc] || NOTE_TEMPLATES['Progress Note'];
-  const [f, setF] = useState(() => ({
+  const saved = getNoteDraft(client.client_id, doc);
+  const [f, setF] = useState(() => saved ? { ...saved.fields } : ({
     date: isoOf(TODAY), time: '10:00 AM', contact: '', place: '', minutes: '',
     checks: {}, narrative: draft ? 'Met with ' + client.name.split(' ')[0] + ' for a scheduled session. ' : '', plan: '', attest: false,
   }));
@@ -76,6 +86,7 @@ function NoteEditor({ client, doc, ctx }) {
       resolveNotif(ctx.n.notification_id, 'note-signed', { doc });
       clearNoteCtx(client.client_id, doc);
     }
+    clearNoteDraft(client.client_id, doc);
     guard.setToast({ status: 'success', title: doc + ' signed',
       detail: ctx ? (ctx.n.urgent ? 'Follow-up documented — the alert is closed.' : 'Cleared from your notifications.') : 'Added to ' + client.name.split(' ')[0] + '’s chart.' });
     back();
@@ -84,6 +95,11 @@ function NoteEditor({ client, doc, ctx }) {
     <Panel title={doc}>
       <div className="note-page">
         <NoteLinkBanner ctx={ctx} kind={draft ? 'draft' : 'new'} />
+        {saved && !ctx && (
+          <div className="chc-note chc-note--info note-link"><Icon name="uiDocumentEdit" size={15} />
+            <div><b>Your draft</b>, saved {saved.saved.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}. Signing files it to the chart.</div>
+          </div>
+        )}
         <div className="ovl-grid ovl-grid--4">
           <DateField label="Date of service" required value={f.date} onChange={v => set('date', v)} />
           <Field label="Start time"><Dropdown value={f.time} options={NOTE_TIMES} onChange={v => set('time', v)} /></Field>
@@ -108,7 +124,7 @@ function NoteEditor({ client, doc, ctx }) {
         <div className="note-foot">
           <Button variant="ghost" onClick={back}>Cancel</Button>
           <span className="spacer" />
-          <Button variant="secondary" onClick={() => { guard.clearDirty(); guard.setToast({ status: 'success', title: 'Draft saved', detail: ctx ? 'The notification stays open until the note is signed.' : 'Not filed to the chart yet.' }); }}>Save Draft</Button>
+          <Button variant="secondary" onClick={() => { saveNoteDraft(client.client_id, doc, f); guard.clearDirty(); guard.setToast({ status: 'success', title: 'Draft saved', detail: ctx ? 'The notification stays open until the note is signed.' : 'Not filed to the chart yet.' }); }}>Save Draft</Button>
           <Button variant="primary" onClick={sign}>Sign Note</Button>
         </div>
       </div>
