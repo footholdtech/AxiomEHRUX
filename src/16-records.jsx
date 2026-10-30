@@ -212,7 +212,7 @@ function addNote(client, { body, topic, importance, notify, attr }) {
    they can't be added to a chart any more, but every chart that has one keeps
    it, with its history. */
 const ATTR_CATALOG = RD.attributeCatalog || [];
-const ATTR_CFG_KEY = 'axiom-attr-config-v2';   // bump when the fixture list changes
+const ATTR_CFG_KEY = 'axiom-attr-config-v3';   // bump when the fixture list changes
 let AGENCY_ATTRS = (() => {
   try { const s = JSON.parse(localStorage.getItem(ATTR_CFG_KEY) || 'null'); if (s && Array.isArray(s.rows)) return s.rows; } catch (e) {}
   return (RD.attributeLibrary || []).slice();
@@ -268,7 +268,9 @@ function attrState(r) {
   if (r.ended_at && r.end_date && r.end_date <= t) return 'ended';
   return 'active';
 }
-const activeAttrs = client => getAttrAssignments(client).filter(r => attrState(r) === 'active');
+/* High-priority attributes lead, so they're never the ones that wrap away. */
+const activeAttrs = client => getAttrAssignments(client).filter(r => attrState(r) === 'active')
+  .sort((a, b) => (b.attribute.priority === 'high') - (a.attribute.priority === 'high'));
 
 /* Library entries the chart itself suggests: an ACTIVE diagnosis whose ICD-10
    code starts with one of the entry's prefixes, or an ACTIVE problem it names.

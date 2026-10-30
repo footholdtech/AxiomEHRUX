@@ -288,6 +288,20 @@ No modal. Signing out of Home is not an event.
 
 ---
 
+## 5a. Client Access Request ("break the glass")
+
+Agencies can open charts beyond a clinician's caseload. When they do, opening a chart **outside the caseload** (another program) or a **restricted record** asks for a reason first. Which charts count is agency configuration; the prototype uses eight fictional clients in `clients_agency.json` (six other-program, two restricted).
+
+- **Same guard, same dialog.** It's a variant of Intercept A, so it reads like a client switch: title **Client Access Request**, a caution banner, then **Opening** (or **Leaving → Switching to** when another client is in context), then the fields.
+- **Banner copy:** "{First} isn't in your caseload." or "{First}'s record is restricted." + "To open the chart, choose why you need it. Your access is recorded and may be reviewed by your agency's privacy and compliance officers." With unsaved work it adds "You also have unsaved changes on this page, which will be discarded."
+- **Fields:** Reason (required, from an agency list; "Other" makes Comment required) and Comment.
+- **Buttons:** Cancel · **Submit and Open Chart** (or **Submit and Discard Changes** with unsaved work).
+- **Recorded:** who, when, reason and comment (`BTG_GRANTS`; an access log for reviewers later). A reason lasts for the session, so the same chart doesn't ask again. A toast confirms "Access recorded".
+- **Never behind the dialog.** A direct link to such a chart shows a locked page (Access Request Needed, with Request Access) under the dialog, not the record. Cancelling returns to All Clients.
+- **Finding them.** They appear in **All Clients** (lock icon; action reads Request Access) and in **global search** ("Outside your caseload" / "Restricted record"). The client picker on a module page shows an **Outside Your Caseload** group only when a search matches one. They're excluded from Documents until access is given.
+
+The reason list is written for the prototype (Providing direct care, Covering for a colleague, Care coordination, Crisis or emergency response, Intake or referral, Scheduling, Billing or claims, Records request, Quality review or audit, Clinical supervision, Other); production's list is agency-configured.
+
 ## 6. Intercept B — Diagnosis Selection at discharge
 
 > **Superseded 2026-09-28.** After review with the customer, the selection step

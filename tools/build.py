@@ -27,7 +27,7 @@ OUTPUTS = [ROOT / "index.html", ROOT / "AxiomEHR-Prototype.html"]
 
 CSS_BLOCKING = ["styles/tokens.css", "styles/app.css", "styles/discharge.css"]
 CSS_DEFERRED = "styles/fonts.css"   # ~1.4 MB of base64 faces; never render-blocking
-JS = ["assets/fluent-icons.js", "assets/fluent-attr-icons.js", "assets/ds-icons.js", "assets/refdata.js",
+JS = ["assets/fluent-icons.js", "assets/fluent-attr-icons.js", "assets/fluent-ui-icons.js", "assets/ds-icons.js", "assets/refdata.js",
       "vendor/react.production.min.js", "vendor/react-dom.production.min.js", "vendor/babel.min.js"]
 
 FONT_MIME = {".ttf": "font/ttf", ".otf": "font/otf", ".woff": "font/woff", ".woff2": "font/woff2"}

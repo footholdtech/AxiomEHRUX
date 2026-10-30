@@ -47,7 +47,7 @@ function suggestText(s) {
 function AttrPreview({ attr }) {
   return (
     <div className="cam-preview" aria-label="Preview in the client header">
-      <span className="cph-attr"><AttrGlyph attr={attr} />{(attr.name || '').trim() || 'Attribute name'}</span>
+      <span className="cph-attr"><AttrGlyph attr={attr} />{(attr.name || '').trim() || 'Attribute name'}<AttrFlag attr={attr} /></span>
     </div>
   );
 }
@@ -58,7 +58,7 @@ function AttributeEditOverlay({ attr, onClose }) {
   const isNew = !attr;
   const [f, setF] = useState(() => attr ? { ...attr } : {
     attribute_id: newId('ATTR'), catalog_id: null, source: 'custom', name: '', category: '', icon: null, image: null,
-    suggest: {}, removal: 'remove', note_topic: 'Other', status: 'Active' });
+    description: '', priority: 'normal', suggest: {}, removal: 'remove', note_topic: 'Other', status: 'Active' });
   const [tried, setTried] = useState(false);
   const [fileErr, setFileErr] = useState(null);
   const fileRef = useRef(null);
@@ -90,7 +90,7 @@ function AttributeEditOverlay({ attr, onClose }) {
   const save = () => {
     setTried(true);
     if (err.name || err.category || err.mark) return;
-    saveAgencyAttr({ ...f, name });
+    saveAgencyAttr({ ...f, name, description: (f.description || '').trim() || null });
     guard.setToast({ status: 'success', title: isNew ? name + ' created' : name + ' saved',
       detail: f.status === 'Inactive' ? 'Staff can’t add it to charts. Charts that have it keep it.' : 'Staff can add it to client charts.' });
     onClose();
@@ -149,7 +149,15 @@ function AttributeEditOverlay({ attr, onClose }) {
         <AttrPreview attr={f} />
       </Field>
 
-      <Checkbox checked={f.removal === 'end-date'} onChange={v => set('removal', v ? 'end-date' : 'remove')} label="Require End Date on Removal" />
+      <Field label="Description" hint="Shown to clinicians as an info tooltip.">
+        <TextArea value={f.description || ''} onChange={v => set('description', v)} rows={2} placeholder="When should staff apply this attribute?" />
+      </Field>
+
+      <div className="cam-checks">
+        <Checkbox checked={f.priority === 'high'} onChange={v => set('priority', v ? 'high' : 'normal')} label="High Priority" />
+        <span className="cam-check-note">Adds a red flag and lists it first.</span>
+        <Checkbox checked={f.removal === 'end-date'} onChange={v => set('removal', v ? 'end-date' : 'remove')} label="Require End Date on Removal" />
+      </div>
 
       <div className="ovl-grid ovl-grid--2">
         <Field label="Note Topic" hint="Preselected when staff add an internal note about this attribute.">
@@ -224,7 +232,7 @@ function AttributeLibraryOverlay({ onClose }) {
                     <Checkbox checked={checked} disabled={!!have} onChange={() => {}} ariaLabel={c.name} />
                     <span className="attrm-glyph"><AttrGlyph attr={c} /></span>
                     <span className="attrmodal-opt-text">
-                      <span className="attrmodal-opt-name">{c.name}</span>
+                      <span className="attrmodal-opt-name">{c.name}<AttrFlag attr={c} /><AttrInfo attr={c} /></span>
                       {have && <span className="attrmodal-opt-why">{have.status === 'Inactive' ? 'In your list, inactive' : 'In your list'}</span>}
                     </span>
                   </div>
@@ -298,7 +306,7 @@ function ClientAttributesPage() {
                 <tr key={a.attribute_id}>
                   <td className="wrap">
                     <span className="cam-name"><span className="attrm-glyph"><AttrGlyph attr={a} /></span>
-                      <button className="lnk" onClick={() => setEditing(a)}>{a.name}</button></span>
+                      <button className="lnk" onClick={() => setEditing(a)}>{a.name}</button><AttrFlag attr={a} /></span>
                   </td>
                   <td className="wrap">{a.category}</td>
                   <td className="cam-c">{a.source === 'custom' && <CamCheck label="Custom to your agency" />}</td>

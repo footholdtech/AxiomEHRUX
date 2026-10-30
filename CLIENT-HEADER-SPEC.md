@@ -77,6 +77,46 @@ The top bar follows the DS sizing spec:
 - **Tablet (850–1184px):** Notifications, Calendar and Messages fold into a **More (…)** menu, which carries the notification badge.
 - **Mobile (below 850px):** the agency name and wordmark hide too, and search becomes an icon that opens a full-width search sheet under the bar.
 
+## 2c. Quick actions (the round buttons)
+
+`src/48-quick-actions.jsx`. Every button opens a real interaction. All six are on by default; an admin can remove any per header.
+
+| Button | What it opens |
+| --- | --- |
+| **Client Notes** | The care-team thread (unchanged). |
+| **Add Note** (Fluent Document Add) | An inline, scrollable menu with no header or footer. **Pick Up Where You Left Off** first (drafts saved from the note editor, notes started from an alert, "Finish your note" tasks), then every note type A–Z. Which notes a user can write will come from agency service configuration later. Save Draft in the note editor now really keeps the draft. |
+| **Call** | Confirm the number (mobile or home), then Call. The timer starts when the number is dialled. Mute, Camera (mobile numbers only; follows device permissions), Keypad, Add Caller, End. Ending offers "Add a Note About This Call". |
+| **Send Text Message** | Plain text, **Saved Replies** (see below), a character and segment count, and a **phone preview** with the agency's header ("Msg from staff at …") and footer (Reply STOP). **Open Messages** (outward arrow, because it navigates) goes to the chart's Text Messages page; an unsent message is kept. |
+| **Send Email** | From (filled, disabled). To: the client, plus care team and support contacts (a contact with no release of information can't be chosen) or any address. Subject, a rich-text editor (bold, italic, underline, lists, link), **Saved Replies**, signatures (the agency's is **locked**), attachments (PDF, Word, PNG, JPG, 10 MB each). |
+| **Start Chat** | The secure client-portal thread (an add-on not every agency has): everything the client received, with history above and a composer below, attachments and emoji. Shares its messages with the Client Summary's Messages widget. |
+| **Schedule Appointment** (the DS calendar-plus glyph) | Production's New Appointment form: staff, date, guest list (add more clients), start time with Now, duration, end time (follows), site, reason, meeting type, room (follows the site), transportation (**required for in-person**), client in room, comments, reminder, frequency. |
+| **More Actions** | Future channels: AI Avatar Check-In, WhatsApp, Video Visit Link. Shown, and explained as unavailable. |
+
+**Unavailable channels** are disabled (aria-disabled, still focusable). The tooltip is one plain sentence about the client, and, when there's a way to recover that the user is allowed to take, a link to do it. Unlike a normal tooltip it stays open as the pointer moves into it, and the link is the next Tab stop. It opens below the button so the top bar can't clip it.
+
+| Case | Tooltip |
+| --- | --- |
+| Opted out of texts | "Jim has disabled texting as a communication channel." (no fix: it's the client's choice) |
+| No mobile number | "Sam has no phone number with texting enabled. To add a text-enabled phone method, **Update Contact Info**." |
+| No phone | "Marcus has no phone number on file. To add one, **Update Contact Info**." |
+| No email | "… has no email address on file. To add one, **Update Contact Info**." |
+| No portal | "Emily hasn't set up the client portal. You can **Send a Portal Invite**." (link not wired yet) |
+| Do Not Call | "… has asked not to be called." |
+
+Update Contact Info opens the client's Cover Sheet. Whether a user may edit contact info will come from their role (`CAN_EDIT_CONTACTS`, always true here).
+
+**Saved Replies** (`SavedReplies`, reusable in any composer — notes, service plans and assessments next). A dropdown button. Choose a reply to put it in the message. **Save New Reply** at the top saves what's in the message now; it's disabled until there's text, and its tooltip says "To save a new reply, write your message first, then save it here." A new reply opens straight into naming. Each row has **Rename** (the name becomes an input; the check or Enter keeps it; clicking away or Escape drops the edit) and **Delete** (removed at once; the toast offers **Undo**). The client's first name is stored as `{first}`, so a reply reads right for every client. Replies are each user's own.
+
+## 2d. Admin › User Interface Options › Communications
+
+`src/49-communications.jsx`. How the agency appears when staff email, text and call clients. Same structure as Client Header: a **Communications** card on User Interface Options → a page listing the three areas → one edit page per area, each with Unsaved changes / Discard / Save Changes and the unsaved-changes guard.
+
+- **Email:** the agency's **signatures**, edited in a rich-text editor (bold, italic, underline, placeholders such as staff name, role and credentials), one marked **Default**, with a live preview under a sample email. **Staff Can Edit Agency Signatures** (off by default: signatures appear locked in the staff composer) and **Staff Can Add Their Own Signatures** (on). "No Signature" is only offered when staff may edit.
+- **Texting:** the agency's name in three lengths and its sign-off — **Official Name** `{agency}` (Horizon Wellness), **Short Name** `{short}` (Horizon), **Abbreviation** `{abbr}` (HW), **Sign-Off** `{closer}` (—Your Team at Horizon); the **header and footer** on every text; and **message templates** (Greeting, Welcome, Appointment Reminder, No-Show Follow-Up, Billing Question, Office Closure, Crisis Line Reply) with placeholders and a phone preview. Staff get the templates under **From Your Agency** in Saved Replies (insert only). **Staff Can Save Their Own Replies** turns personal replies on or off.
+- **Phone Calls:** the **voice** for automated calls (Female / Male, with Play Sample), a **recorded greeting** that plays first (MP3, WAV or M4A, up to 5 MB) or a **spoken greeting** read in that voice, and **Notify Support Contacts for Minors** (for clients under 18, automated calls also go to support contacts with a release of information).
+
+Saved in this browser (`localStorage`, `axiom-comms-config-v1`); recordings are kept in memory only. Template wording is example copy for review.
+
 ## 2a. Client attributes
 
 Built to inform direction for attributes across Radicle EHRs, not just AxiomEHR.
@@ -85,7 +125,11 @@ Built to inform direction for attributes across Radicle EHRs, not just AxiomEHR.
 - **Every attribute has a mark**: a glyph from the DS or the Fluent attribute set (36 icons, `assets/fluent-attr-icons.js`, regenerated by `tools/fetch-attribute-icons.py`), or an **image an admin uploaded**. LGBTQ+ Identified shows the uploaded-image path (a pride flag; Fluent's flag is colour-only). The admin upload screen is next.
 - **Effective dates.** Each attribute on a chart has a start date and an optional end date, inclusive. A future start is *Scheduled*; a past end is *Ended*. Only active attributes show in the header.
 - **Audit trail.** Every assignment records who added it and when, and every later change: dates changed, ended, removed. Nothing is deleted: *Remove, Entered in Error* marks the entry removed and it stays, with its history, under "Ended and Removed".
-- **Suggested from the chart.** An attribute is suggested when the client has an **active** diagnosis whose ICD-10 code starts with one of the attribute's prefixes, or an **active** problem it names. Suggestions are offered, never applied. Dee Carter shows three: Substance Abuse (F10.20), Unhoused and On Probation/Parole (problem list).
+- **Description.** Optional, written by the admin: when the attribute applies (e.g. "Diagnosed by a provider and on the problem list — not just reported by the client"). Clinicians see it as an **info icon with a tooltip** beside the name in Manage Attributes (list and cards). Clicking the icon never ticks the row.
+- **High priority.** An admin setting for the few attributes that must not blend in (the prototype marks Suicidal Ideation, Homicidal Ideation, History of Violence, Overdose History, Elopement Risk and Known Medication Allergy). They show a **red flag**: after the name wherever there's a name, and on the corner of the mark in the collapsed header. They sort first, so they're never the ones that wrap away. Red is used for nothing else among attributes; keeping the list short is what keeps the flag meaningful.
+- **Substance use is specific.** Alcohol, Opioid, Cannabis, Sedative, Stimulant and Polysubstance Use (each suggested from its ICD-10 F1x code), plus Tobacco Use and Overdose History. The old general entry is **inactive**, so charts that have it keep it and staff can't add it.
+- **Safety additions:** Suicidal Ideation, Homicidal Ideation and Self-Harm, each suggested from the matching active problem.
+- **Suggested from the chart.** An attribute is suggested when the client has an **active** diagnosis whose ICD-10 code starts with one of the attribute's prefixes, or an **active** problem it names. Suggestions are offered, never applied. Dee Carter shows Alcohol Use (F10.20), Unhoused and On Probation/Parole; Maria Gonzalez shows Homicidal Ideation (active problem). In the fixtures, safety, substance and diagnosis-based attributes are only on charts whose own problems or codes support them, language attributes follow the primary language, and Known Medication Allergy follows the allergy list.
 - **Manage Attributes dialog** (`AttributesOverlay`, lg): client name in the header like every other dialog.
   - *Add Attributes* (left): search by name, *Suggested From the Chart*, then *All Attributes* **alphabetically**, with checkboxes. Categories organise the list for administrators and aren't shown here.
   - *On This Chart* (right): each attribute is a **card** with its dates, who added it, its notes, Edit Dates, Add Internal Note and History.

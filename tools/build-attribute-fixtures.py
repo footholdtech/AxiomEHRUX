@@ -81,11 +81,21 @@ LIB = [
     ("ATTR-CARDIAC", "Cardiac Condition", "Medical", "flHeartPulse", {"icd10": ["I20", "I21", "I25", "I50"]}),
     ("ATTR-TBI", "Traumatic Brain Injury", "Medical", "flBrain", {"icd10": ["S06"]}),
     ("ATTR-PREGNANT", "Pregnant / Postpartum", "Medical", "flHeart", {"icd10": ["O", "Z33", "Z34", "Z39"]}),
-    ("ATTR-SUBSTANCE", "Substance Abuse", "Behavioral Health", "flPill",
-        {"icd10": ["F10", "F11", "F12", "F13", "F14", "F15", "F16", "F18", "F19"]}),
+    # The general entry, kept so charts that have it keep their history; the
+    # agency now uses the specific substances below and has turned it off.
+    ("ATTR-SUBSTANCE", "Substance Use (General)", "Behavioral Health", "flPill", None),
+    ("ATTR-ALCOHOL", "Alcohol Use", "Behavioral Health", "flDrinkWine", {"icd10": ["F10"]}),
+    ("ATTR-OPIOID", "Opioid Use", "Behavioral Health", "flPill", {"icd10": ["F11"]}),
+    ("ATTR-CANNABIS", "Cannabis Use", "Behavioral Health", "flLeafThree", {"icd10": ["F12"]}),
+    ("ATTR-SEDATIVE", "Sedative Use", "Behavioral Health", "flWeatherMoon", {"icd10": ["F13"]}),
+    ("ATTR-STIMULANT", "Stimulant Use", "Behavioral Health", "flPulse", {"icd10": ["F14", "F15"]}),
+    ("ATTR-POLYSUB", "Polysubstance Use", "Behavioral Health", "flBeaker", {"icd10": ["F19"]}),
+    ("ATTR-OVERDOSE", "Overdose History", "Behavioral Health", "flHeartPulseError", None),
     ("ATTR-TOBACCO", "Tobacco Use", "Behavioral Health", "flProhibitedSmoking", {"icd10": ["F17"]}),
-    ("ATTR-HIGHRISK", "High Risk Flag", "Safety", "dsWarning",
-        {"problems": ["Suicidal Ideation", "Homicidal Ideation", "Non-Suicidal Self-Injury"]}),
+    ("ATTR-HIGHRISK", "High Risk Flag", "Safety", "dsWarning", None),
+    ("ATTR-SI", "Suicidal Ideation", "Safety", "flPersonAlert", {"problems": ["Suicidal Ideation"]}),
+    ("ATTR-HI", "Homicidal Ideation", "Safety", "flShieldProhibited", {"problems": ["Homicidal Ideation"]}),
+    ("ATTR-SELFHARM", "Self-Harm", "Safety", "flErrorCircle", {"problems": ["Non-Suicidal Self-Injury"]}),
     ("ATTR-AGGRESSION", "Aggression", "Safety", "flPersonWarning", None),
     ("ATTR-VIOLENCE", "History of Violence", "Safety", "flAlertUrgent", None),
     ("ATTR-ELOPEMENT", "Elopement Risk", "Safety", "flPersonRunning", None),
@@ -198,7 +208,7 @@ SCHOOL = [
 CUSTOM = {"ATTR-HFW-WAITLIST"}
 # Turned off by this agency's admin: not selectable any more, still on the
 # charts that already had it.
-INACTIVE = {"ATTR-TOBACCO"}
+INACTIVE = {"ATTR-TOBACCO", "ATTR-SUBSTANCE"}
 
 # How an attribute comes off a chart — an admin setting per attribute.
 #   "remove":   a clinician can remove it (it stays in the audit trail)
@@ -212,11 +222,48 @@ NOTE_TOPIC = {
     "ATTR-NOCONTACT": "Court / legal", "ATTR-COURTORDERED": "Court / legal", "ATTR-PROBATION": "Court / legal",
     "ATTR-MINOR": "Guardian", "ATTR-CONSERVATOR": "Guardian", "ATTR-FOSTERCARE": "Guardian",
     "ATTR-ALLERGY": "Allergies", "ATTR-SUBSTANCE": "Substance use", "ATTR-TOBACCO": "Substance use",
+    "ATTR-ALCOHOL": "Alcohol use", "ATTR-OPIOID": "Opioids", "ATTR-CANNABIS": "Illicit drug use", "ATTR-SEDATIVE": "Benzodiazepines",
+    "ATTR-STIMULANT": "Stimulants", "ATTR-POLYSUB": "Substance use", "ATTR-OVERDOSE": "Overdose",
     "ATTR-UNHOUSED": "Housing", "ATTR-TRANSPORT": "Transportation", "ATTR-INPT-TRANSFER": "Hospital discharge",
     "ATTR-HFW-WAITLIST": "Referrals",
 }
+# Why an attribute applies — written by the agency admin, shown to clinicians
+# as an info tooltip. Fictional example wording, for review.
+DESCRIPTIONS = {
+    "ATTR-VIOLENCE": "Documented violence toward others in the last 5 years. Plan visits with a second staff member and review the safety plan first.",
+    "ATTR-AGGRESSION": "Recent verbal or physical aggression during services. Check the latest incident notes before a visit.",
+    "ATTR-SI": "Current suicidal ideation, documented by a clinician. Follow the safety plan and the agency's suicide-risk protocol.",
+    "ATTR-HI": "Current homicidal ideation, documented by a clinician. Follow the agency's duty-to-warn protocol.",
+    "ATTR-SELFHARM": "Recent non-suicidal self-injury. Ask about it at each contact and keep the safety plan current.",
+    "ATTR-HIGHRISK": "Clinically assessed as high risk. See the most recent risk assessment for why.",
+    "ATTR-ELOPEMENT": "Has left a supervised setting without notice. Confirm whereabouts at each shift change.",
+    "ATTR-OVERDOSE": "At least one overdose on record. Make sure naloxone is on hand and the client knows where it is.",
+    "ATTR-DIABETIC": "Diagnosed by a provider and on the problem list — not just reported by the client.",
+    "ATTR-HIV": "Diagnosed by a provider. Share only with staff who need to know; HIV status has extra disclosure protections.",
+    "ATTR-IMMUNO": "Diagnosed or treatment-related immune suppression. Reschedule in-person visits if staff are sick.",
+    "ATTR-CARDIAC": "Diagnosed by a provider. Check medications before prescribing anything that affects heart rhythm.",
+    "ATTR-SICKLECELL": "Diagnosed by a provider. Pain crises can be sudden; follow the client's pain plan.",
+    "ATTR-ALLERGY": "A medication allergy confirmed on the allergy list. Check it before any order.",
+    "ATTR-ALCOHOL": "Alcohol use that affects treatment, from assessment or a diagnosis. Not for occasional use reported in passing.",
+    "ATTR-OPIOID": "Opioid use that affects treatment, from assessment or a diagnosis. Consider naloxone and MAT referral.",
+    "ATTR-CANNABIS": "Cannabis use that affects treatment, from assessment or a diagnosis.",
+    "ATTR-SEDATIVE": "Sedative, hypnotic or benzodiazepine misuse, from assessment or a diagnosis. Check before prescribing.",
+    "ATTR-STIMULANT": "Cocaine, methamphetamine or other stimulant use, from assessment or a diagnosis.",
+    "ATTR-POLYSUB": "Use of more than one substance that affects treatment.",
+    "ATTR-SUBSTANCE": "Retired. Use the specific substance attributes instead.",
+    "ATTR-COURTORDERED": "Treatment ordered by a court. Attendance and progress may need to be reported; check the order for terms.",
+    "ATTR-NOCONTACT": "A court or protective order limits contact with someone. Check the order before sharing information or scheduling.",
+    "ATTR-DONOTCALL": "The client asked not to be called. Text or email instead, if those are allowed.",
+    "ATTR-INTERPRETER": "Use a qualified interpreter, not family members, for clinical conversations.",
+    "ATTR-RESTRICTED": "Access to this record is limited. Share only with staff directly involved in care.",
+}
+# Attributes the agency marks high priority: shown with a red flag so they
+# don't blend in with the rest.
+HIGH_PRIORITY = {"ATTR-SI", "ATTR-HI", "ATTR-VIOLENCE", "ATTR-OVERDOSE", "ATTR-ELOPEMENT", "ATTR-ALLERGY"}
+
 def entry(aid, name, cat, glyph, suggest, image=None):
     return {"name": name, "category": cat, "icon": glyph, "image": image,
+            "description": DESCRIPTIONS.get(aid), "priority": "high" if aid in HIGH_PRIORITY else "normal",
             "suggest": suggest or {}, "removal": "end-date" if aid in END_DATE_ONLY else "remove",
             "note_topic": NOTE_TOPIC.get(aid, "Other")}
 catalog = []
@@ -246,7 +293,19 @@ for aid, name, img in SCHOOL:
                     **entry(aid, name, "Education", None, None, img), "status": "Active"})
 # Random chart picks only draw on the original list: school and nationality
 # attributes need a real reason to be on a chart.
-LIB_IDS = [aid for aid, *_ in LIB if aid not in INACTIVE]
+# Safety and substance attributes are never scattered at random: each one goes
+# only on a chart whose own diagnoses or problems support it (EVIDENCED below).
+NOT_RANDOM = {"ATTR-SI", "ATTR-HI", "ATTR-SELFHARM", "ATTR-OVERDOSE", "ATTR-ALCOHOL", "ATTR-OPIOID",
+              "ATTR-CANNABIS", "ATTR-SEDATIVE", "ATTR-STIMULANT", "ATTR-POLYSUB",
+              # diagnosis-based medical attributes: the synthetic charts carry no
+              # matching diagnoses, so none of these are on a chart yet
+              "ATTR-HIV", "ATTR-IMMUNO", "ATTR-DIABETIC", "ATTR-SICKLECELL", "ATTR-CARDIAC", "ATTR-TBI", "ATTR-SEIZURE",
+              # follow from other data: language from primary_language, allergy
+              # from the allergy list, and high-priority safety flags by hand
+              "ATTR-SPANISH", "ATTR-INTERPRETER", "ATTR-FRENCH", "ATTR-ALLERGY",
+              "ATTR-VIOLENCE", "ATTR-AGGRESSION", "ATTR-ELOPEMENT", "ATTR-HIGHRISK"}
+ALLERGIC = {a["client_id"] for a in load("allergies.json") if (a.get("status") or "Active") == "Active"}
+LIB_IDS = [aid for aid, *_ in LIB if aid not in INACTIVE and aid not in NOT_RANDOM]
 
 # ---- Assignments --------------------------------------------------------
 def at(d, hhmm="09:00"): return f"{d.isoformat()}T{hhmm}"
@@ -273,14 +332,14 @@ for c in clients:
     if cid == DEMO:
         # One of each state the dialog has to show: active with a planned end,
         # active open-ended, scheduled, ended, and removed in error. Left off on
-        # purpose so they appear as suggestions: Substance Abuse (active F10.20),
-        # Unhoused and High Risk Flag (active problems).
+        # purpose so they appear as suggestions: Alcohol Use (active F10.20),
+        # Unhoused, and Suicidal Ideation if that problem is active.
         assign(cid, "ATTR-COURTORDERED", dt.date(2025, 11, 3), dt.date(2027, 5, 3), by="ST-2004",
                added=at(dt.date(2025, 11, 3), "10:12"),
                history=[event("dates", at(dt.date(2026, 2, 10), "14:40"), "ST-2007", "2025-11-03", "2027-05-03",
                               "End date set from the court order")])
         rows[-1]["history"][0]["end_date"] = None
-        assign(cid, "ATTR-ALLERGY", dt.date(2024, 6, 12), by="ST-2008", added=at(dt.date(2024, 6, 12), "08:31"))
+        assign(cid, "ATTR-WHEELCHAIR", dt.date(2024, 6, 12), by="ST-2008", added=at(dt.date(2024, 6, 12), "08:31"))
         assign(cid, "ATTR-INPT-TRANSFER", TODAY + dt.timedelta(days=6), TODAY + dt.timedelta(days=20),
                by="ST-2006", added=at(days(1), "16:05"))
         assign(cid, "ATTR-DONOTCALL", dt.date(2025, 1, 15), dt.date(2026, 3, 1), by="ST-2009",
@@ -298,6 +357,8 @@ for c in clients:
         assign(cid, "ATTR-INTERPRETER", enrolled); picked.add("ATTR-INTERPRETER")
         if c.get("primary_language") == "Spanish":
             assign(cid, "ATTR-SPANISH", enrolled); picked.add("ATTR-SPANISH")
+    if cid in ALLERGIC:
+        assign(cid, "ATTR-ALLERGY", enrolled + dt.timedelta(days=seed(cid + "alg") % 60)); picked.add("ATTR-ALLERGY")
     years = (TODAY - dt.date.fromisoformat(c["dob"])).days // 365
     unfit = {"ATTR-HFW-WAITLIST", "ATTR-INPT-TRANSFER", "ATTR-LGBTQ"}   # not something to scatter at random
     if c.get("gender") != "Female": unfit.add("ATTR-PREGNANT")
@@ -319,6 +380,14 @@ for c in clients:
             assign(cid, aid, start, end,
                    history=[event("ended", at(end, "10:00"), who, start.isoformat(), end.isoformat(), None)])
 
+# Backed by each client's active problems or ICD-10 codes. Maria's homicidal
+# ideation and Dee's alcohol use are left off so they show as suggestions.
+EVIDENCED = [("CL-100240", "ATTR-SI", 40), ("CL-100240", "ATTR-CANNABIS", 120), ("CL-100242", "ATTR-OPIOID", 200),
+             ("CL-100242", "ATTR-OVERDOSE", 90), ("CL-100243", "ATTR-ALCOHOL", 160), ("CL-100238", "ATTR-SELFHARM", 30),
+             ("CL-100244", "ATTR-HI", 14), ("CL-100244", "ATTR-VIOLENCE", 300), ("CL-100236", "ATTR-ELOPEMENT", 60)]
+for cid, aid, ago_days in EVIDENCED:
+    assign(cid, aid, days(ago_days))
+
 # The inactive one is still on a chart, so the admin page can say so.
 assign("CL-100243", "ATTR-TOBACCO", dt.date(2025, 3, 18), by="ST-2008", added=at(dt.date(2025, 3, 18), "10:40"))
 
@@ -327,7 +396,7 @@ write("attribute_catalog.json",
       "suggestion rules, removal rule and note topic. Agency admins turn entries on for "
       "their staff (see attribute_library.json). `image` is used where a glyph can't work "
       "(flags).",
-      ["catalog_id", "name", "category", "icon", "image", "suggest", "removal", "note_topic"], catalog)
+      ["catalog_id", "name", "category", "icon", "image", "description", "priority", "suggest", "removal", "note_topic"], catalog)
 write("attribute_library.json",
       "The agency's client attributes: standard entries it turned on (catalog_id) and its "
       "own (source custom). Managed by administrators; clinicians apply "
@@ -335,8 +404,8 @@ write("attribute_library.json",
       "uploaded picture (data URI). `suggest` lists ICD-10 prefixes and problem names that "
       "make the attribute a suggestion when active on the chart. `removal` is remove | end-date. "
       "`note_topic` preselects the topic of a note added from the attribute.",
-      ["attribute_id", "catalog_id", "source", "name", "category", "icon", "image", "suggest", "removal",
-       "note_topic", "status"], library)
+      ["attribute_id", "catalog_id", "source", "name", "category", "icon", "image", "description", "priority",
+       "suggest", "removal", "note_topic", "status"], library)
 write("client_attribute_assignments.json",
       "Attributes applied to client charts, with effective dates and an audit trail. "
       "An attribute is active from start_date through end_date (inclusive); null end_date "

@@ -85,6 +85,7 @@ function GuardProvider({ children }) {
        record the next thing you type lands in. */
     else if (clientId && !target && !req.signOut && dirty) reasons.push('leave');
     else if (req.signOut && clientId) reasons.push('signout');
+    if (target && target !== clientId && needsAccessRequest(target)) reasons.push('access');
     if (!reasons.length) return commit(full);
     setIntercept({ req: full, reasons });
   }, [clientId, dirty, commit]);
@@ -136,10 +137,31 @@ function GLink({ to, client, className, style, children, title }) {
    question lives *inside* the warning banner when there is unsaved work rather
    than being repeated above it, and the identity pair appears only when a
    client is actually changing — leaving a page is not a switch. */
+/* ===== Client Access Request ("break the glass") ==================
+   Agencies can let staff open charts beyond their caseload. When they do, a
+   chart outside the caseload (another program) or a restricted record asks
+   for a reason first, and the access is recorded for the agency's privacy
+   and compliance officers. Which charts count is agency configuration; here
+   it's the clients with `access` (clients_agency.json).
+   A reason, once given, lasts for the session (BTG_GRANTS). The intercept is
+   part of the same guard as switching clients, so it reads the same. */
+const BTG_GRANTS = {};   // client_id -> { reason, comment, at, by }
+const needsAccessRequest = cid => { const c = CLIENT_BY_ID[cid]; return !!(c && c.access && !BTG_GRANTS[cid]); };
+const ACCESS_REASONS = ['Providing direct care', 'Covering for a colleague', 'Care coordination', 'Crisis or emergency response',
+  'Intake or referral', 'Scheduling', 'Billing or claims', 'Records request', 'Quality review or audit', 'Clinical supervision',
+  'Other (explain in comment)'];
+const accessLog = () => Object.keys(BTG_GRANTS).map(cid => ({ client_id: cid, ...BTG_GRANTS[cid] }));
+
 function NavIntercept({ intercept, dirty, onCancel, onCommit, currentClient }) {
   const { req, reasons } = intercept;
   const target = req.client ? CLIENT_BY_ID[req.client] : null;
   const unsaved = reasons.indexOf('unsaved') !== -1;
+  const access = reasons.indexOf('access') !== -1;
+  const [why, setWhy] = useState('');
+  const [comment, setComment] = useState('');
+  const [tried, setTried] = useState(false);
+  const needComment = /^Other/.test(why);
+  const accessErr = { why: !why ? 'Choose a reason.' : null, comment: needComment && !comment.trim() ? 'Explain the reason.' : null };
   const kind = reasons.indexOf('switch') !== -1 ? 'switch'
     : reasons.indexOf('signout') !== -1 ? 'signout'
     : reasons.indexOf('leave') !== -1 ? 'leave' : 'unsaved';
@@ -156,7 +178,11 @@ function NavIntercept({ intercept, dirty, onCancel, onCommit, currentClient }) {
     : kind === 'signout' ? 'Are you sure you want to sign out?'
     : 'Are you sure you want to leave this page?';
 
-  const COPY = unsaved
+  const first = target ? target.shortName : 'this client';
+  const restricted = target && target.access && target.access.scope === 'restricted';
+  const COPY = access
+    ? { title: 'Client Access Request', cancel: 'Cancel', confirm: unsaved ? 'Submit and Discard Changes' : 'Submit and Open Chart' }
+    : unsaved
     ? {
         title: 'Unsaved Changes',
         cancel: 'Stay on Page',
@@ -187,12 +213,32 @@ function NavIntercept({ intercept, dirty, onCancel, onCommit, currentClient }) {
         </div>
 
         <div className="intercept-body">
-          {unsaved
+          {access ? (
+            /* Cautionary, not alarming: why this chart asks, what happens to
+               the answer. Unsaved work is the same dialog's second sentence. */
+            <div className="warn-banner" role="note">
+              <Icon name="warn" size={20} />
+              <div>
+                {restricted ? first + '’s record is restricted.' : first + ' isn’t in your caseload.'} To open the chart, choose why you need it.
+                {' '}Your access is recorded and may be reviewed by your agency’s privacy and compliance officers.
+                {unsaved && ' You also have unsaved changes on this page, which will be discarded.'}
+              </div>
+            </div>
+          ) : unsaved
             ? <div className="warn-banner" role="note">
                 <Icon name="warn" size={20} />
                 <div>You have unsaved changes on this page. {question}</div>
               </div>
             : <p className="intercept-lede">{question}</p>}
+
+          {access && kind !== 'switch' && (
+            <div className="switch-pair switch-pair--one">
+              <div className="switch-side">
+                <div className="switch-cap">Opening</div>
+                <div className="switch-who"><Avatar name={target?.name || ''} size="M" /><span>{target?.displayName || '—'}</span></div>
+              </div>
+            </div>
+          )}
 
           {kind === 'switch' && (
             <div className="switch-pair">
@@ -209,6 +255,17 @@ function NavIntercept({ intercept, dirty, onCancel, onCommit, currentClient }) {
               </div>
             </div>
           )}
+
+          {access && (
+            <div className="btg-fields">
+              <Field label="Reason" required error={tried ? accessErr.why : null}>
+                <Dropdown value={why} options={ACCESS_REASONS} placeholder="Please select an option" onChange={setWhy} invalid={tried && !!accessErr.why} menuMinWidth={300} />
+              </Field>
+              <Field label="Comment" required={needComment} error={tried ? accessErr.comment : null}>
+                <TextArea value={comment} onChange={setComment} rows={2} placeholder="Anything that helps a reviewer understand this access" invalid={tried && !!accessErr.comment} />
+              </Field>
+            </div>
+          )}
         </div>
 
         <div className="intercept-foot">
@@ -216,7 +273,13 @@ function NavIntercept({ intercept, dirty, onCancel, onCommit, currentClient }) {
               chart clears the client outright — carrying one onto an unrelated
               page is the tethering problem this prototype argues against. */}
           <Button variant="secondary" onClick={onCancel}>{COPY.cancel}</Button>
-          <Button variant="primary" onClick={() => onCommit(req)}>{COPY.confirm}</Button>
+          <Button variant="primary" onClick={() => {
+            if (!access) return onCommit(req);
+            setTried(true);
+            if (accessErr.why || accessErr.comment) return;
+            BTG_GRANTS[req.client] = { reason: why, comment: comment.trim() || null, at: new Date().toISOString(), by: ME.id };
+            onCommit({ ...req, toast: { status: 'info', title: 'Access recorded', detail: first + ' · ' + why } });
+          }}>{COPY.confirm}</Button>
         </div>
       </div>
     </React.Fragment>,
