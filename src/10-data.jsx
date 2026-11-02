@@ -54,6 +54,27 @@ const siteName = id => SITE[id]?.name || '—';
 const roleName = id => ROLE[id]?.name || '—';
 const PRONOUN = { Female: 'She/Her', Male: 'He/Him' };
 
+/* The signed-in clinician's own week. The fixture set has few appointments
+   for them near the pinned TODAY, so "Prepare me for today" in the AI drawer
+   would have nothing to say. These fill Tuesday through the next Monday with
+   their caseload, the same way: deterministic, fictional. The discharge demo
+   client is left out — they leave today. */
+const MY_WEEK_APPTS = (() => {
+  const me = 'ST-2003', pool = pick((RD.clients || []).filter(c => c.status === 'Active' && c.client_id !== 'CL-100235'), 'myweek', 99);
+  const reasons = ['Individual Therapy', 'Care Coordination', 'Medication Review', 'Telehealth Check-in', 'Relapse Prevention Group', 'Field Outreach'];
+  const day = [[0, ['09:00', '11:30', '14:00']], [1, ['10:00', '15:30']], [2, ['09:30', '13:00']], [3, ['11:00']], [6, ['09:00', '14:30']]];
+  let n = 0;
+  return day.flatMap(([off, times]) => times.map(t => {
+    const i = n++, c = pool[i % Math.max(1, pool.length)];
+    const tele = seed('mw' + i) % 4 === 0;
+    return { appointment_id: 'APT-MW' + String(i + 1).padStart(3, '0'), client_id: c.client_id, staff_id: me, type: 'On Site', title: c.first_name + ' ' + c.last_name,
+      date: isoOf(addDays(TODAY, off)), start_time: t, duration_minutes: seed('md' + i) % 2 ? 60 : 30, site_id: c.site_id, place_of_service: null,
+      meeting_type: tele ? 'Online/Teams Meeting' : 'In Person', appointment_reason: tele ? 'Telehealth Check-in' : reasons[seed('mr' + i) % reasons.length],
+      completion_status: 'Scheduled' };
+  }));
+})();
+RD.appointments = (RD.appointments || []).concat(MY_WEEK_APPTS);
+
 const _byClient = arr => { const o = {}; (arr || []).forEach(r => { (o[r.client_id] = o[r.client_id] || []).push(r); }); return o; };
 const APPT_BY_CLIENT = _byClient(RD.appointments), ALLERGY_BY_CLIENT = _byClient(RD.allergies),
       RX_BY_CLIENT = _byClient(RD.prescriptions), VITAL_BY_CLIENT = _byClient(RD.vitals),
@@ -219,18 +240,22 @@ function clientDocs(cid, count = 6) {
   const staff = RD.staff || [];
   const noteNames = (RD.noteTypes || []).map(n => n.name || n.note_type || String(n));
   const docPool = noteNames.length ? noteNames : ['Progress Note', 'Service Plan', 'Assessment'];
+  /* A client the signed-in clinician sees has some of their notes on the
+     chart, so "my documentation" (Chat With Chart) has something to read. */
+  const seen = (APPT_BY_CLIENT[cid] || []).some(a => a.staff_id === ME.id);
   return Array.from({ length: count }).map((_, i) => {
     const s = seed(cid + 'doc' + i);
     const isScan = s % 7 === 0;
     const isAssess = !isScan && s % 5 === 0;
+    const byId = seen && !isScan && !isAssess && i % 2 === 0 ? ME.id : staff[s % Math.max(1, staff.length)]?.staff_id;
     return {
       id: cid + '-d' + i,
       name: isScan ? 'Scanned Document — ' + ['Insurance Card', 'Court Order', 'Prior Records'][s % 3]
         : isAssess ? (cat.length ? cat[s % cat.length].name : 'Assessment')
         : docPool[s % docPool.length],
       kind: isScan ? 'Upload' : isAssess ? 'Assessment' : 'Note',
-      byId: staff[s % Math.max(1, staff.length)]?.staff_id,
-      by: sName(staff[s % Math.max(1, staff.length)]?.staff_id),
+      byId,
+      by: sName(byId),
       at: addDays(TODAY, -(i * 3 + (s % 3))),
       status: s % 6 === 0 ? 'Draft' : s % 6 === 1 ? 'Pending co-sign' : 'Signed',
     };
@@ -243,22 +268,31 @@ function clientDocs(cid, count = 6) {
    The professional side of the chart is the care team, which has its own box;
    listing a care-team member here as well would say the same thing twice. */
 const SUPPORT_RELATIONSHIPS = ['Sibling', 'Parent', 'Adult Child', 'Cousin', 'Partner'];
+/* Production's Contact History columns: contact type, name, relationship,
+   contact details. Phone numbers are 555 numbers; who entered each is derived
+   like the other fixture rows. A minor's parent is their guardian. */
 function supportContacts(client) {
   const cid = client.client_id;
   const at = n => CIN_ALPHA[seed(cid + n) % CIN_ALPHA.length];
   const relAt = n => SUPPORT_RELATIONSHIPS[seed(cid + n) % SUPPORT_RELATIONSHIPS.length];
+  const minor = client.age !== '' && client.age < 18;
+  const phoneAt = n => '555-010-' + String(3000 + seed(cid + n) % 6999);
+  const on = n => isoOf(addDays(TODAY, -(60 + seed(cid + n) % 700)));
+  const by = n => (client.records ? null : ((RD.staff || [])[seed(cid + n) % Math.max(1, (RD.staff || []).length)] || {}).staff_id);
+  const rel1 = minor ? 'Parent' : relAt('rel');
   const out = [{
-    name: at('sup') + '. ' + client.last_name, role: relAt('rel'), emergency: true,
-    release: seed(cid + 'roi') % 3 !== 0,
+    id: cid + '-sc1', name: at('sup') + '. ' + client.last_name, role: rel1, type: minor ? 'Guardian' : 'Emergency Contact', emergency: true,
+    release: seed(cid + 'roi') % 3 !== 0, phone: phoneAt('ph1'), preferred: seed(cid + 'pc1') % 2 ? 'Phone call' : 'Text message',
+    entered_on: on('on1'), entered_by_staff_id: by('by1'),
   }];
   /* Roughly half of charts carry a second. A list that is always exactly one
      long reads as a placeholder. */
   if (seed(cid + 'sup2') % 2 === 0) {
     const rel2 = relAt('rel2');
     out.push({
-      name: at('sup2i') + '. ' + client.last_name,
-      role: rel2 === out[0].role ? 'Parent' : rel2,
-      emergency: false, release: seed(cid + 'roi2') % 3 !== 0,
+      id: cid + '-sc2', name: at('sup2i') + '. ' + client.last_name,
+      role: rel2 === out[0].role ? 'Parent' : rel2, type: 'Family', emergency: false, release: seed(cid + 'roi2') % 3 !== 0,
+      phone: phoneAt('ph2'), preferred: 'Phone call', entered_on: on('on2'), entered_by_staff_id: by('by2'),
     });
   }
   return out;

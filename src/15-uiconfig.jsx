@@ -33,6 +33,13 @@
      bool    a switch
      choice  one of a short list
      fields  any number of a short list (the "which specific IDs" case) */
+/* Options most record views share. Whether a view's add button opens a
+   dialog in the header is not among them: that's a product decision made for
+   client safety, not agency configuration. Every record view adds in the
+   header except the instruments marked `addOnPage`, which are too long or
+   too clinical for a dialog and open their full page instead. */
+const ROWS_OPT = { key: 'rows', kind: 'choice', label: 'Rows to list', choices: ['5', '10', 'All'], def: '5' };
+
 const QUICKVIEW_CATALOG = [
   {
     key: 'general', label: 'General', icon: 'dsPeople',
@@ -68,6 +75,7 @@ const QUICKVIEW_CATALOG = [
     blurb: 'Allergens, reactions and severity.',
     options: [
       { key: 'activeOnly', kind: 'bool', label: 'Active allergies only', def: true },
+      ROWS_OPT,
     ],
   },
   {
@@ -90,6 +98,7 @@ const QUICKVIEW_CATALOG = [
     blurb: 'Vaccines given, reported and declined.',
     options: [
       { key: 'showDeclined', kind: 'bool', label: 'Include declined', def: true },
+      ROWS_OPT,
     ],
   },
   {
@@ -100,17 +109,18 @@ const QUICKVIEW_CATALOG = [
     ],
   },
   {
-    key: 'contact', label: 'Contact Info', icon: 'dsPhone',
-    blurb: 'Email, phone and address.',
+    key: 'contact', label: 'Contact Info', icon: 'dsPhone', module: 'Cover Sheet',
+    blurb: 'Phones, email, address and the preferred way to reach the client. Kept on the Cover Sheet.',
     options: [
       { key: 'showAddress', kind: 'bool', label: 'Show mailing address', def: true },
       { key: 'showPreferred', kind: 'bool', label: 'Show preferred contact method and language', def: true },
     ],
   },
   {
-    key: 'appointments', label: 'Appointments', icon: 'calendar',
+    key: 'appointments', label: 'Appointments', icon: 'calendar', module: 'Appointments',
     blurb: 'What is next, and what was missed.',
     options: [
+      { key: 'defaultFilter', kind: 'choice', label: 'Opens on', choices: ['Upcoming', 'Past'], def: 'Upcoming' },
       { key: 'count', kind: 'choice', label: 'Appointments to list', choices: ['3', '5', '10'], def: '5' },
       { key: 'includeMissed', kind: 'bool', label: 'Include no-shows and cancellations', def: true },
     ],
@@ -126,43 +136,49 @@ const QUICKVIEW_CATALOG = [
   },
   {
     key: 'notes', label: 'Clinical Notes', icon: 'documents',
-    blurb: 'The most recent documentation on the chart.',
+    blurb: 'The most recent documentation on the chart. Adding a note opens the note itself.',
     options: [
       { key: 'count', kind: 'choice', label: 'Notes to list', choices: ['3', '5', '10'], def: '5' },
       { key: 'unsignedFirst', kind: 'bool', label: 'Surface drafts and unsigned notes first', def: true },
     ],
   },
   {
-    key: 'diagnoses', label: 'Diagnoses', icon: 'dsWarning',
+    key: 'diagnoses', label: 'Diagnoses', icon: 'dsWarning', module: 'Diagnosis',
     blurb: 'ICD-10 diagnoses recorded on the chart.',
     options: [
-      { key: 'activeOnly', kind: 'bool', label: 'Active statuses only',
-        help: 'Active, In Remission and Provisional. Resolved and Inactive are hidden.', def: true },
+      { key: 'defaultFilter', kind: 'choice', label: 'Opens on', choices: ['Active', 'All'], def: 'Active',
+        help: 'Active includes In Remission and Provisional.' },
       { key: 'showCodes', kind: 'bool', label: 'Show ICD-10 codes', def: true },
+      { key: 'showSnomed', kind: 'bool', label: 'Show SNOMED codes', def: false },
+      ROWS_OPT,
     ],
   },
   {
-    key: 'problems', label: 'Problems', icon: 'dsWarning',
+    key: 'problems', label: 'Problems', icon: 'dsWarning', module: 'Problem List',
     blurb: 'The problem list.',
     options: [
-      { key: 'activeOnly', kind: 'bool', label: 'Active problems only', def: true },
+      { key: 'defaultFilter', kind: 'choice', label: 'Opens on', choices: ['Active', 'All'], def: 'Active' },
       { key: 'showCategory', kind: 'bool', label: 'Show category', def: true },
+      ROWS_OPT,
     ],
   },
   {
-    key: 'support', label: 'Support Contacts', icon: 'dsPeople',
-    blurb: 'Natural supports and who may be contacted.',
+    key: 'support', label: 'Support Contacts', icon: 'dsPeople', module: 'Cover Sheet',
+    blurb: 'Natural supports and who may be contacted. Kept on the Cover Sheet.',
     options: [
       { key: 'showRelationship', kind: 'bool', label: 'Show relationship', def: true },
       { key: 'consentOnly', kind: 'bool', label: 'Only contacts with a release on file', def: false },
+      { key: 'showCareTeam', kind: 'bool', label: 'Show care team', def: true },
     ],
   },
   {
     key: 'assessments', label: 'Assessments', icon: 'reports',
-    blurb: 'Instruments administered and when they are next due.',
+    blurb: 'Every instrument on the chart: latest score, who gave it, and when it is next due.',
     options: [
-      { key: 'count', kind: 'choice', label: 'Instruments to list', choices: ['3', '5'], def: '3' },
       { key: 'showScores', kind: 'bool', label: 'Show scores and interpretation', def: true },
+      { key: 'includeDue', kind: 'bool', label: 'Include instruments tracked by due date only',
+        help: 'Instruments the agency schedules but whose results aren’t in this chart’s records.', def: true },
+      ROWS_OPT,
     ],
   },
   {
@@ -173,21 +189,27 @@ const QUICKVIEW_CATALOG = [
     ],
   },
   {
-    key: 'demographics', label: 'Demographics', icon: 'clients',
-    blurb: 'Race, ethnicity, language and gender.',
+    key: 'demographics', label: 'Demographics', icon: 'clients', module: 'Cover Sheet',
+    blurb: 'Name, gender, race, ethnicity and language. Kept on the Cover Sheet.',
     options: [
       { key: 'showRaceEthnicity', kind: 'bool', label: 'Show race and ethnicity', def: true },
       { key: 'showLanguage', kind: 'bool', label: 'Show language and interpreter need', def: true },
+      /* Off by default: the header is on screen whenever the chart is, often
+         where others can see it. */
+      { key: 'showSogi', kind: 'bool', label: 'Show gender identity and sexual orientation', def: false,
+        help: 'The header is visible to anyone who can open the chart, often on a shared screen.' },
+      { key: 'showSocial', kind: 'bool', label: 'Show marital, veteran and employment status', def: false },
       { key: 'customFields', kind: 'fields', label: 'Custom fields', choices: [], def: [] },
     ],
   },
   /* Scored instruments. One pattern for all of them: the latest score, its
      band and date up front; earlier administrations below; any row opens the
      captured answers in an overlay, and New opens the form itself. The full
-     instrument is never laid out in the header. */
+     instrument is never laid out in the header. PCL-5 (20 items) and AIMS (a
+     clinician's examination) always start on the full page (`addOnPage`). */
   { key: 'phq9', label: 'PHQ-9', icon: 'clipboard', module: 'PHQ', form: 'PHQ9', blurb: 'Depression severity.',
     options: [{ key: 'count', kind: 'choice', label: 'Earlier administrations to list', choices: ['2', '4'], def: '2' }] },
-  { key: 'pcl5', label: 'PCL-5', icon: 'clipboard', module: 'PCL5', form: 'PCL5', blurb: 'PTSD symptom severity.',
+  { key: 'pcl5', label: 'PCL-5', icon: 'clipboard', module: 'PCL5', form: 'PCL5', addOnPage: true, blurb: 'PTSD symptom severity.',
     options: [{ key: 'count', kind: 'choice', label: 'Earlier administrations to list', choices: ['2', '4'], def: '2' }] },
   { key: 'pcptsd5', label: 'PC-PTSD-5', icon: 'clipboard', module: 'PC-PTSD', form: 'PCPTSD5', blurb: 'Primary-care PTSD screen.',
     options: [{ key: 'count', kind: 'choice', label: 'Earlier administrations to list', choices: ['2', '4'], def: '2' }] },
@@ -195,7 +217,7 @@ const QUICKVIEW_CATALOG = [
     options: [{ key: 'count', kind: 'choice', label: 'Earlier administrations to list', choices: ['2', '4'], def: '2' }] },
   { key: 'audit', label: 'AUDIT', icon: 'clipboard', module: 'AUDIT', form: 'AUDIT', blurb: 'Alcohol use risk.',
     options: [{ key: 'count', kind: 'choice', label: 'Earlier administrations to list', choices: ['2', '4'], def: '2' }] },
-  { key: 'aims', label: 'AIMS', icon: 'clipboard', module: 'AIMS', form: 'AIMS', blurb: 'Involuntary movement scale.',
+  { key: 'aims', label: 'AIMS', icon: 'clipboard', module: 'AIMS', form: 'AIMS', addOnPage: true, blurb: 'Involuntary movement scale.',
     options: [{ key: 'count', kind: 'choice', label: 'Earlier administrations to list', choices: ['2', '4'], def: '2' }] },
   { key: 'sdoh', label: 'SDOH', icon: 'clipboard', module: 'SDOH', form: 'SDOH', blurb: 'Social needs screen.',
     options: [{ key: 'count', kind: 'choice', label: 'Earlier administrations to list', choices: ['2', '4'], def: '2' }] },

@@ -207,8 +207,8 @@ function DischargePlan({ client, config, onOpenModule }) {
        need to pick. Resolved and Inactive items stay off the document, and
        nothing on the chart changes status either way. */
     setSelection({
-      diagnoses: client.diagnoses.filter(d => isActiveStatus(d.status)),
-      problems: client.problems.filter(p => isActiveStatus(p.status)),
+      diagnoses: getDiagnoses(client).filter(d => isActiveStatus(d.status)),
+      problems: getProblems(client).filter(p => isActiveStatus(p.status)),
       capturedOn: isoOf(TODAY),
     });
     setStage('preview');
@@ -453,7 +453,7 @@ function SubSection({ title, children }) {
    chart list WITH status, and says plainly that discharging does not change
    it — so the rule is visible before the clinician ever hits save. */
 function DiagnosisSection({ client, onOpenModule }) {
-  const dx = client.diagnoses;
+  const dx = getDiagnoses(client);
   return (
     <SubSection title="Diagnosis">
       <div className="table-wrap">
@@ -532,7 +532,8 @@ function PrototypeBar({ config, onPrefill, onReset }) {
 const apptOutcome = (a, today) => {
   const d = _parse(a.date);
   if (!d) return 'Scheduled';
-  if (d > today) return 'Scheduled';
+  /* Booked for today and not yet checked in: still scheduled. */
+  if (d > today || (isoOf(d) === isoOf(today) && a.completion_status === 'Scheduled')) return 'Scheduled';
   const r = seed(a.appointment_id) % 10;
   return r === 0 ? 'No Show' : r === 1 ? 'Cancelled' : 'Attended';
 };
@@ -564,17 +565,11 @@ function useClientSummaryData(client) {
        sample_results}. Reading it as a list silently produced no due dates. */
     /* Age-appropriate instruments only: CANS/Vanderbilt for youth (through
        21, the usual CANS ceiling), ANSA for adults. */
-    const youth = client.age !== '' && client.age <= 21;
-    const cat = (((RD.assessments || {}).instruments) || [])
-      .filter(a => (/youth/i.test(a.domain) ? youth : /adult/i.test(a.domain) ? !youth : true));
+    /* Shared with the header's Assessments quick view (35-record-views.jsx),
+       so the two agree about what's due. */
+    const dueAssessments = dueAssessmentsFor(client);
     const results = ((RD.assessments || {}).sample_results) || [];
-    const dueAssessments = pick(cat, cid + 'due', Math.min(3, cat.length)).map(a => {
-      const every = cadenceDays(a.typical_cadence) || 180;
-      const last = addDays(today, -(every - (seed(cid + a.assessment_id) % 40) + 20));
-      const next = addDays(last, every);
-      const days = Math.round((next - today) / 86400000);
-      return { kind: 'Assessment', name: a.name, code: a.assessment_id, last, next, days };
-    });
+    const cat = ((RD.assessments || {}).instruments) || [];
     const consents = CONSENTS.map(c => {
       const r = seed(cid + c.name) % 5;
       /* An expiring consent is a signed one — r === 1 used to read as both
@@ -927,6 +922,8 @@ function ChartPage({ id, module, config }) {
         ? <DischargePlan client={client} config={config} onOpenModule={switchTab} />
         : doc && tab === docTab(doc)
         ? <DocumentView client={client} doc={doc} />
+        : tab === 'Cover Sheet'
+        ? <CoverSheetPage key={id} client={client} />
         : START_NOTE_TYPES.indexOf(tab) !== -1 || getNoteCtx(id, tab)
         ? <NotePage key={id + tab} client={client} doc={tab} />
         /* Every other module: its records and a form to add one. */
