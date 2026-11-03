@@ -4,7 +4,14 @@
  * `var(--token, #fallback)` pattern matches the convention already in app.css.
  * ------------------------------------------------------------------ */
 
-.page { max-width: 1320px; }
+/* Forms and tables stop at 1280px so lines and rows stay readable on a wide
+ * monitor. Card layouts (Home, the chart and its Client Summary) are fluid
+ * and fill the space, as the client header does; their tabs span it too.
+ * A fluid page's non-card content (every chart tab but the summary) sits in
+ * `.page-capped`. */
+.page { max-width: 1280px; }
+.page--fluid { max-width: none; }
+.page-capped { max-width: 1280px; }
 .page-head-row { display: flex; align-items: flex-end; gap: var(--sp-lg); margin-bottom: var(--sp-lg); }
 .page-sub { font-size: 13px; color: var(--foreground-secondary); margin-top: 2px; }
 .spacer { flex: 1; }
@@ -636,8 +643,10 @@
 .cph-link:hover { text-decoration: underline; }
 .cph-suffix { font-size: 12px; line-height: 16px; font-weight: 400; color: var(--foreground-secondary); flex: 1 0 0; min-width: 0; }
 
+/* Never narrower than one member (120px plus its padding), so a name
+   truncates inside the box instead of running past it. */
 .cph-team {
-  flex: 1 0 0; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-xs);
+  flex: 1 0 0; min-width: calc(120px + 2 * var(--sp-xs)); display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-xs);
   padding: var(--sp-xs); border-radius: var(--radius-md);
   background: var(--background-surface-brand-primary);
 }
@@ -645,7 +654,7 @@
    text — that is what the component does. */
 .cph-team-head { font-size: 14px; line-height: 20px; font-weight: 600; color: var(--foreground-interactive-primary-default); white-space: nowrap; }
 .cph-team-grid { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-xs); width: 100%; }
-.cph-member { display: flex; align-items: flex-start; gap: 4px; width: 120px; }  /* 120px raw */
+.cph-member { display: flex; align-items: flex-start; gap: 4px; width: 120px; max-width: 100%; min-width: 0; }  /* 120px raw */
 .cph-member-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .cph-member-name { font-size: 12px; line-height: 16px; font-weight: 500; color: var(--foreground-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cph-member-role { font-size: 11px; line-height: 16px; font-weight: 400; color: var(--foreground-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -916,6 +925,9 @@
   gap: var(--sp-lg); align-items: start;
 }
 .home-span2 { grid-column: 1 / -1; }
+.home-grid--three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.home-span-wide { grid-column: span 2; display: flex; }
+.home-span-wide > .panel { flex: 1; min-width: 0; margin-bottom: 0; }
 /* Panels are the grid items, so they must not carry their own bottom gap. */
 .home-grid > .panel, .home-grid > .home-span2 > .panel { margin-bottom: 0; }
 .home-grid > .home-span2 { display: flex; }
@@ -1014,6 +1026,11 @@
 .cs-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-lg); align-items: start; }
 .cs-pair > .panel { margin-bottom: 0; }
 .cs-rail { position: sticky; top: calc(var(--topnav-h) + var(--sp-lg)); min-width: 0; }
+/* Three columns (1200px of content and up): what needs doing; what's been
+ * done and what the client said; how they're tracking and what changed. The
+ * rail carries two cards here, too tall to pin, so it scrolls with the page. */
+.cs.cs--three { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(300px, 0.75fr); }
+.cs--three .cs-rail { position: static; display: flex; flex-direction: column; gap: var(--sp-lg); }
 
 /* --- Needs attention. Overdue is the only tinted row. --- */
 .cs-attn { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
@@ -1426,7 +1443,9 @@
 .cph-detail-inner { max-height: 46vh; overflow-y: auto; }
 .cph-qvx { flex: 1 1 100%; min-width: 0; display: flex; flex-direction: column; gap: var(--sp-sm); }
 .qvx-bar { display: flex; align-items: center; gap: var(--sp-md); flex-wrap: wrap; }
-.qvx-title { display: flex; align-items: baseline; gap: var(--sp-xs); flex: 1; min-width: 0; }
+/* Sized to its content, so when the bar is too narrow for title and actions
+   the actions drop to a second line rather than squeezing the title. */
+.qvx-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--sp-xs); flex: 1 1 auto; min-width: 0; }
 .qvx-name { font-size: 14px; font-weight: 600; color: var(--foreground-primary); }
 .qvx-meta { font-size: 12px; color: var(--foreground-secondary); }
 .qvx-acts { display: flex; align-items: center; gap: var(--sp-md); flex: none; }
@@ -1448,7 +1467,7 @@
 .qvx-vital-k { font-size: 12px; color: var(--foreground-secondary); }
 .qvx-vital-v { font-size: 16px; line-height: 22px; font-weight: 600; color: var(--foreground-primary); }
 .qvx-vital-u { font-size: 11px; font-weight: 400; color: var(--foreground-secondary); margin-left: 3px; }
-.qvx-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--sp-sm); }
+.qvx-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: var(--sp-sm); }
 .qvx-card { border: 1px solid var(--divider-primary, #e7eaec); border-radius: var(--radius-md); padding: var(--sp-sm) var(--sp-md); display: flex; flex-direction: column; gap: 4px; }
 .qvx-card-head { display: flex; align-items: center; gap: var(--sp-2xs); flex-wrap: wrap; }
 .qvx-card-meta, .qvx-card-hist { font-size: 12px; color: var(--foreground-secondary); }
@@ -1462,7 +1481,7 @@
 .qvx-score:focus-visible { outline: 2px solid var(--background-interactive-primary-default); outline-offset: 2px; }
 .qvx-score-n { font-family: var(--font-display); font-size: 32px; line-height: 36px; color: var(--foreground-primary); }
 .qvx-score-max { font-family: var(--font-sans); font-size: 13px; color: var(--foreground-secondary); margin-left: 2px; }
-.qvx-score-text { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.qvx-score-text { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; }
 .qvx-score-date { font-size: 12px; color: var(--foreground-secondary); }
 .qvx-filterrow { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-md); flex-wrap: wrap; }
 .qvx-filters { display: flex; gap: var(--sp-xs); flex-wrap: wrap; }
@@ -1477,6 +1496,9 @@
 .qvx-sub-name { font-size: 13px; font-weight: 600; color: var(--foreground-primary); flex: 1; }
 .qvx-side--wide { flex: 3 1 520px; }
 .qvx-kvgroups { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--sp-md) var(--sp-xl); }
+.qvx-kvgroup { min-width: 0; }
+/* One-line values with no break points (an email address): truncate. */
+.qvx-trunc { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .qvx-kvhead { font-size: 13px; font-weight: 600; color: var(--foreground-primary); margin-bottom: var(--sp-2xs); }
 .qvx-kv { margin: 0; display: flex; flex-direction: column; gap: 4px; }
 .qvx-kvrow { display: grid; grid-template-columns: minmax(110px, 40%) 1fr; gap: var(--sp-xs); font-size: 13px; line-height: 18px; }
@@ -2208,6 +2230,13 @@
 .cph--compact .cph-qvx .qvx-table { display: block; max-width: 100%; overflow-x: auto; }
 .cph--compact .cph-qvx .qvx-side { flex-basis: 100%; }
 .cph--compact .cph-qvx .qvx-table td:first-child { min-width: 180px; }
+.cph--compact .cph-qvx .qvx-vitals { grid-template-columns: repeat(2, minmax(0, 1fr)); flex-basis: 100%; }
+.cph--compact .cph-qvx .qvx-score { flex-basis: 100%; min-width: 0; }
+.cph--compact .cph-qvx .qvx-score .cph-qv-tag { white-space: normal; }
+/* Between phone and full width (header < 860px) the table keeps its full
+   width, its cells wrap and their side padding tightens, so a seven-column
+   table fits instead of running past the header. */
+.cph--narrow .cph-qvx .qvx-table th, .cph--narrow .cph-qvx .qvx-table td { white-space: normal; padding-left: var(--sp-xs); padding-right: var(--sp-xs); }
 
 /* ================= Header AI assistant =================
  * The one place the top bar leaves the DS on purpose: a frosted glass button

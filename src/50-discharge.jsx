@@ -703,115 +703,140 @@ function ClientSummary({ client, onOpenTab }) {
   const docs = showAllDocs ? d.docs : d.docs.slice(0, 4);
   const rate = d.past.length ? Math.round((d.attended / d.past.length) * 100) : null;
 
-  return (
-    <div className="cs">
-      <div className="cs-main">
-        {/* 1. What needs doing — this client's slice of the notification
-            center (urgent alerts, tasks waiting on me, Important notes) plus
-            due and expiring work. Hidden entirely when there is nothing. */}
-        <ClientAttentionPanel client={client} derived={d.attention} />
+  /* Laid out for its own width, as the client header is. Up to 1200px of
+     content (a 1280 viewport with the side nav closed): the main column and
+     the Activity rail, which stack on a narrow screen. Wider: three columns,
+     so the cards fill the space instead of a wide monitor leaving a margin. */
+  const [ref, w] = useElementWidth();
+  const three = w != null && w >= 1200;
+  const attention = (
+    <React.Fragment>
+      {/* 1. What needs doing — this client's slice of the notification
+          center (urgent alerts, tasks waiting on me, Important notes) plus
+          due and expiring work. Hidden entirely when there is nothing. */}
+      <ClientAttentionPanel client={client} derived={d.attention} />
 
-        {/* Care-team notes about this client — the same thread as the header's
-            Client Notes overlay, so read state is shared. */}
-        <ClientNotesPanel client={client} />
-
-        <div className="cs-pair">
-          {/* 2. What has been done */}
-          <Panel title="Recent Documentation"
-            action={d.docs.length > 4 ? <button className="lnk" onClick={() => setShowAllDocs(s => !s)}>{showAllDocs ? 'Show less' : 'Show all'}</button> : null}>
-            <ul className="cs-docs">
-              {docs.map(doc => (
-                <li key={doc.id}>
-                  <span className="cs-doc-main">
-                    <span className="cs-doc-name">{doc.name}</span>
-                    <span className="cs-doc-meta">{doc.kind} · {doc.by} · {fmtDate(doc.at)}</span>
-                  </span>
-                  <span className={'cs-doc-status' + (doc.status === 'Signed' ? '' : ' pending')}>{doc.status}</span>
-                </li>
-              ))}
-              {!docs.length && <div className="ov-empty">Nothing documented yet.</div>}
-            </ul>
-          </Panel>
-
-          {/* 3. What the client said */}
-          <Panel title="Messages">
-            <div className="cs-msgs">
-              {d.msgs.map(m => {
-                const fromClient = m.sender_type === 'client';
-                return (
-                  <div key={m.message_id} className={'cs-msg' + (fromClient ? ' in' : '')}>
-                    <div className="cs-msg-who">{fromClient ? client.shortName : sName(m.sender_id)}<span>{fmtDate(m.timestamp)}</span></div>
-                    <div className="cs-msg-body">{m.body}</div>
-                  </div>
-                );
-              })}
-              {!d.msgs.length && <div className="ov-empty">No correspondence.</div>}
+      {/* Care-team notes about this client — the same thread as the header's
+          Client Notes overlay, so read state is shared. */}
+      <ClientNotesPanel client={client} />
+    </React.Fragment>
+  );
+  const docsPanel = (
+    <Panel title="Recent Documentation"
+      action={d.docs.length > 4 ? <button className="lnk" onClick={() => setShowAllDocs(s => !s)}>{showAllDocs ? 'Show less' : 'Show all'}</button> : null}>
+      <ul className="cs-docs">
+        {docs.map(doc => (
+          <li key={doc.id}>
+            <span className="cs-doc-main">
+              <span className="cs-doc-name">{doc.name}</span>
+              <span className="cs-doc-meta">{doc.kind} · {doc.by} · {fmtDate(doc.at)}</span>
+            </span>
+            <span className={'cs-doc-status' + (doc.status === 'Signed' ? '' : ' pending')}>{doc.status}</span>
+          </li>
+        ))}
+        {!docs.length && <div className="ov-empty">Nothing documented yet.</div>}
+      </ul>
+    </Panel>
+  );
+  const msgsPanel = (
+    <Panel title="Messages">
+      <div className="cs-msgs">
+        {d.msgs.map(m => {
+          const fromClient = m.sender_type === 'client';
+          return (
+            <div key={m.message_id} className={'cs-msg' + (fromClient ? ' in' : '')}>
+              <div className="cs-msg-who">{fromClient ? client.shortName : sName(m.sender_id)}<span>{fmtDate(m.timestamp)}</span></div>
+              <div className="cs-msg-body">{m.body}</div>
             </div>
-            <div className="msgr-composer cs-composer">
-              <input placeholder={'Message ' + client.shortName + '...'} aria-label={'Message ' + client.shortName} />
-              <Button size="sm" variant="primary">Send</Button>
-            </div>
-          </Panel>
-        </div>
-
-        {/* 4. When they are in */}
-        <Panel title="Appointments"><ApptCalendar appts={d.appts} /></Panel>
-
-        {/* 5. How they are tracking */}
-        <Panel title="Engagement and Progress">
-          <div className="cs-metrics">
-            <div className="cs-metric">
-              <span className="cs-metric-val">{rate === null ? '—' : rate + '%'}</span>
-              <span className="cs-metric-label">Attendance</span>
-              <span className="cs-metric-sub">{d.attended} of {d.past.length} kept{d.noShows ? ' · ' + d.noShows + ' missed' : ''}</span>
-            </div>
-            <div className="cs-metric">
-              <span className="cs-metric-val">{d.goalsOnTrack}/{d.goalsTotal}</span>
-              <span className="cs-metric-label">Service plan goals on track</span>
-              <span className="cs-metric-sub">{client.program}</span>
-            </div>
-            {d.recorded ? (
-              <div className="cs-metric">
-                <span className="cs-metric-val">{d.recorded.score}</span>
-                <span className="cs-metric-label">{d.recordedInstrument ? d.recordedInstrument.name : 'Assessment'}</span>
-                <span className="cs-metric-sub">{d.recorded.interpretation} · {fmtDate(d.recorded.date)}</span>
-              </div>
-            ) : d.tracksProgress ? (
-              <div className="cs-metric">
-                <span className="cs-metric-val">
-                  {d.scores[d.scores.length - 1]}
-                  <span className={'cs-trend ' + (d.scores[d.scores.length - 1] < d.scores[0] ? 'down' : 'up')}>
-                    {d.scores[d.scores.length - 1] < d.scores[0] ? '↓' : '↑'}
-                  </span>
-                </span>
-                <span className="cs-metric-label">Acuity score</span>
-                <span className="cs-metric-sub">last three: {d.scores.join(' → ')}{d.scores[d.scores.length - 1] < d.scores[0] ? ' · improving' : ' · worsening'}</span>
-              </div>
-            ) : (
-              <div className="cs-metric cs-metric--muted">
-                <span className="cs-metric-val">—</span>
-                <span className="cs-metric-label">Acuity score</span>
-                <span className="cs-metric-sub">not tracked for {client.program}</span>
-              </div>
-            )}
-          </div>
-        </Panel>
+          );
+        })}
+        {!d.msgs.length && <div className="ov-empty">No correspondence.</div>}
       </div>
+      <div className="msgr-composer cs-composer">
+        <input placeholder={'Message ' + client.shortName + '...'} aria-label={'Message ' + client.shortName} />
+        <Button size="sm" variant="primary">Send</Button>
+      </div>
+    </Panel>
+  );
+  const apptsPanel = <Panel title="Appointments"><ApptCalendar appts={d.appts} /></Panel>;
+  const engagement = (
+    <Panel title="Engagement and Progress">
+      <div className="cs-metrics">
+        <div className="cs-metric">
+          <span className="cs-metric-val">{rate === null ? '—' : rate + '%'}</span>
+          <span className="cs-metric-label">Attendance</span>
+          <span className="cs-metric-sub">{d.attended} of {d.past.length} kept{d.noShows ? ' · ' + d.noShows + ' missed' : ''}</span>
+        </div>
+        <div className="cs-metric">
+          <span className="cs-metric-val">{d.goalsOnTrack}/{d.goalsTotal}</span>
+          <span className="cs-metric-label">Service plan goals on track</span>
+          <span className="cs-metric-sub">{client.program}</span>
+        </div>
+        {d.recorded ? (
+          <div className="cs-metric">
+            <span className="cs-metric-val">{d.recorded.score}</span>
+            <span className="cs-metric-label">{d.recordedInstrument ? d.recordedInstrument.name : 'Assessment'}</span>
+            <span className="cs-metric-sub">{d.recorded.interpretation} · {fmtDate(d.recorded.date)}</span>
+          </div>
+        ) : d.tracksProgress ? (
+          <div className="cs-metric">
+            <span className="cs-metric-val">
+              {d.scores[d.scores.length - 1]}
+              <span className={'cs-trend ' + (d.scores[d.scores.length - 1] < d.scores[0] ? 'down' : 'up')}>
+                {d.scores[d.scores.length - 1] < d.scores[0] ? '↓' : '↑'}
+              </span>
+            </span>
+            <span className="cs-metric-label">Acuity score</span>
+            <span className="cs-metric-sub">last three: {d.scores.join(' → ')}{d.scores[d.scores.length - 1] < d.scores[0] ? ' · improving' : ' · worsening'}</span>
+          </div>
+        ) : (
+          <div className="cs-metric cs-metric--muted">
+            <span className="cs-metric-val">—</span>
+            <span className="cs-metric-label">Acuity score</span>
+            <span className="cs-metric-sub">not tracked for {client.program}</span>
+          </div>
+        )}
+      </div>
+    </Panel>
+  );
+  const activity = (
+    <Panel title="Activity">
+      <ol className="cs-timeline">
+        {d.timeline.map((t, i) => (
+          <li key={i}>
+            <span className="cs-tl-when">{fmtDate(t.at)}</span>
+            <span className="cs-tl-what">{t.what}</span>
+            <span className="cs-tl-who">{t.who}</span>
+          </li>
+        ))}
+      </ol>
+    </Panel>
+  );
 
-      {/* 6. What changed recently */}
-      <aside className="cs-rail">
-        <Panel title="Activity">
-          <ol className="cs-timeline">
-            {d.timeline.map((t, i) => (
-              <li key={i}>
-                <span className="cs-tl-when">{fmtDate(t.at)}</span>
-                <span className="cs-tl-what">{t.what}</span>
-                <span className="cs-tl-who">{t.who}</span>
-              </li>
-            ))}
-          </ol>
-        </Panel>
-      </aside>
+  /* The reading order is the same in both: what needs doing, what's been
+     done, what the client said, when they're in, how they're tracking, and
+     what changed recently. */
+  return (
+    <div ref={ref}>
+      {three ? (
+        <div className="cs cs--three">
+          <div className="cs-main">{attention}</div>
+          <div className="cs-main">{docsPanel}{msgsPanel}{apptsPanel}</div>
+          <aside className="cs-rail">{engagement}{activity}</aside>
+        </div>
+      ) : (
+        <div className="cs">
+          <div className="cs-main">
+            {attention}
+            {/* 2. What has been done · 3. What the client said */}
+            <div className="cs-pair">{docsPanel}{msgsPanel}</div>
+            {/* 4. When they are in · 5. How they are tracking */}
+            {apptsPanel}{engagement}
+          </div>
+          {/* 6. What changed recently */}
+          <aside className="cs-rail">{activity}</aside>
+        </div>
+      )}
     </div>
   );
 }
@@ -906,7 +931,7 @@ function ChartPage({ id, module, config }) {
   toHome.current = () => switchTab(CHART_HOME_TAB);
 
   return (
-    <div className="page">
+    <div className="page page--fluid">
       {/* Breadcrumbs and the client header are chrome now, not page content —
           `ChartChrome` in the app shell renders them at full width above this,
           per artboard 4433:94068. The hand-rolled `.clinical-strip` that used
@@ -914,11 +939,14 @@ function ChartPage({ id, module, config }) {
       {/* Never wraps: overflow goes to a More menu, per the DS tabs docs. */}
       {/* A document opened from a notification or the nav joins the strip as
           its own tab, so the strip always shows where you are. */}
+      {/* The tabs span the page like the header above them; the summary's
+          cards fill it too. Every other tab is a form or a table, held at
+          1280px so lines and rows stay readable on a wide monitor. */}
       <TabStrip className="chart-tabs" tabs={CHART_TABS.indexOf(tab) === -1 ? CHART_TABS.concat([tab]) : CHART_TABS} active={tab} onSelect={switchTab} />
 
       {tab === CHART_HOME_TAB
         ? <ClientSummary client={client} onOpenTab={switchTab} />
-        : tab === 'Discharge Plan'
+        : <div className="page-capped">{tab === 'Discharge Plan'
         ? <DischargePlan client={client} config={config} onOpenModule={switchTab} />
         : doc && tab === docTab(doc)
         ? <DocumentView client={client} doc={doc} />
@@ -927,7 +955,7 @@ function ChartPage({ id, module, config }) {
         : START_NOTE_TYPES.indexOf(tab) !== -1 || getNoteCtx(id, tab)
         ? <NotePage key={id + tab} client={client} doc={tab} />
         /* Every other module: its records and a form to add one. */
-        : <ClientModulePage key={id + tab} client={client} module={tab} />}
+        : <ClientModulePage key={id + tab} client={client} module={tab} />}</div>}
     </div>
   );
 }

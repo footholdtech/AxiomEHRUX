@@ -910,7 +910,12 @@ function PillPager({ views, active, onSelect, maxRows = 2 }) {
     const full = wrap.clientWidth;
     let p = paginate(full);
     if (p.length > 1) p = paginate(full - ((arrowsRef.current && arrowsRef.current.offsetWidth) || 104) - GAP);
-    setPages(p);
+    /* Only a real repagination counts. Paging to a one-row page makes the
+       pager shorter, which fires the observer; handing back an equal but new
+       array would re-run the effect below and snap back to the open pill's
+       page — the "flash" on the last page. */
+    const sig = JSON.stringify(p);
+    setPages(prev => (JSON.stringify(prev) === sig ? prev : p));
   }, [maxRows]);
 
   useEffect(() => {

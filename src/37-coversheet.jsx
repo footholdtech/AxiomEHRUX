@@ -96,7 +96,9 @@ function contactGroups(cs, o, preview) {
       ['Home', p.home ? tel(p.home) : null],
       p.dnc && ['Calls', <KvTag warn>Do Not Call</KvTag>],
       o.showPreferred && ['Preferred contact', p.preferred]]],
-    ['Email and Portal', [['Email', p.email ? (preview ? p.email : <a className="cph-link" href={'mailto:' + p.email}>{p.email}</a>) : null],
+    /* An address has no break points, so it truncates in place; the full
+       address is the tooltip. */
+    ['Email and Portal', [['Email', p.email ? <span className="qvx-trunc" title={p.email}>{preview ? p.email : <a className="cph-link" href={'mailto:' + p.email}>{p.email}</a>}</span> : null],
       ['Client portal', p.portal ? 'Active' : <KvTag>Not set up</KvTag>],
       o.showPreferred && ['Preferred language', cs.personal.preferredLanguage]]],
     o.showAddress && ['Address', [

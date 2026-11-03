@@ -68,7 +68,12 @@ function useElementWidth() {
   const ref = useRef(null);
   const [w, setW] = useState(null);
   useEffect(() => {
-    const el = ref.current; if (!el || !window.ResizeObserver) return;
+    const el = ref.current; if (!el) return;
+    /* Measured once up front, so the first paint already has the right
+       layout, and so a throttled tab whose observer never fires still does. */
+    const cs = getComputedStyle(el);
+    setW(Math.round(el.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)));
+    if (!window.ResizeObserver) return;
     const ro = new ResizeObserver(([e]) => setW(Math.round(e.contentRect.width)));
     ro.observe(el);
     return () => ro.disconnect();

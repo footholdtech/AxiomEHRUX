@@ -1516,7 +1516,14 @@ input { font-family: inherit; }
  * `var(--token, #fallback)` pattern matches the convention already in app.css.
  * ------------------------------------------------------------------ */
 
-.page { max-width: 1320px; }
+/* Forms and tables stop at 1280px so lines and rows stay readable on a wide
+ * monitor. Card layouts (Home, the chart and its Client Summary) are fluid
+ * and fill the space, as the client header does; their tabs span it too.
+ * A fluid page's non-card content (every chart tab but the summary) sits in
+ * `.page-capped`. */
+.page { max-width: 1280px; }
+.page--fluid { max-width: none; }
+.page-capped { max-width: 1280px; }
 .page-head-row { display: flex; align-items: flex-end; gap: var(--sp-lg); margin-bottom: var(--sp-lg); }
 .page-sub { font-size: 13px; color: var(--foreground-secondary); margin-top: 2px; }
 .spacer { flex: 1; }
@@ -2148,8 +2155,10 @@ input { font-family: inherit; }
 .cph-link:hover { text-decoration: underline; }
 .cph-suffix { font-size: 12px; line-height: 16px; font-weight: 400; color: var(--foreground-secondary); flex: 1 0 0; min-width: 0; }
 
+/* Never narrower than one member (120px plus its padding), so a name
+   truncates inside the box instead of running past it. */
 .cph-team {
-  flex: 1 0 0; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-xs);
+  flex: 1 0 0; min-width: calc(120px + 2 * var(--sp-xs)); display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-xs);
   padding: var(--sp-xs); border-radius: var(--radius-md);
   background: var(--background-surface-brand-primary);
 }
@@ -2157,7 +2166,7 @@ input { font-family: inherit; }
    text — that is what the component does. */
 .cph-team-head { font-size: 14px; line-height: 20px; font-weight: 600; color: var(--foreground-interactive-primary-default); white-space: nowrap; }
 .cph-team-grid { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-xs); width: 100%; }
-.cph-member { display: flex; align-items: flex-start; gap: 4px; width: 120px; }  /* 120px raw */
+.cph-member { display: flex; align-items: flex-start; gap: 4px; width: 120px; max-width: 100%; min-width: 0; }  /* 120px raw */
 .cph-member-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .cph-member-name { font-size: 12px; line-height: 16px; font-weight: 500; color: var(--foreground-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cph-member-role { font-size: 11px; line-height: 16px; font-weight: 400; color: var(--foreground-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -2428,6 +2437,9 @@ input { font-family: inherit; }
   gap: var(--sp-lg); align-items: start;
 }
 .home-span2 { grid-column: 1 / -1; }
+.home-grid--three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.home-span-wide { grid-column: span 2; display: flex; }
+.home-span-wide > .panel { flex: 1; min-width: 0; margin-bottom: 0; }
 /* Panels are the grid items, so they must not carry their own bottom gap. */
 .home-grid > .panel, .home-grid > .home-span2 > .panel { margin-bottom: 0; }
 .home-grid > .home-span2 { display: flex; }
@@ -2526,6 +2538,11 @@ input { font-family: inherit; }
 .cs-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-lg); align-items: start; }
 .cs-pair > .panel { margin-bottom: 0; }
 .cs-rail { position: sticky; top: calc(var(--topnav-h) + var(--sp-lg)); min-width: 0; }
+/* Three columns (1200px of content and up): what needs doing; what's been
+ * done and what the client said; how they're tracking and what changed. The
+ * rail carries two cards here, too tall to pin, so it scrolls with the page. */
+.cs.cs--three { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(300px, 0.75fr); }
+.cs--three .cs-rail { position: static; display: flex; flex-direction: column; gap: var(--sp-lg); }
 
 /* --- Needs attention. Overdue is the only tinted row. --- */
 .cs-attn { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
@@ -2938,7 +2955,9 @@ input { font-family: inherit; }
 .cph-detail-inner { max-height: 46vh; overflow-y: auto; }
 .cph-qvx { flex: 1 1 100%; min-width: 0; display: flex; flex-direction: column; gap: var(--sp-sm); }
 .qvx-bar { display: flex; align-items: center; gap: var(--sp-md); flex-wrap: wrap; }
-.qvx-title { display: flex; align-items: baseline; gap: var(--sp-xs); flex: 1; min-width: 0; }
+/* Sized to its content, so when the bar is too narrow for title and actions
+   the actions drop to a second line rather than squeezing the title. */
+.qvx-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--sp-xs); flex: 1 1 auto; min-width: 0; }
 .qvx-name { font-size: 14px; font-weight: 600; color: var(--foreground-primary); }
 .qvx-meta { font-size: 12px; color: var(--foreground-secondary); }
 .qvx-acts { display: flex; align-items: center; gap: var(--sp-md); flex: none; }
@@ -2960,7 +2979,7 @@ input { font-family: inherit; }
 .qvx-vital-k { font-size: 12px; color: var(--foreground-secondary); }
 .qvx-vital-v { font-size: 16px; line-height: 22px; font-weight: 600; color: var(--foreground-primary); }
 .qvx-vital-u { font-size: 11px; font-weight: 400; color: var(--foreground-secondary); margin-left: 3px; }
-.qvx-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--sp-sm); }
+.qvx-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: var(--sp-sm); }
 .qvx-card { border: 1px solid var(--divider-primary, #e7eaec); border-radius: var(--radius-md); padding: var(--sp-sm) var(--sp-md); display: flex; flex-direction: column; gap: 4px; }
 .qvx-card-head { display: flex; align-items: center; gap: var(--sp-2xs); flex-wrap: wrap; }
 .qvx-card-meta, .qvx-card-hist { font-size: 12px; color: var(--foreground-secondary); }
@@ -2974,7 +2993,7 @@ input { font-family: inherit; }
 .qvx-score:focus-visible { outline: 2px solid var(--background-interactive-primary-default); outline-offset: 2px; }
 .qvx-score-n { font-family: var(--font-display); font-size: 32px; line-height: 36px; color: var(--foreground-primary); }
 .qvx-score-max { font-family: var(--font-sans); font-size: 13px; color: var(--foreground-secondary); margin-left: 2px; }
-.qvx-score-text { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.qvx-score-text { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; }
 .qvx-score-date { font-size: 12px; color: var(--foreground-secondary); }
 .qvx-filterrow { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-md); flex-wrap: wrap; }
 .qvx-filters { display: flex; gap: var(--sp-xs); flex-wrap: wrap; }
@@ -2989,6 +3008,9 @@ input { font-family: inherit; }
 .qvx-sub-name { font-size: 13px; font-weight: 600; color: var(--foreground-primary); flex: 1; }
 .qvx-side--wide { flex: 3 1 520px; }
 .qvx-kvgroups { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--sp-md) var(--sp-xl); }
+.qvx-kvgroup { min-width: 0; }
+/* One-line values with no break points (an email address): truncate. */
+.qvx-trunc { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .qvx-kvhead { font-size: 13px; font-weight: 600; color: var(--foreground-primary); margin-bottom: var(--sp-2xs); }
 .qvx-kv { margin: 0; display: flex; flex-direction: column; gap: 4px; }
 .qvx-kvrow { display: grid; grid-template-columns: minmax(110px, 40%) 1fr; gap: var(--sp-xs); font-size: 13px; line-height: 18px; }
@@ -3720,6 +3742,13 @@ input { font-family: inherit; }
 .cph--compact .cph-qvx .qvx-table { display: block; max-width: 100%; overflow-x: auto; }
 .cph--compact .cph-qvx .qvx-side { flex-basis: 100%; }
 .cph--compact .cph-qvx .qvx-table td:first-child { min-width: 180px; }
+.cph--compact .cph-qvx .qvx-vitals { grid-template-columns: repeat(2, minmax(0, 1fr)); flex-basis: 100%; }
+.cph--compact .cph-qvx .qvx-score { flex-basis: 100%; min-width: 0; }
+.cph--compact .cph-qvx .qvx-score .cph-qv-tag { white-space: normal; }
+/* Between phone and full width (header < 860px) the table keeps its full
+   width, its cells wrap and their side padding tightens, so a seven-column
+   table fits instead of running past the header. */
+.cph--narrow .cph-qvx .qvx-table th, .cph--narrow .cph-qvx .qvx-table td { white-space: normal; padding-left: var(--sp-xs); padding-right: var(--sp-xs); }
 
 /* ================= Header AI assistant =================
  * The one place the top bar leaves the DS on purpose: a frosted glass button
@@ -4499,7 +4528,12 @@ function useElementWidth() {
   const ref = useRef(null);
   const [w, setW] = useState(null);
   useEffect(() => {
-    const el = ref.current; if (!el || !window.ResizeObserver) return;
+    const el = ref.current; if (!el) return;
+    /* Measured once up front, so the first paint already has the right
+       layout, and so a throttled tab whose observer never fires still does. */
+    const cs = getComputedStyle(el);
+    setW(Math.round(el.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)));
+    if (!window.ResizeObserver) return;
     const ro = new ResizeObserver(([e]) => setW(Math.round(e.contentRect.width)));
     ro.observe(el);
     return () => ro.disconnect();
@@ -7654,7 +7688,12 @@ function PillPager({ views, active, onSelect, maxRows = 2 }) {
     const full = wrap.clientWidth;
     let p = paginate(full);
     if (p.length > 1) p = paginate(full - ((arrowsRef.current && arrowsRef.current.offsetWidth) || 104) - GAP);
-    setPages(p);
+    /* Only a real repagination counts. Paging to a one-row page makes the
+       pager shorter, which fires the observer; handing back an equal but new
+       array would re-run the effect below and snap back to the open pill's
+       page — the "flash" on the last page. */
+    const sig = JSON.stringify(p);
+    setPages(prev => (JSON.stringify(prev) === sig ? prev : p));
   }, [maxRows]);
 
   useEffect(() => {
@@ -11304,7 +11343,9 @@ function contactGroups(cs, o, preview) {
       ['Home', p.home ? tel(p.home) : null],
       p.dnc && ['Calls', <KvTag warn>Do Not Call</KvTag>],
       o.showPreferred && ['Preferred contact', p.preferred]]],
-    ['Email and Portal', [['Email', p.email ? (preview ? p.email : <a className="cph-link" href={'mailto:' + p.email}>{p.email}</a>) : null],
+    /* An address has no break points, so it truncates in place; the full
+       address is the tooltip. */
+    ['Email and Portal', [['Email', p.email ? <span className="qvx-trunc" title={p.email}>{preview ? p.email : <a className="cph-link" href={'mailto:' + p.email}>{p.email}</a>}</span> : null],
       ['Client portal', p.portal ? 'Active' : <KvTag>Not set up</KvTag>],
       o.showPreferred && ['Preferred language', cs.personal.preferredLanguage]]],
     o.showAddress && ['Address', [
@@ -12406,8 +12447,19 @@ function ProductivityModule() {
 function Home() {
   const greeting = TODAY.getHours() < 12 ? 'Good morning' : 'Good afternoon';
   const todayLabel = TODAY.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  /* Laid out for its own width, as the client header is. Two columns, per
+     the artboard, with the three table modules as full-width bands. From
+     1200px of content (a 1280 viewport with the side nav closed) the grid
+     has three columns, so a wide monitor fills rather than leaving a margin.
+     Each row between the bands pairs a narrow card with one spanning two
+     columns: the modules holding a table or a two-pane view (Critical Info,
+     Messenger, Pending Labs) need ~540px and get two-thirds; the lists get
+     one. Rows stay full and the order is the artboard's. */
+  const [ref, w] = useElementWidth();
+  const three = w != null && w >= 1200;
+  const wide = node => (three ? <div className="home-span-wide">{node}</div> : node);
   return (
-    <div className="page home">
+    <div className="page page--fluid home" ref={ref}>
       <div className="page-head-row">
         <div>
           <h1 className="page-title">{greeting}, {ME.name.split(' ')[0]}</h1>
@@ -12415,15 +12467,14 @@ function Home() {
         </div>
       </div>
 
-      {/* Two-column grid; three modules span both, per the artboard. */}
-      <div className="home-grid">
+      <div className={'home-grid' + (three ? ' home-grid--three' : '')}>
         <div className="home-span2"><MyClientsModule /></div>
         <ApprovalsTasksModule />
-        <CriticalInfoModule />
+        {wide(<CriticalInfoModule />)}
         <div className="home-span2"><MyTeamModule /></div>
-        <MessengerModule />
+        {wide(<MessengerModule />)}
         <UpcomingAppointmentsModule />
-        <PendingLabsModule />
+        {wide(<PendingLabsModule />)}
         <AnnouncementsModule />
         <div className="home-span2"><ProductivityModule /></div>
       </div>
@@ -16160,115 +16211,140 @@ function ClientSummary({ client, onOpenTab }) {
   const docs = showAllDocs ? d.docs : d.docs.slice(0, 4);
   const rate = d.past.length ? Math.round((d.attended / d.past.length) * 100) : null;
 
-  return (
-    <div className="cs">
-      <div className="cs-main">
-        {/* 1. What needs doing — this client's slice of the notification
-            center (urgent alerts, tasks waiting on me, Important notes) plus
-            due and expiring work. Hidden entirely when there is nothing. */}
-        <ClientAttentionPanel client={client} derived={d.attention} />
+  /* Laid out for its own width, as the client header is. Up to 1200px of
+     content (a 1280 viewport with the side nav closed): the main column and
+     the Activity rail, which stack on a narrow screen. Wider: three columns,
+     so the cards fill the space instead of a wide monitor leaving a margin. */
+  const [ref, w] = useElementWidth();
+  const three = w != null && w >= 1200;
+  const attention = (
+    <React.Fragment>
+      {/* 1. What needs doing — this client's slice of the notification
+          center (urgent alerts, tasks waiting on me, Important notes) plus
+          due and expiring work. Hidden entirely when there is nothing. */}
+      <ClientAttentionPanel client={client} derived={d.attention} />
 
-        {/* Care-team notes about this client — the same thread as the header's
-            Client Notes overlay, so read state is shared. */}
-        <ClientNotesPanel client={client} />
-
-        <div className="cs-pair">
-          {/* 2. What has been done */}
-          <Panel title="Recent Documentation"
-            action={d.docs.length > 4 ? <button className="lnk" onClick={() => setShowAllDocs(s => !s)}>{showAllDocs ? 'Show less' : 'Show all'}</button> : null}>
-            <ul className="cs-docs">
-              {docs.map(doc => (
-                <li key={doc.id}>
-                  <span className="cs-doc-main">
-                    <span className="cs-doc-name">{doc.name}</span>
-                    <span className="cs-doc-meta">{doc.kind} · {doc.by} · {fmtDate(doc.at)}</span>
-                  </span>
-                  <span className={'cs-doc-status' + (doc.status === 'Signed' ? '' : ' pending')}>{doc.status}</span>
-                </li>
-              ))}
-              {!docs.length && <div className="ov-empty">Nothing documented yet.</div>}
-            </ul>
-          </Panel>
-
-          {/* 3. What the client said */}
-          <Panel title="Messages">
-            <div className="cs-msgs">
-              {d.msgs.map(m => {
-                const fromClient = m.sender_type === 'client';
-                return (
-                  <div key={m.message_id} className={'cs-msg' + (fromClient ? ' in' : '')}>
-                    <div className="cs-msg-who">{fromClient ? client.shortName : sName(m.sender_id)}<span>{fmtDate(m.timestamp)}</span></div>
-                    <div className="cs-msg-body">{m.body}</div>
-                  </div>
-                );
-              })}
-              {!d.msgs.length && <div className="ov-empty">No correspondence.</div>}
+      {/* Care-team notes about this client — the same thread as the header's
+          Client Notes overlay, so read state is shared. */}
+      <ClientNotesPanel client={client} />
+    </React.Fragment>
+  );
+  const docsPanel = (
+    <Panel title="Recent Documentation"
+      action={d.docs.length > 4 ? <button className="lnk" onClick={() => setShowAllDocs(s => !s)}>{showAllDocs ? 'Show less' : 'Show all'}</button> : null}>
+      <ul className="cs-docs">
+        {docs.map(doc => (
+          <li key={doc.id}>
+            <span className="cs-doc-main">
+              <span className="cs-doc-name">{doc.name}</span>
+              <span className="cs-doc-meta">{doc.kind} · {doc.by} · {fmtDate(doc.at)}</span>
+            </span>
+            <span className={'cs-doc-status' + (doc.status === 'Signed' ? '' : ' pending')}>{doc.status}</span>
+          </li>
+        ))}
+        {!docs.length && <div className="ov-empty">Nothing documented yet.</div>}
+      </ul>
+    </Panel>
+  );
+  const msgsPanel = (
+    <Panel title="Messages">
+      <div className="cs-msgs">
+        {d.msgs.map(m => {
+          const fromClient = m.sender_type === 'client';
+          return (
+            <div key={m.message_id} className={'cs-msg' + (fromClient ? ' in' : '')}>
+              <div className="cs-msg-who">{fromClient ? client.shortName : sName(m.sender_id)}<span>{fmtDate(m.timestamp)}</span></div>
+              <div className="cs-msg-body">{m.body}</div>
             </div>
-            <div className="msgr-composer cs-composer">
-              <input placeholder={'Message ' + client.shortName + '...'} aria-label={'Message ' + client.shortName} />
-              <Button size="sm" variant="primary">Send</Button>
-            </div>
-          </Panel>
-        </div>
-
-        {/* 4. When they are in */}
-        <Panel title="Appointments"><ApptCalendar appts={d.appts} /></Panel>
-
-        {/* 5. How they are tracking */}
-        <Panel title="Engagement and Progress">
-          <div className="cs-metrics">
-            <div className="cs-metric">
-              <span className="cs-metric-val">{rate === null ? '—' : rate + '%'}</span>
-              <span className="cs-metric-label">Attendance</span>
-              <span className="cs-metric-sub">{d.attended} of {d.past.length} kept{d.noShows ? ' · ' + d.noShows + ' missed' : ''}</span>
-            </div>
-            <div className="cs-metric">
-              <span className="cs-metric-val">{d.goalsOnTrack}/{d.goalsTotal}</span>
-              <span className="cs-metric-label">Service plan goals on track</span>
-              <span className="cs-metric-sub">{client.program}</span>
-            </div>
-            {d.recorded ? (
-              <div className="cs-metric">
-                <span className="cs-metric-val">{d.recorded.score}</span>
-                <span className="cs-metric-label">{d.recordedInstrument ? d.recordedInstrument.name : 'Assessment'}</span>
-                <span className="cs-metric-sub">{d.recorded.interpretation} · {fmtDate(d.recorded.date)}</span>
-              </div>
-            ) : d.tracksProgress ? (
-              <div className="cs-metric">
-                <span className="cs-metric-val">
-                  {d.scores[d.scores.length - 1]}
-                  <span className={'cs-trend ' + (d.scores[d.scores.length - 1] < d.scores[0] ? 'down' : 'up')}>
-                    {d.scores[d.scores.length - 1] < d.scores[0] ? '↓' : '↑'}
-                  </span>
-                </span>
-                <span className="cs-metric-label">Acuity score</span>
-                <span className="cs-metric-sub">last three: {d.scores.join(' → ')}{d.scores[d.scores.length - 1] < d.scores[0] ? ' · improving' : ' · worsening'}</span>
-              </div>
-            ) : (
-              <div className="cs-metric cs-metric--muted">
-                <span className="cs-metric-val">—</span>
-                <span className="cs-metric-label">Acuity score</span>
-                <span className="cs-metric-sub">not tracked for {client.program}</span>
-              </div>
-            )}
-          </div>
-        </Panel>
+          );
+        })}
+        {!d.msgs.length && <div className="ov-empty">No correspondence.</div>}
       </div>
+      <div className="msgr-composer cs-composer">
+        <input placeholder={'Message ' + client.shortName + '...'} aria-label={'Message ' + client.shortName} />
+        <Button size="sm" variant="primary">Send</Button>
+      </div>
+    </Panel>
+  );
+  const apptsPanel = <Panel title="Appointments"><ApptCalendar appts={d.appts} /></Panel>;
+  const engagement = (
+    <Panel title="Engagement and Progress">
+      <div className="cs-metrics">
+        <div className="cs-metric">
+          <span className="cs-metric-val">{rate === null ? '—' : rate + '%'}</span>
+          <span className="cs-metric-label">Attendance</span>
+          <span className="cs-metric-sub">{d.attended} of {d.past.length} kept{d.noShows ? ' · ' + d.noShows + ' missed' : ''}</span>
+        </div>
+        <div className="cs-metric">
+          <span className="cs-metric-val">{d.goalsOnTrack}/{d.goalsTotal}</span>
+          <span className="cs-metric-label">Service plan goals on track</span>
+          <span className="cs-metric-sub">{client.program}</span>
+        </div>
+        {d.recorded ? (
+          <div className="cs-metric">
+            <span className="cs-metric-val">{d.recorded.score}</span>
+            <span className="cs-metric-label">{d.recordedInstrument ? d.recordedInstrument.name : 'Assessment'}</span>
+            <span className="cs-metric-sub">{d.recorded.interpretation} · {fmtDate(d.recorded.date)}</span>
+          </div>
+        ) : d.tracksProgress ? (
+          <div className="cs-metric">
+            <span className="cs-metric-val">
+              {d.scores[d.scores.length - 1]}
+              <span className={'cs-trend ' + (d.scores[d.scores.length - 1] < d.scores[0] ? 'down' : 'up')}>
+                {d.scores[d.scores.length - 1] < d.scores[0] ? '↓' : '↑'}
+              </span>
+            </span>
+            <span className="cs-metric-label">Acuity score</span>
+            <span className="cs-metric-sub">last three: {d.scores.join(' → ')}{d.scores[d.scores.length - 1] < d.scores[0] ? ' · improving' : ' · worsening'}</span>
+          </div>
+        ) : (
+          <div className="cs-metric cs-metric--muted">
+            <span className="cs-metric-val">—</span>
+            <span className="cs-metric-label">Acuity score</span>
+            <span className="cs-metric-sub">not tracked for {client.program}</span>
+          </div>
+        )}
+      </div>
+    </Panel>
+  );
+  const activity = (
+    <Panel title="Activity">
+      <ol className="cs-timeline">
+        {d.timeline.map((t, i) => (
+          <li key={i}>
+            <span className="cs-tl-when">{fmtDate(t.at)}</span>
+            <span className="cs-tl-what">{t.what}</span>
+            <span className="cs-tl-who">{t.who}</span>
+          </li>
+        ))}
+      </ol>
+    </Panel>
+  );
 
-      {/* 6. What changed recently */}
-      <aside className="cs-rail">
-        <Panel title="Activity">
-          <ol className="cs-timeline">
-            {d.timeline.map((t, i) => (
-              <li key={i}>
-                <span className="cs-tl-when">{fmtDate(t.at)}</span>
-                <span className="cs-tl-what">{t.what}</span>
-                <span className="cs-tl-who">{t.who}</span>
-              </li>
-            ))}
-          </ol>
-        </Panel>
-      </aside>
+  /* The reading order is the same in both: what needs doing, what's been
+     done, what the client said, when they're in, how they're tracking, and
+     what changed recently. */
+  return (
+    <div ref={ref}>
+      {three ? (
+        <div className="cs cs--three">
+          <div className="cs-main">{attention}</div>
+          <div className="cs-main">{docsPanel}{msgsPanel}{apptsPanel}</div>
+          <aside className="cs-rail">{engagement}{activity}</aside>
+        </div>
+      ) : (
+        <div className="cs">
+          <div className="cs-main">
+            {attention}
+            {/* 2. What has been done · 3. What the client said */}
+            <div className="cs-pair">{docsPanel}{msgsPanel}</div>
+            {/* 4. When they are in · 5. How they are tracking */}
+            {apptsPanel}{engagement}
+          </div>
+          {/* 6. What changed recently */}
+          <aside className="cs-rail">{activity}</aside>
+        </div>
+      )}
     </div>
   );
 }
@@ -16363,7 +16439,7 @@ function ChartPage({ id, module, config }) {
   toHome.current = () => switchTab(CHART_HOME_TAB);
 
   return (
-    <div className="page">
+    <div className="page page--fluid">
       {/* Breadcrumbs and the client header are chrome now, not page content —
           `ChartChrome` in the app shell renders them at full width above this,
           per artboard 4433:94068. The hand-rolled `.clinical-strip` that used
@@ -16371,11 +16447,14 @@ function ChartPage({ id, module, config }) {
       {/* Never wraps: overflow goes to a More menu, per the DS tabs docs. */}
       {/* A document opened from a notification or the nav joins the strip as
           its own tab, so the strip always shows where you are. */}
+      {/* The tabs span the page like the header above them; the summary's
+          cards fill it too. Every other tab is a form or a table, held at
+          1280px so lines and rows stay readable on a wide monitor. */}
       <TabStrip className="chart-tabs" tabs={CHART_TABS.indexOf(tab) === -1 ? CHART_TABS.concat([tab]) : CHART_TABS} active={tab} onSelect={switchTab} />
 
       {tab === CHART_HOME_TAB
         ? <ClientSummary client={client} onOpenTab={switchTab} />
-        : tab === 'Discharge Plan'
+        : <div className="page-capped">{tab === 'Discharge Plan'
         ? <DischargePlan client={client} config={config} onOpenModule={switchTab} />
         : doc && tab === docTab(doc)
         ? <DocumentView client={client} doc={doc} />
@@ -16384,7 +16463,7 @@ function ChartPage({ id, module, config }) {
         : START_NOTE_TYPES.indexOf(tab) !== -1 || getNoteCtx(id, tab)
         ? <NotePage key={id + tab} client={client} doc={tab} />
         /* Every other module: its records and a form to add one. */
-        : <ClientModulePage key={id + tab} client={client} module={tab} />}
+        : <ClientModulePage key={id + tab} client={client} module={tab} />}</div>}
     </div>
   );
 }
