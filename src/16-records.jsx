@@ -15,7 +15,7 @@
 
 const RECORDS_EVT = 'axiom-records-changed';
 const SESSION = {
-  added: { allergies: [], vitals: [], immunizations: [], injections: [], admins: [], meds: [], notes: [] },
+  added: { allergies: [], vitals: [], immunizations: [], injections: [], admins: [], meds: [], notes: [], diagnoses: [], problems: [], contacts: [] },
   medPatch: {},          // med_rx_id -> fields overriding the fixture row
   noteRead: {},          // note_id -> true | false (overrides the fixture's read_by for ME)
   noteDeleted: {},       // note_id -> true (author removed their own note)
@@ -118,6 +118,14 @@ const formMax = form => form.items.length * form.scale[form.scale.length - 1][1]
 const byDateDesc = key => (a, b) => String(b[key] || '').localeCompare(String(a[key] || ''));
 const own = (rows, cid) => (rows || []).filter(r => r.client_id === cid);
 
+/* Who entered a fixture row, and when, where the fixture doesn't say. Derived
+   from the row's id so it's stable across reloads; rows added in the session
+   carry their own (the signed-in user, today). */
+const STAFF_IDS = (RD.staff || []).map(s => s.staff_id);
+const derivedBy = id => STAFF_IDS[hashStr(String(id) + 'by') % Math.max(1, STAFF_IDS.length)] || null;
+const derivedOn = (id, span) => isoOf(addDays(TODAY, -(14 + hashStr(String(id) + 'on') % (span || 400))));
+const enteredNow = () => ({ entered_by_staff_id: ME.id, entered_on: isoOf(TODAY) });
+
 /* ---- Getters ------------------------------------------------------ */
 function getMeds(client) {
   if (client.records) return client.records.meds || [];
@@ -125,7 +133,40 @@ function getMeds(client) {
     .map(r => (SESSION.medPatch[r.med_rx_id] ? { ...r, ...SESSION.medPatch[r.med_rx_id] } : r));
 }
 function getAllergies(client) {
-  return (client.allergies || []).concat(client.records ? [] : own(SESSION.added.allergies, client.client_id));
+  return (client.records ? [] : own(SESSION.added.allergies, client.client_id)).concat((client.allergies || []).map(a => (client.records ? a : {
+    ...a, entered_by_staff_id: a.entered_by_staff_id || derivedBy(a.allergy_id), entered_on: a.entered_on || derivedOn(a.allergy_id, 900) })));
+}
+/* Diagnoses and problems: the chart's rows plus any added in the session.
+   `entered_by_staff_id` is who recorded it; `end_date` is when it was
+   resolved. Condition (Acute / Chronic) and Behavioral aren't in the fixture,
+   so they're read from the code and type. Status is never changed from the
+   header — that's a clinical decision made on the full page. */
+const CHRONIC_ICD = /^(F2|F31|F33|F10\.2|F11\.2|F43\.1|E1|I1|J45|B20)/;
+function getDiagnoses(client) {
+  if (client.records) return client.diagnoses || [];
+  return own(SESSION.added.diagnoses, client.client_id).concat((client.diagnoses || []).map(d => ({
+    ...d, entered_by_staff_id: d.diagnosed_by_staff_id || derivedBy(d.client_dx_id),
+    condition: d.condition || (CHRONIC_ICD.test(d.icd10 || '') ? 'Chronic' : 'Acute'),
+    behavioral: d.diagnosis_type ? d.diagnosis_type !== 'Medical' : true,
+    end_date: d.end_date || d.resolved_date || null, program: d.program || client.program,
+  })));
+}
+function getProblems(client) {
+  if (client.records) return client.problems || [];
+  return own(SESSION.added.problems, client.client_id).concat((client.problems || []).map(p => ({
+    ...p, entered_by_staff_id: p.entered_by_staff_id || derivedBy(p.client_problem_id),
+    end_date: p.end_date || p.resolved_date || null, program: p.program || client.program,
+  })));
+}
+/* Appointments booked in the session (the header's Schedule Appointment, the
+   Appointments page) plus the fixture's. */
+function getAppointments(client) {
+  if (client.records) return client.records.appts || [];
+  return pageRows(client.client_id, 'Appointments').concat(own(RD.appointments, client.client_id));
+}
+/* Support contacts: added in the session first, then the chart's. */
+function getSupportContacts(client) {
+  return (client.records ? [] : own(SESSION.added.contacts, client.client_id)).concat(supportContacts(client));
 }
 function getVitals(client) {
   if (client.records) return client.records.vitals || [];
@@ -278,8 +319,8 @@ const activeAttrs = client => getAttrAssignments(client).filter(r => attrState(r
    disappears the moment it's added. */
 function attrSuggestions(client, rows) {
   const onChart = new Set(rows.filter(r => ['active', 'scheduled'].indexOf(attrState(r)) !== -1).map(r => r.attribute_id));
-  const dx = (client.diagnoses || []).filter(d => d.status === 'Active');
-  const pr = (client.problems || []).filter(p => p.status === 'Active');
+  const dx = getDiagnoses(client).filter(d => d.status === 'Active');
+  const pr = getProblems(client).filter(p => p.status === 'Active');
   const out = [];
   selectableAttrs().forEach(a => {
     if (onChart.has(a.attribute_id)) return;

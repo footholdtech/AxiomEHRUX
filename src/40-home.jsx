@@ -377,8 +377,19 @@ function ProductivityModule() {
 function Home() {
   const greeting = TODAY.getHours() < 12 ? 'Good morning' : 'Good afternoon';
   const todayLabel = TODAY.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  /* Laid out for its own width, as the client header is. Two columns, per
+     the artboard, with the three table modules as full-width bands. From
+     1200px of content (a 1280 viewport with the side nav closed) the grid
+     has three columns, so a wide monitor fills rather than leaving a margin.
+     Each row between the bands pairs a narrow card with one spanning two
+     columns: the modules holding a table or a two-pane view (Critical Info,
+     Messenger, Pending Labs) need ~540px and get two-thirds; the lists get
+     one. Rows stay full and the order is the artboard's. */
+  const [ref, w] = useElementWidth();
+  const three = w != null && w >= 1200;
+  const wide = node => (three ? <div className="home-span-wide">{node}</div> : node);
   return (
-    <div className="page home">
+    <div className="page page--fluid home" ref={ref}>
       <div className="page-head-row">
         <div>
           <h1 className="page-title">{greeting}, {ME.name.split(' ')[0]}</h1>
@@ -386,15 +397,14 @@ function Home() {
         </div>
       </div>
 
-      {/* Two-column grid; three modules span both, per the artboard. */}
-      <div className="home-grid">
+      <div className={'home-grid' + (three ? ' home-grid--three' : '')}>
         <div className="home-span2"><MyClientsModule /></div>
         <ApprovalsTasksModule />
-        <CriticalInfoModule />
+        {wide(<CriticalInfoModule />)}
         <div className="home-span2"><MyTeamModule /></div>
-        <MessengerModule />
+        {wide(<MessengerModule />)}
         <UpcomingAppointmentsModule />
-        <PendingLabsModule />
+        {wide(<PendingLabsModule />)}
         <AnnouncementsModule />
         <div className="home-span2"><ProductivityModule /></div>
       </div>

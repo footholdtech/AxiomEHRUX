@@ -34,7 +34,7 @@ Rendered on every client-specific page, full width, directly under the breadcrum
 | **Identity** — avatar, name with preferred name (e.g. `DeShawn "Dee" Carter`), status pill, pronouns, DOB with age | **Always** | Not configurable. The name takes the width it needs; the status pill sits directly after it. |
 | **Client Notes** button | **Always** | First in the action row; not configurable. Red badge top-right with the signed-in user's unread count. Opens an overlay of care-team notes about this client; each can be marked read/unread (§2a). |
 | **Actions toolbar** — round icon buttons | Configurable (on/off + which buttons) | Followed by two fixed controls whenever the toolbar is on: **More Actions** and **Chat With Chart**. Every round button shows a **tooltip** above it on hover/focus with its name. |
-| **Quick-view pills** | Expanded state only | Any number, in the admin's order. They take up to **two rows**; past that, **previous/next arrows** page through them ("1 of 2"). Paging browses — it doesn't change the open quick view. |
+| **Quick-view pills** | Expanded state only | Any number, in the admin's order. They take up to **two rows**; past that, **previous/next arrows** page through them ("1 of 2"). Paging browses — it doesn't change the open quick view. The page only jumps back to the open pill's page when the pills actually regroup (a resize), never because a shorter last page changed the header's height. |
 | **Expand Details / Collapse Details** toggle | Always | The only thing that changes expanded/collapsed. |
 | **Detail row** | Expanded state only | Content of the selected quick view. |
 | **Clinical Info strip** — weight, height, BMI, BP, and counts for allergies, vitals, problems, current meds; biological sex | Configurable (on/off) | Shown in both collapsed and expanded states when on. |
@@ -70,6 +70,13 @@ The same component, made denser so it doesn't take half the screen even when col
 - **Expand / collapse toggle:** sits on the DOB line and reads **Expand** / **Collapse**, so a collapsed header has no extra row for it. Its accessible name keeps "details".
 - **Quick-view pills:** one row with the previous/next arrows on the same line. The "1 of N" count is hidden.
 - **Clinical Info:** one line that scrolls sideways, instead of wrapping to four lines.
+
+**Quick-view content never runs past its column, at any width:**
+
+- **Values with no break points truncate.** An email address ends in an ellipsis inside its column, and the full address is the tooltip. A name or role in the Care Team box truncates the same way. Attribute marks are the exception above: they wrap, never truncate.
+- **Care Team is never narrower than one member** (a 120px tile plus padding). Beside a wide table, the table gives up the width.
+- **Narrow header:** record-table cells wrap and their side padding tightens from md to xs, so a seven-column table (Diagnoses) fits without scrolling.
+- **Phone layout:** record tables scroll sideways on their own, so the quick view's title and actions stay put. Vitals drop to two columns, cards and score tiles take the full width, and when a title and its actions don't fit on one line the actions move to a second line.
 
 The top bar follows the DS sizing spec:
 
@@ -152,32 +159,42 @@ Built to inform direction for attributes across Radicle EHRs, not just AxiomEHR.
 
 ## 3. Quick-view catalogue
 
-Twelve sections an admin can place in the header. Each has its own options. Option kinds: **bool** (checkbox), **choice** (one of a list), **fields** (any number of a list).
+Every quick view except General and Incidents is a **record view**, and they all follow one pattern:
+
+- **What's on file:** a short table of the records, each with its status, when it started (and ended), and **who entered it and when** (an *Entered* column: date over name; "You" for the signed-in user). Scored instruments show the latest score, band and next due.
+- **Link out:** **View all ↗** opens the full module page; each record's name links there too. Cover Sheet views link to their section of the Cover Sheet.
+- **Quick entry:** **+ Add …** opens a dialog sized to the form; the new record appears in the header *and* on the module page straight away (one shared store). Long or multi-step forms don't get a dialog: notes open the note itself, and PCL-5 and AIMS start on the full page by default.
+- **Never from the header:** changing a diagnosis's or problem's status, enrolling or discharging, assigning a payor. Those are clinical or billing decisions made on their own pages.
+
+Option kinds: **bool** (checkbox), **choice** (one of a list), **fields** (any number of a list). Two options recur:
+
+- **Rows to list** (choice: 5 / 10 / All, default 5). Shorter lists end with "Showing 5 of 12. View all 12".
+- **Where Add goes is not configurable.** Every record view's add button opens a dialog in the header. This is a product decision made for client safety and consistent UX, not an agency setting. The exceptions are fixed by product: PCL-5 and AIMS (too long or too clinical for a dialog) and notes open their full page, and the button gains ↗.
 
 | Quick view | Shows | Options (default) |
 | --- | --- | --- |
 | **General** | Identifiers, funding, housing, attributes, care team | *Always shown (locked):* first & last name, preferred name, DOB, age · *Identifiers to display* (fields): Axiom ID, CIN, Shared Service ID, MRN, Funding, Residence, Housing Type, Primary Language (first 6 on except MRN, Primary Language) · Show client attributes (on) · Show care team (on) |
-| **Enrollment** | Program, modality, site, enrolled date + days, status | Include closed enrollments (off) · Show payor and authorisation (on) |
-| **Allergies** | Allergen, category, reaction, severity, status · **+ Add Allergy** | Active allergies only (on) |
+| **Enrollment** | Episodes: program, site, admitted, discharged, status, entered · Payor: payor, policy type and number, coverage dates, authorization, entered, with a **Payor Assignment ↗** link. No add: enrollment and payors are intake and billing workflows. | Include closed enrollments (off) · Show payor and authorisation (on) |
+| **Allergies** | Allergen, category, reaction, severity, status, entered · **+ Add Allergy** | Active allergies only (on) · Rows to list (5) |
 | **Medications** | Current / Expired / Discontinued / All filters; schedule badge on controlled substances; refills left; pharmacy · bulk **Refill** and **Discontinue** · **+ Add Medication** (§3a) | Opens on (Current) · Show pharmacy (on) |
 | **Service Plans** | Active plans with status, last edit, and goal progress against the plan's own start and review dates (dates on hover) · View Plan opens the full plan in place (§3b) | Opens on (Active / All) |
-| **Vitals** | Latest BP, pulse, temp, resp, O₂, weight, BMI, pain + earlier readings · **+ Record Vitals** | Readings to list: 3/5 (3) |
-| **Immunizations** | Vaccine, dose, date, status (administered / historical / declined), lot · **+ Add Immunization** | Include declined (on) |
-| **Injections** | Per injectable: dose, interval, site, last given, next due (overdue flagged) · **+ Record Injection** | Doses to list: 3/5 (3) |
-| **PHQ-9 · PCL-5 · PC-PTSD-5 · ACE · AUDIT · AIMS · SDOH** | Latest **score / max**, result band, date and who administered; earlier administrations below. Selecting any opens the captured answers in an overlay. **+ New** opens the instrument form. The full instrument is never laid out in the header. | Earlier administrations to list: 2/4 (2) |
-| **Contact Info** | Email, phone (text-enabled), address | Show mailing address (on) · Show preferred contact method and language (on) |
-| **Appointments** | Upcoming and recent | Appointments to list: 3/5/10 (5) · Include no-shows and cancellations (on) |
-| **Clinical Notes** | Recent documentation | Notes to list: 3/5/10 (5) · Surface drafts and unsigned first (on) |
-| **Diagnoses** | ICD-10 diagnoses | Active statuses only — Active, In Remission, Provisional (on) · Show ICD-10 codes (on) |
-| **Problems** | Problem list | Active problems only (on) · Show category (on) |
-| **Support Contacts** | Natural supports + care team | Show relationship (on) · Only contacts with a release on file (off) |
-| **Assessments** | Instruments, due/overdue, scores | Instruments to list: 3/5 (3) · Show scores and interpretation (on) |
+| **Vitals** | Latest BP, pulse, temp, resp, O₂, weight, BMI, pain + earlier readings with who recorded them · **+ Record Vitals** | Readings to list: 3/5 (3) |
+| **Immunizations** | Vaccine, dose, date, status (administered / historical / declined), lot, given by · **+ Add Immunization** | Include declined (on) · Rows to list (5) |
+| **Injections** | Per injectable: dose, interval, site, last given and by whom, next due (overdue flagged) · **+ Record Injection** | Doses to list: 3/5 (3) |
+| **PHQ-9 · PCL-5 · PC-PTSD-5 · ACE · AUDIT · AIMS · SDOH** | Latest **score / max**, result band, date and who gave it, **next due** (from the instrument's cadence; none where it's "as clinically indicated"); AIMS also by region (facial & oral, extremities, trunk), as production's history table does. Earlier administrations below with who gave them. Selecting any opens the captured answers. **+ New** opens the instrument. | Earlier administrations to list: 2/4 (2) · (PCL-5 and AIMS: **+ New** always opens the full page) |
+| **Contact Info** | From the Cover Sheet: cell (text enabled / opted out), home, Do Not Call, preferred contact; email, client portal, preferred language; address, county, verified or not, Unhoused, Do Not Mail. "Updated {date} by {name}". **Cover Sheet ↗**. No add: it's one record, edited on the Cover Sheet. | Show mailing address (on) · Show preferred contact method and language (on) |
+| **Appointments** | Upcoming / Past filters: date, time and length, reason, staff member, site and room, meeting type, status (no-show flagged). "Next {date} with {name}" · **+ Schedule Appointment** (the header's scheduling form) | Opens on (Upcoming) · Appointments to list: 3/5/10 (5) · Include no-shows and cancellations (on) |
+| **Clinical Notes** | Your unfinished notes first (drafts, notes started from an alert), then recent documentation: note, type, date, author, status · **Add Note** is the header's Add Note menu, which opens the note · **View all in Documents ↗** opens Documents filtered to this client | Notes to list: 3/5/10 (5) · Surface drafts and unsigned first (on) |
+| **Diagnoses** | Active / All filters: ICD-10 — description (SNOMED optional), behavioral, precedence, condition (acute / chronic), status, start and end, entered · **+ Add Diagnosis** (§3c) | Opens on (Active — includes In Remission and Provisional) · Show ICD-10 codes (on) · Show SNOMED codes (off) · Rows to list (5) |
+| **Problems** | Active / All filters: problem, category, status, start and end, program, entered · **+ Add Problem** (§3c) | Opens on (Active) · Show category (on) · Rows to list (5) |
+| **Support Contacts** | From the Cover Sheet's Contact History: name, preferred contact, contact type (Emergency Contact, Guardian…), relationship, phone, release (on file / none), entered · care team alongside · **+ Add Contact** (§3d) | Show relationship (on) · Only contacts with a release on file (off) · Show care team (on) |
+| **Assessments** | Every instrument on the chart: latest score and band, given (date, by), next due. Overdue first, then soonest due. Includes instruments the agency tracks by due date only, so it agrees with the Client Summary's Needs Attention. Each links to its page. | Show scores and interpretation (on) · Include instruments tracked by due date only (on) · Rows to list (5) |
 | **Incidents** | Reportable events | Look-back window: 30 days / 90 days / 12 months (90 days) |
-| **Demographics** | Gender, pronouns, DOB, race, ethnicity, language, interpreter need, MRN | Show race and ethnicity (on) · Show language and interpreter need (on) · Custom fields (fields, none by default) |
+| **Demographics** | From the Cover Sheet: legal and preferred name; DOB and age; primary language and interpreter; gender at birth and pronouns; race, ethnicity and tribal affiliation. "Updated {date} by {name}". **Cover Sheet ↗**. No add. | Show race and ethnicity (on) · Show language and interpreter need (on) · **Show gender identity and sexual orientation (off)**: the header is on screen whenever the chart is, often where others can see it · Show marital, veteran and employment status (off) · Custom fields (none by default) |
 
 The old combined **Medical** view is replaced by Allergies, Medications and Vitals; saved headers that used it are migrated to those three.
 
-**Every clinical quick view** links each record to its full module page, has a **View all** link, and adds records in an overlay sized to the form (sm 480 / md 720 / lg 1040) without leaving the page. The new record appears in the header immediately.
+Dialogs are sized to the form (sm 480 / md 720 / lg 1040). On a narrow header, a record table scrolls sideways on its own; the title, filters and actions stay put.
 
 ### 3a. Medications quick view
 
@@ -204,6 +221,16 @@ The old combined **Medical** view is replaced by Allergies, Medications and Vita
   - **Goals and Objectives:** per goal, the identified need, domain of wellness, specific objective, and baseline / current / target measures, with an interventions table. Each goal has a **copy** button, for pasting a goal into a note.
   - **Agreements:** agreement, copy offered in preferred language, and the signatures table.
   - **Footer:** Close and **Edit Service Plan**, which leaves the page for the module. There's no copy-the-whole-plan action; nobody needs it.
+
+### 3c. Add Diagnosis and Add Problem
+
+- **Fields** (from production's input forms): code search (ICD-10, name or SNOMED; problems by name or category), type, status, condition, precedence (diagnoses), start date (today), end date, program, sensitivity classification, comments.
+- **Defaults:** a substance-use code (F10–F19) defaults the sensitivity to 42 CFR Part 2, as medications do. Precedence defaults to Secondary when the chart already has an active primary, and says so if you pick Primary anyway.
+- **Duplicates:** choosing one that's already active on the chart says so ("…is already active on this chart (since {date}). To change it, open it on the full page.") and disables Add.
+
+### 3d. Cover Sheet
+
+Demographics, Contact Info and Support Contacts live on the Cover Sheet in production, so their quick views read the same data as the prototype's **Cover Sheet** page and link to their section (the page scrolls to it). The page shows production's sections (Client, Personal Information, Gender, Race and Ethnicity, Identifiers, Attributes, Address, Phone) read-only, and **Contact History** with **Add Contact**. Add Contact asks for contact type, relationship, name, phone, email, preferred contact (its phone or email is then required) and language, plus an emergency-contact flag. It says plainly that adding a contact doesn't let staff share the client's information: that needs a signed release.
 
 ### 2a. Client Notes
 

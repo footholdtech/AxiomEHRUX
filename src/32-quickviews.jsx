@@ -10,6 +10,12 @@
      3. Adding a record never leaves the page: "+ Add …" opens a dialog sized to
         the form, and the new record appears in the header immediately.
 
+   Every record view also says who entered each record and when, and its
+   status. Admins choose per header how many rows to list. Where Add goes is
+   not theirs to choose: it opens a dialog here, except long or multi-step
+   forms (PCL-5 and AIMS via `addOnPage`, and notes), which start on the
+   full page.
+
    Records come from 16-records.jsx. In the admin preview (`preview`), links
    and add actions are shown but inert — the preview client is fictional.
    ================================================================ */
@@ -27,7 +33,8 @@ function TextIn({ value, onChange, placeholder = 'Please input…', type = 'text
 
 /* The strip across the top of every clinical quick view: what it is, how many,
    and the two actions every one of them has — open the full page, add one. */
-function QvBar({ title, meta, onViewAll, onAdd, addLabel, preview, children }) {
+/* `addNode`: an add control of the view's own (Add Note's menu) in the add slot. */
+function QvBar({ title, meta, onViewAll, viewAllLabel = 'View all', onAdd, addLabel, addOut, addNode, preview, children }) {
   const inert = preview ? 'Not available in the preview' : null;
   return (
     <div className="qvx-bar">
@@ -40,14 +47,15 @@ function QvBar({ title, meta, onViewAll, onAdd, addLabel, preview, children }) {
         {onViewAll && (
           <Tooltip label={inert} placement="bottom">
             <button className="lnk qvx-viewall" disabled={preview} onClick={onViewAll}>
-              View all <Icon name="external" size={13} />
+              {viewAllLabel} <Icon name="external" size={13} />
             </button>
           </Tooltip>
         )}
+        {addNode && (preview ? <Tooltip label={inert} placement="bottom"><Button size="sm" variant="secondary" disabled><Icon name="plus" size={14} /> {addLabel}</Button></Tooltip> : addNode)}
         {onAdd && (
           <Tooltip label={inert} placement="bottom">
             <Button size="sm" variant="secondary" disabled={preview} onClick={onAdd}>
-              <Icon name="plus" size={14} /> {addLabel}
+              <Icon name="plus" size={14} /> {addLabel}{addOut && <Icon name="external" size={13} />}
             </Button>
           </Tooltip>
         )}
@@ -63,6 +71,20 @@ function RecLink({ children, onOpen, preview }) {
 }
 
 const QvxEmpty = ({ children }) => <div className="cph-qv-empty qvx-empty">{children}</div>;
+
+/* "Rows to list": 5, 10 or All. */
+const rowLimit = (opt, fallback = 5) => (opt === 'All' ? Infinity : parseInt(opt, 10) || fallback);
+/* Under a table that's been cut short: how many aren't shown, and where they are. */
+function QvMore({ shown, total, onViewAll, preview }) {
+  if (total <= shown) return null;
+  return (
+    <div className="qvx-more">Showing {shown} of {total}.{' '}
+      {preview ? null : <button className="lnk" onClick={onViewAll}>View all {total}</button>}
+    </div>
+  );
+}
+/* Who entered a record and when, in one cell: date over name. */
+const EnteredCell = ({ on, by }) => <td>{on ? fmtDate(on) : '—'}<div className="cell-sub">{by ? (by === ME.id ? 'You' : sName(by)) : '—'}</div></td>;
 
 function useModuleNav(client) {
   const guard = useGuard();
@@ -81,25 +103,29 @@ function AllergiesQV({ view, client, preview }) {
   useRecordsVersion();
   const go = useModuleNav(client);
   const [adding, setAdding] = useState(false);
+  const o = view.options;
   const all = getAllergies(client);
-  const rows = view.options.activeOnly ? all.filter(a => (a.status || 'Active') === 'Active') : all;
+  const rows = o.activeOnly ? all.filter(a => (a.status || 'Active') === 'Active') : all;
+  const shown = rows.slice(0, rowLimit(o.rows));
   return (
     <div className="cph-qvx">
-      <QvBar title="Allergies" meta={rows.length + (view.options.activeOnly ? ' active' : ' recorded')} preview={preview}
+      <QvBar title="Allergies" meta={rows.length + (o.activeOnly ? ' active' : ' recorded')} preview={preview}
         onViewAll={() => go('Allergy')} onAdd={() => setAdding(true)} addLabel="Add Allergy" />
       {rows.length ? (
         <table className="data-table compact qvx-table">
-          <thead><tr><th>Allergen</th><th>Category</th><th>Reaction</th><th>Severity</th><th>Status</th></tr></thead>
-          <tbody>{rows.map(a => (
+          <thead><tr><th>Allergen</th><th>Category</th><th>Reaction</th><th>Severity</th><th>Status</th><th>Entered</th></tr></thead>
+          <tbody>{shown.map(a => (
             <tr key={a.allergy_id}>
               <td><RecLink preview={preview} onOpen={() => go('Allergy')}>{a.allergen}</RecLink></td>
               <td>{a.allergen_category}</td><td>{a.reaction || '—'}</td>
               <td><span className={'cph-qv-tag' + (a.severity_flag === 'High' ? ' is-warn' : '')}>{a.severity_flag}</span></td>
               <td>{a.status || 'Active'}</td>
+              <EnteredCell on={a.entered_on} by={a.entered_by_staff_id} />
             </tr>
           ))}</tbody>
         </table>
       ) : <QvxEmpty>No known allergies recorded.</QvxEmpty>}
+      <QvMore shown={shown.length} total={rows.length} preview={preview} onViewAll={() => go('Allergy')} />
       {adding && <AddAllergyOverlay client={client} onClose={() => setAdding(false)} />}
     </div>
   );
@@ -115,7 +141,7 @@ function AddAllergyOverlay({ client, onClose }) {
     setTried(true);
     if (missing) return;
     addRecord('allergies', { allergy_id: newId('ALG'), client_id: client.client_id, allergen: f.allergen.trim(),
-      allergen_category: f.category, reaction: f.reaction.trim() || null, severity_flag: f.severity, status: f.status });
+      allergen_category: f.category, reaction: f.reaction.trim() || null, severity_flag: f.severity, status: f.status, ...enteredNow() });
     guard.setToast({ status: 'success', title: 'Allergy added', detail: f.allergen.trim() + ' · ' + f.severity + ' severity' });
     onClose();
   };
@@ -166,11 +192,12 @@ function VitalsQV({ view, client, preview }) {
           </div>
           {!!recent.length && (
             <table className="data-table compact qvx-table qvx-side">
-              <thead><tr><th>Earlier</th><th>BP</th><th>Pulse</th><th>Weight</th></tr></thead>
+              <thead><tr><th>Earlier</th><th>BP</th><th>Pulse</th><th>Weight</th><th>Recorded By</th></tr></thead>
               <tbody>{recent.map(v => (
                 <tr key={v.vitals_id}>
                   <td><RecLink preview={preview} onOpen={() => go('Vitals')}>{fmtDate(v.date_time)}</RecLink></td>
                   <td>{v.bp_systolic}/{v.bp_diastolic}</td><td>{v.pulse_bpm}</td><td>{v.weight_lbs}</td>
+                  <td>{v.recorded_by_staff_id ? sName(v.recorded_by_staff_id) : '—'}</td>
                 </tr>
               ))}</tbody>
             </table>
@@ -232,25 +259,29 @@ function ImmunizationsQV({ view, client, preview }) {
   useRecordsVersion();
   const go = useModuleNav(client);
   const [adding, setAdding] = useState(false);
+  const o = view.options;
   const all = getImmunizations(client);
-  const rows = view.options.showDeclined ? all : all.filter(r => r.status !== 'Declined');
+  const rows = o.showDeclined ? all : all.filter(r => r.status !== 'Declined');
+  const shown = rows.slice(0, rowLimit(o.rows));
   return (
     <div className="cph-qvx">
       <QvBar title="Immunizations" meta={rows.length + ' on file'} preview={preview}
         onViewAll={() => go('Immunization')} onAdd={() => setAdding(true)} addLabel="Add Immunization" />
       {rows.length ? (
         <table className="data-table compact qvx-table">
-          <thead><tr><th>Vaccine</th><th>Dose</th><th>Date</th><th>Status</th><th>Lot</th></tr></thead>
-          <tbody>{rows.map(r => (
+          <thead><tr><th>Vaccine</th><th>Dose</th><th>Date</th><th>Status</th><th>Lot</th><th>Given By</th></tr></thead>
+          <tbody>{shown.map(r => (
             <tr key={r.immunization_id}>
               <td><RecLink preview={preview} onOpen={() => go('Immunization')}>{r.vaccine}</RecLink></td>
               <td>{r.dose}</td><td>{fmtDate(r.date)}</td>
-              <td>{r.status}{r.source ? <span className="cell-note"> {r.source}</span> : null}</td>
+              <td><span className={'cph-qv-tag' + (r.status === 'Declined' ? ' is-warn' : '')}>{r.status}</span></td>
               <td>{r.lot || '—'}</td>
+              <td>{r.administered_by_staff_id ? (r.administered_by_staff_id === ME.id ? 'You' : sName(r.administered_by_staff_id)) : r.source || '—'}</td>
             </tr>
           ))}</tbody>
         </table>
       ) : <QvxEmpty>No immunizations on file.</QvxEmpty>}
+      <QvMore shown={shown.length} total={rows.length} preview={preview} onViewAll={() => go('Immunization')} />
       {adding && <AddImmunizationOverlay client={client} onClose={() => setAdding(false)} />}
     </div>
   );
@@ -315,7 +346,7 @@ function InjectionsQV({ view, client, preview }) {
                 </div>
                 <div className="qvx-card-meta">{last.dose} · every {last.interval_days || 28} days · {last.site}</div>
                 <div className="qvx-card-row">
-                  <span>Last given <b>{fmtDate(last.date_given)}</b></span>
+                  <span>Last given <b>{fmtDate(last.date_given)}</b>{last.given_by_staff_id ? ' by ' + (last.given_by_staff_id === ME.id ? 'you' : sName(last.given_by_staff_id)) : ''}</span>
                   <span className={'cph-qv-tag' + (d < 0 ? ' is-warn' : '')}>Next {fmtDate(next)} · {dueLabel(next)}</span>
                 </div>
                 {g.rows.length > 1 && (
@@ -372,6 +403,16 @@ function RecordInjectionOverlay({ client, onClose, suggested }) {
 }
 
 /* ================= Scored instruments ================= */
+/* How often each instrument is repeated, in days (null: as clinically
+   indicated, so no due date). Agency policy in production; fixed here. */
+const FORM_CADENCE = { PHQ9: 90, PCPTSD5: 365, AUDIT: 365, AIMS: 182, SDOH: 365, PCL5: null, ACE: null };
+const formNextDue = (form, admin) => (admin && FORM_CADENCE[form.form_id] ? isoOf(addDays(_parse(admin.date), FORM_CADENCE[form.form_id])) : null);
+/* Instruments read by region as well as in total — AIMS, the way
+   production's history table lists it: [label, first item, last item]. */
+const FORM_GROUPS = { AIMS: [['Facial & oral', 1, 4], ['Extremities', 5, 6], ['Trunk', 7, 7]] };
+const groupScores = (form, admin) => (FORM_GROUPS[form.form_id] || []).map(([l, a, b]) =>
+  [l, admin.responses.slice(a - 1, b).reduce((n, v) => n + (v || 0), 0)]);
+
 function InstrumentQV({ view, client, preview }) {
   useRecordsVersion();
   const go = useModuleNav(client);
@@ -388,7 +429,8 @@ function InstrumentQV({ view, client, preview }) {
   return (
     <div className="cph-qvx">
       <QvBar title={form.name} meta={form.full_name} preview={preview}
-        onViewAll={() => go(def.module)} onAdd={() => setAdding(true)} addLabel={'New ' + form.name} />
+        onViewAll={() => go(def.module)} onAdd={def.addOnPage ? () => go(def.module) : () => setAdding(true)}
+        addOut={!!def.addOnPage} addLabel={'New ' + form.name} />
       {latest ? (
         <div className="qvx-split">
           <button className="qvx-score" onClick={() => setOpen(latest)} aria-label={'Open ' + form.name + ' answers from ' + fmtDate(latest.date)}>
@@ -396,17 +438,24 @@ function InstrumentQV({ view, client, preview }) {
             <span className="qvx-score-text">
               <span className={'cph-qv-tag' + (b.top || latest.flagged ? ' is-warn' : '')}>{b.label}</span>
               {latest.flagged && <span className="cph-qv-tag is-warn">Item {form.flag_item} endorsed</span>}
-              <span className="qvx-score-date">{fmtDate(latest.date)} · {sName(latest.administered_by_staff_id)}</span>
+              <span className="qvx-score-date">{fmtDate(latest.date)} · {latest.administered_by_staff_id === ME.id ? 'You' : sName(latest.administered_by_staff_id)}</span>
+              {!!groupScores(form, latest).length && (
+                <span className="qvx-score-date">{groupScores(form, latest).map(([l, n]) => l + ' ' + n).join(' · ')}</span>
+              )}
+              {formNextDue(form, latest) && (
+                <span className={'cph-qv-tag' + (daysUntil(formNextDue(form, latest)) < 0 ? ' is-warn' : '')}>Next due {fmtDate(formNextDue(form, latest))} · {dueLabel(formNextDue(form, latest))}</span>
+              )}
               <span className="lnk qvx-score-open">View answers</span>
             </span>
           </button>
           {!!earlier.length && (
             <table className="data-table compact qvx-table qvx-side">
-              <thead><tr><th>Earlier</th><th>Score</th><th>Result</th></tr></thead>
+              <thead><tr><th>Earlier</th><th>Score</th><th>Result</th><th>Given By</th></tr></thead>
               <tbody>{earlier.map(a => (
                 <tr key={a.administration_id} className="qvx-click" onClick={() => setOpen(a)}>
                   <td><button className="lnk" onClick={e => { e.stopPropagation(); setOpen(a); }}>{fmtDate(a.date)}</button></td>
                   <td>{a.score}</td><td>{formBand(form, a.score).label}</td>
+                  <td>{a.administered_by_staff_id === ME.id ? 'You' : sName(a.administered_by_staff_id)}</td>
                 </tr>
               ))}</tbody>
             </table>
@@ -899,10 +948,16 @@ function AddMedicationOverlay({ client, onClose }) {
   );
 }
 
-/* ---- Dispatcher used by QuickViewBody ------------------------------ */
+/* ---- Dispatcher used by QuickViewBody ------------------------------
+   Every quick view except General and Incidents is a record view now: the
+   clinical ones here, the record views in 35-record-views.jsx and the Cover
+   Sheet ones in 37-coversheet.jsx. */
 const CLINICAL_QV = {
   allergies: AllergiesQV, medications: MedicationsQV, vitals: VitalsQV,
   immunizations: ImmunizationsQV, injections: InjectionsQV, serviceplans: ServicePlansQV,
+  diagnoses: DiagnosesQV, problems: ProblemsQV, appointments: AppointmentsQV, notes: NotesQV,
+  assessments: AssessmentsQV, enrollment: EnrollmentQV,
+  demographics: DemographicsQV, contact: ContactQV, support: SupportQV,
 };
 function ClinicalQuickView(props) {
   const def = QV_BY_KEY[props.view.key];

@@ -316,6 +316,9 @@ function TopNav({ onHamburger, navOpen, onPrefs }) {
             )}
           </div>
         )}
+        {/* The AI add-on's entry point: immediately left of the avatar, on
+            every page. See 38-ai-assistant.jsx. */}
+        <AiAssistButton />
         <div className="menu-anchor" ref={menuRef}>
           <button className="tn-avatar-btn" onClick={() => setMenuOpen(o => !o)} aria-haspopup="menu" aria-expanded={menuOpen} aria-label="Account menu">
             <Avatar name={ME.name} size="M" />
@@ -328,7 +331,7 @@ function TopNav({ onHamburger, navOpen, onPrefs }) {
               </div>
               <button className="menu-item" onClick={() => { setMenuOpen(false); onPrefs(); }}><Icon name="palette" size={17} /> Preferences</button>
               <button className="menu-item"><Icon name="admin" size={17} /> Account settings</button>
-              <button className="menu-item" onClick={() => { setMenuOpen(false); guard.signOut(); }}><Icon name="logout" size={17} /> Sign out</button>
+              <button className="menu-item" onClick={() => { setMenuOpen(false); aiForget(); guard.signOut(); }}><Icon name="logout" size={17} /> Sign out</button>
             </div>
           )}
         </div>
@@ -758,26 +761,33 @@ function QvCol({ head, children, className }) {
   );
 }
 function QvRow({ k, v, icon, suffix, copy }) {
+  const has = !(v == null || v === '');
   return (
     <div className="cph-row">
       {icon && <Icon name={icon} size={20} className="cph-rowico" />}
       {k && <span className="cph-k">{k}:</span>}
-      <span className="cph-v" title={typeof v === 'string' ? v : undefined}>{v == null || v === '' ? '—' : v}</span>
-      {copy && <Icon name="dsDocCopy" size={20} className="cph-copy" />}
+      <span className="cph-v" title={typeof v === 'string' ? v : undefined}>{has ? v : '—'}</span>
+      {copy && has && <CopyIdButton label={k} value={String(v)} client={copy} />}
       {suffix && <span className="cph-suffix">{suffix}</span>}
     </div>
   );
 }
-/* A list entry: one line of substance, one of context. */
-function QvItem({ name, meta, tag, tone }) {
+/* An identifier is often typed into another system (a payer portal, a
+   referral), so it copies in one click. The toast names whose ID it was, so a
+   paste into the wrong place is caught early. In the Admin preview the
+   client is fictional and nothing is copied. */
+function CopyIdButton({ label, value, client }) {
+  const guard = useGuard();
+  const copy = () => {
+    if (client.records) return;
+    copyText(value).then(() => guard.setToast({ status: 'success', title: label + ' for ' + client.name + ' was copied to clipboard' }));
+  };
   return (
-    <div className="cph-qv-item">
-      <div className="cph-qv-item-main">
-        <span className="cph-qv-item-name" title={name}>{name}</span>
-        {tag && <span className={'cph-qv-tag' + (tone ? ' ' + tone : '')}>{tag}</span>}
-      </div>
-      {meta && <div className="cph-qv-item-meta">{meta}</div>}
-    </div>
+    <Tooltip label="Copy to Clipboard">
+      <button type="button" className="icon-btn cph-copy" aria-label={'Copy ' + label + ' to clipboard'} onClick={copy}>
+        <Icon name="dsDocCopy" size={20} />
+      </button>
+    </Tooltip>
   );
 }
 const QvEmpty = ({ children }) => <QvCol><div className="cph-qv-empty">{children}</div></QvCol>;
@@ -823,8 +833,8 @@ function TeamBox({ team }) {
 }
 
 function QuickViewBody({ view, client, attrsShown, onEditAttrs, preview }) {
-  /* Clinical views (allergies, medications, vitals, immunizations,
-     injections, scored instruments) live in 32-quickviews.jsx. */
+  /* Record views — every quick view but General and Incidents — live in
+     32-quickviews.jsx, 35-record-views.jsx and 37-coversheet.jsx. */
   if (view && isClinicalQV(view.key)) return <ClinicalQuickView view={view} client={client} preview={preview} />;
   const o = (view && view.options) || {};
   const cid = client.client_id;
@@ -844,212 +854,12 @@ function QuickViewBody({ view, client, attrsShown, onEditAttrs, preview }) {
           {o.showAttributes && <AttrBox shown={attrsShown} onEdit={onEditAttrs} />}
           {cols.map((col, i) => (
             <QvCol key={i}>
-              {col.map(f => <QvRow key={f} k={f} v={GENERAL_FIELDS[f](client)} copy={GENERAL_COPYABLE.indexOf(f) !== -1} />)}
+              {col.map(f => <QvRow key={f} k={f} v={GENERAL_FIELDS[f](client)} copy={GENERAL_COPYABLE.indexOf(f) !== -1 && client} />)}
             </QvCol>
           ))}
           {!fields.length && <QvEmpty>No identifiers selected for this header.</QvEmpty>}
           {o.showCareTeam && <TeamBox team={team} />}
         </React.Fragment>
-      );
-    }
-
-    case 'enrollment': {
-      const prg = PRG[client.programId];
-      const start = _parse(client.enrollment_date);
-      const days = start ? Math.round((TODAY - start) / 86400000) : null;
-      /* One prior episode for roughly two clients in three — enough to show
-         what the "include closed enrollments" switch does. Derived, like the
-         rest of the episode data the fixture set does not carry. */
-      const hadPrior = seed(cid + 'pe') % 3 !== 0;
-      const priorEnd = addDays(start || TODAY, -(30 + seed(cid + 'pe1') % 400));
-      const priorStart = addDays(priorEnd, -(120 + seed(cid + 'ps') % 300));
-      const payors = (RD.payors || []).filter(p => p.client_id === cid);
-      return (
-        <React.Fragment>
-          <QvCol head="Current episode">
-            <QvRow k="Program" v={client.program} />
-            <QvRow k="Modality" v={prg && prg.modality} />
-            <QvRow k="Site" v={client.siteName} />
-            <QvRow k="Enrolled" v={fmtDate(client.enrollment_date)} suffix={days != null ? days + ' days' : null} />
-            <QvRow k="Status" v={client.status} />
-          </QvCol>
-          {o.showClosed && (
-            <QvCol head="Closed enrollments">
-              {hadPrior
-                ? <QvItem name={client.program} meta={fmtDate(priorStart) + ' – ' + fmtDate(priorEnd)} tag="Closed" />
-                : <div className="cph-qv-empty">No closed enrollments.</div>}
-            </QvCol>
-          )}
-          {o.showPayor && (
-            <QvCol head="Payor">
-              {payors.length ? payors.map(p => (
-                <QvItem key={p.assignment_id}
-                  name={(PAYOR_PROVIDER[p.payor_provider_id] || {}).name || p.payor_provider_id}
-                  meta={p.policy_type + ' · policy ' + (p.policy_number || '—') + ' · from ' + fmtDate(p.begin_date)}
-                  tag={p.num_visits_authorized ? p.num_visits_authorized + ' visits auth.' : null} />
-              )) : <div className="cph-qv-empty">No payor assignment on file.</div>}
-            </QvCol>
-          )}
-        </React.Fragment>
-      );
-    }
-
-    case 'contact': {
-      const a = client.address || {};
-      return (
-        <React.Fragment>
-          <QvCol head="Reach the client">
-            <div className="cph-row"><Icon name="dsMail" size={20} className="cph-rowico" />
-              <a className="cph-link" href={'mailto:' + client.email}>{client.email}</a></div>
-            <div className="cph-row"><Icon name="dsPhone" size={20} className="cph-rowico" />
-              <a className="cph-link" href={'tel:' + client.phone}>{client.phone}</a>
-              <span className="cph-suffix">Text Enabled</span></div>
-            {o.showPreferred && <QvRow k="Preferred method" v={seed(cid + 'pm') % 2 ? 'Phone call' : 'Text message'} />}
-            {o.showPreferred && <QvRow k="Language" v={client.primary_language} />}
-          </QvCol>
-          {o.showAddress && (
-            <QvCol head="Address">
-              <QvRow k="Street" v={a.line1} />
-              <QvRow k="City" v={[a.city, a.state, a.zip].filter(Boolean).join(', ')} />
-              <QvRow k="Residence" v={client.residence} />
-              <QvRow k="Housing Type" v={client.housingType} />
-            </QvCol>
-          )}
-        </React.Fragment>
-      );
-    }
-
-    case 'appointments': {
-      const n = parseInt(o.count, 10) || 5;
-      let appts = (RD.appointments || []).filter(x => x.client_id === cid)
-        .map(x => ({ ...x, when: _parse(x.date), outcome: apptOutcome(x, TODAY) }))
-        .filter(x => x.when);
-      if (!o.includeMissed) appts = appts.filter(x => x.outcome !== 'No Show' && x.outcome !== 'Cancelled');
-      const upcoming = appts.filter(x => x.when > TODAY).sort((x, y) => x.when - y.when).slice(0, n);
-      const recent = appts.filter(x => x.when <= TODAY).sort((x, y) => y.when - x.when).slice(0, n);
-      const row = x => (
-        <QvItem key={x.appointment_id} name={x.appointment_reason || x.type}
-          meta={fmtDate(x.date) + ' · ' + x.start_time + ' · ' + sName(x.staff_id)}
-          tag={x.outcome === 'Scheduled' ? null : x.outcome}
-          tone={x.outcome === 'No Show' ? 'is-warn' : null} />
-      );
-      return (
-        <React.Fragment>
-          <QvCol head="Upcoming">
-            {upcoming.length ? upcoming.map(row) : <div className="cph-qv-empty">Nothing scheduled.</div>}
-          </QvCol>
-          <QvCol head="Recent">
-            {recent.length ? recent.map(row) : <div className="cph-qv-empty">No past appointments.</div>}
-          </QvCol>
-        </React.Fragment>
-      );
-    }
-
-    case 'notes': {
-      const n = parseInt(o.count, 10) || 5;
-      let docs = clientDocs(cid, 10);
-      if (o.unsignedFirst) {
-        const open = d => d.status !== 'Signed';
-        docs = docs.filter(open).concat(docs.filter(d => !open(d)));
-      }
-      docs = docs.slice(0, n);
-      const half = Math.ceil(docs.length / 2);
-      return (
-        <React.Fragment>
-          {[docs.slice(0, half), docs.slice(half)].filter(c => c.length).map((col, i) => (
-            <QvCol key={i} head={i === 0 ? 'Recent documentation' : ' '}>
-              {col.map(d => (
-                <QvItem key={d.id} name={d.name} meta={fmtDate(d.at) + ' · ' + d.by}
-                  tag={d.status === 'Signed' ? null : d.status}
-                  tone={d.status === 'Draft' ? 'is-warn' : null} />
-              ))}
-            </QvCol>
-          ))}
-          {!docs.length && <QvEmpty>No documentation on this chart.</QvEmpty>}
-        </React.Fragment>
-      );
-    }
-
-    case 'diagnoses': {
-      const list = o.activeOnly ? client.diagnoses.filter(d => isActiveStatus(d.status)) : client.diagnoses;
-      const half = Math.ceil(list.length / 2);
-      if (!list.length) return <QvEmpty>{o.activeOnly ? 'No active diagnoses on this chart.' : 'No diagnoses on this chart.'}</QvEmpty>;
-      return (
-        <React.Fragment>
-          {[list.slice(0, half), list.slice(half)].filter(c => c.length).map((col, i) => (
-            <QvCol key={i} head={i === 0 ? (o.activeOnly ? 'Active diagnoses (' + list.length + ')' : 'Diagnoses (' + list.length + ')') : ' '}>
-              {col.map(d => (
-                <QvItem key={d.client_dx_id} name={(o.showCodes ? d.icd10 + ' — ' : '') + d.description}
-                  meta={d.precedence + ' · onset ' + fmtDate(d.onset_date)} tag={d.status} />
-              ))}
-            </QvCol>
-          ))}
-        </React.Fragment>
-      );
-    }
-
-    case 'problems': {
-      const list = o.activeOnly ? client.problems.filter(p => isActiveStatus(p.status)) : client.problems;
-      const half = Math.ceil(list.length / 2);
-      if (!list.length) return <QvEmpty>{o.activeOnly ? 'No active problems on this chart.' : 'No problems on this chart.'}</QvEmpty>;
-      return (
-        <React.Fragment>
-          {[list.slice(0, half), list.slice(half)].filter(c => c.length).map((col, i) => (
-            <QvCol key={i} head={i === 0 ? (o.activeOnly ? 'Active problems (' + list.length + ')' : 'Problem list (' + list.length + ')') : ' '}>
-              {col.map(p => (
-                <QvItem key={p.client_problem_id} name={p.name}
-                  meta={[o.showCategory ? p.category : null, 'onset ' + fmtDate(p.onset_date)].filter(Boolean).join(' · ')}
-                  tag={p.status} />
-              ))}
-            </QvCol>
-          ))}
-        </React.Fragment>
-      );
-    }
-
-    case 'support': {
-      let list = supportContacts(client);
-      if (o.consentOnly) list = list.filter(s => s.release);
-      return (
-        <React.Fragment>
-          <QvCol head="Support contacts">
-            {list.length ? list.map(s => (
-              <QvItem key={s.name} name={s.name}
-                meta={[o.showRelationship ? s.role : null, s.emergency ? 'Emergency contact' : null].filter(Boolean).join(' · ')}
-                tag={s.release ? 'Release on file' : 'No release'}
-                tone={s.release ? null : 'is-warn'} />
-            )) : <div className="cph-qv-empty">No contacts with a release on file.</div>}
-          </QvCol>
-          <TeamBox team={team} />
-        </React.Fragment>
-      );
-    }
-
-    case 'assessments': {
-      const n = parseInt(o.count, 10) || 3;
-      const cat = ((RD.assessments || {}).instruments) || [];
-      const results = ((RD.assessments || {}).sample_results) || [];
-      /* Same seed key as the Client Summary tab's due list, so the header and
-         the page agree about which instruments this client is on. */
-      const list = pick(cat, cid + 'due', Math.min(n, cat.length));
-      if (!list.length) return <QvEmpty>No assessment instruments configured.</QvEmpty>;
-      return (
-        <QvCol head="Assessments">
-          {list.map(a => {
-            const every = cadenceDays(a.typical_cadence) || 180;
-            const last = addDays(TODAY, -(every - (seed(cid + a.assessment_id) % 40) + 20));
-            const next = addDays(last, every);
-            const days = Math.round((next - TODAY) / 86400000);
-            const score = results.find(r => r.client_id === cid && r.assessment_id === a.assessment_id);
-            return (
-              <QvItem key={a.assessment_id} name={a.name}
-                meta={(o.showScores && score ? 'Score ' + score.score + ' · ' + score.interpretation + ' · ' : '')
-                  + 'last ' + fmtDate(last)}
-                tag={days < 0 ? Math.abs(days) + ' days overdue' : 'due in ' + days + ' days'}
-                tone={days < 0 ? 'is-warn' : null} />
-            );
-          })}
-        </QvCol>
       );
     }
 
@@ -1059,24 +869,6 @@ function QuickViewBody({ view, client, attrsShown, onEditAttrs, preview }) {
           <div className="cph-qv-empty">No reportable incidents in this window.</div>
           <div className="cph-qv-note">Incident records are out of scope for this prototype — the option is here to show the configuration, not the data.</div>
         </QvCol>
-      );
-
-    case 'demographics':
-      return (
-        <React.Fragment>
-          <QvCol head="Demographics">
-            <QvRow k="Gender" v={client.gender} />
-            <QvRow k="Pronouns" v={client.pronouns} />
-            <QvRow k="Date of birth" v={fmtDate(client.dob) + ' (' + client.age + ')'} />
-            {o.showRaceEthnicity && <QvRow k="Race" v={client.race} />}
-          </QvCol>
-          <QvCol head=" ">
-            {o.showRaceEthnicity && <QvRow k="Ethnicity" v={client.ethnicity} />}
-            {o.showLanguage && <QvRow k="Language" v={client.primary_language} />}
-            {o.showLanguage && <QvRow k="Interpreter" v={client.primary_language === 'English' ? 'Not required' : 'Required'} />}
-            <QvRow k="MRN" v={client.mrn} />
-          </QvCol>
-        </React.Fragment>
       );
 
     default:
@@ -1118,7 +910,12 @@ function PillPager({ views, active, onSelect, maxRows = 2 }) {
     const full = wrap.clientWidth;
     let p = paginate(full);
     if (p.length > 1) p = paginate(full - ((arrowsRef.current && arrowsRef.current.offsetWidth) || 104) - GAP);
-    setPages(p);
+    /* Only a real repagination counts. Paging to a one-row page makes the
+       pager shorter, which fires the observer; handing back an equal but new
+       array would re-run the effect below and snap back to the open pill's
+       page — the "flash" on the last page. */
+    const sig = JSON.stringify(p);
+    setPages(prev => (JSON.stringify(prev) === sig ? prev : p));
   }, [maxRows]);
 
   useEffect(() => {
@@ -1180,16 +977,7 @@ function PillPager({ views, active, onSelect, maxRows = 2 }) {
   );
 }
 
-/* On a phone the button is pinned beside the name, in space that can't grow,
-   so its label shortens to "Chat". Its accessible name stays the full one. */
-function ChatWithChartButton({ compact }) {
-  return (
-    <button className={'cph-chat' + (compact ? ' cph-chat--compact' : '')} aria-label={compact ? 'Chat With Chart' : undefined}>
-      <Icon name="dsSparkle" size={compact ? 16 : 20} />
-      <span>{compact ? 'Chat' : 'Chat With Chart'}</span>
-    </button>
-  );
-}
+/* ChatWithChartButton lives with the drawer it opens, in 38-ai-assistant.jsx. */
 
 /* `preset` overrides the resolved one — that is how the Admin configuration
    page previews a draft with the real component instead of a mock of it. */
@@ -1278,7 +1066,7 @@ function ClientPageHeader({ client, preset, preview }) {
     { label: 'Blood Pressure', value: v ? v.bp_systolic + '/' + v.bp_diastolic : '—' },
     { count: 'Allergies (' + getAllergies(client).filter(a => (a.status || 'Active') === 'Active').length + ')' },
     { count: 'Vitals (' + allVitals.length + ')' },
-    { count: 'Problems List (' + client.problems.length + ')' },
+    { count: 'Problems List (' + getProblems(client).length + ')' },
     { count: 'Current Meds (' + getMeds(client).filter(m => m.status === 'Active').length + ')' },
     /* The DS frame labels this "Biological Sex" and its value is the one item
        in the row rendered Regular rather than Medium. */
@@ -1297,7 +1085,7 @@ function ClientPageHeader({ client, preset, preview }) {
   return (
     <section ref={cphRef} className={'cph' + (expanded ? ' cph--expanded' : '') + (narrow ? ' cph--narrow' : '') + (compact ? ' cph--compact' : '')} data-node-id="8139:96518"
       aria-label={'Client header — ' + client.displayName}>
-      {compact && header.showActions && <ChatWithChartButton compact />}
+      {compact && header.showActions && <ChatWithChartButton compact preview={preview} />}
       <div className="cph-top" ref={topRef}>
         {/* The one-line width the name, status and attributes would need. */}
         {wide && attrInd && shown.length > 0 && (
@@ -1341,7 +1129,7 @@ function ClientPageHeader({ client, preset, preview }) {
                 <span className="cph-divider" aria-hidden="true" />
                 <MoreActionsButton client={client} preview={preview} />
                 {!compact && <span className="cph-divider" aria-hidden="true" />}
-                {!compact && <ChatWithChartButton />}
+                {!compact && <ChatWithChartButton preview={preview} />}
               </React.Fragment>
             )}
           </div>

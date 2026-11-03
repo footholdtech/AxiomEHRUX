@@ -61,7 +61,7 @@ const MODULE_SPECS = {
     ],
     save: (c, f) => {
       addRecord('allergies', { allergy_id: newId('ALG'), client_id: c.client_id, allergen: f.allergen.trim(), allergen_category: f.category,
-        reaction: (f.reaction || '').trim() || null, severity_flag: f.severity, status: f.status });
+        reaction: (f.reaction || '').trim() || null, severity_flag: f.severity, status: f.status, ...enteredNow() });
       return { title: 'Allergy added', detail: f.allergen.trim() + ' · ' + f.severity + ' severity' };
     },
   },
@@ -114,33 +114,41 @@ const MODULE_SPECS = {
       return { title: 'Injection recorded', detail: f.med };
     },
   },
+  /* Diagnoses and problems share the header's store (getDiagnoses,
+     getProblems), so one added on either side shows on the other. */
   'Diagnosis': {
-    noun: 'Diagnosis', rows: c => pageRows(c.client_id, 'Diagnosis').concat(c.diagnoses || []),
-    cols: [['ICD-10', r => r.icd10], ['Description', r => r.description], ['Precedence', r => r.precedence || '—'], ['Status', r => r.status],
-      ['Onset', r => r.onset_date ? fmtDate(r.onset_date) : '—']],
+    noun: 'Diagnosis', rows: c => getDiagnoses(c),
+    cols: [['ICD-10', r => r.icd10], ['Description', r => r.description], ['Precedence', r => r.precedence || '—'], ['Condition', r => r.condition || '—'],
+      ['Status', r => r.status], ['Start', r => r.onset_date ? fmtDate(r.onset_date) : '—'], ['End', r => r.end_date ? fmtDate(r.end_date) : '—'],
+      ['Entered By', r => sName(r.entered_by_staff_id)]],
     fields: [
       { key: 'dx', label: 'Diagnosis', type: 'select', options: DX_CODES.map(d => d.icd10 + ' ' + d.description), required: true, wide: true },
       { key: 'precedence', label: 'Precedence', type: 'select', options: ['Primary', 'Secondary', 'Tertiary'], required: true },
       { key: 'status', label: 'Status', type: 'select', options: ['Active', 'Provisional', 'In Remission', 'Resolved'], required: true, def: 'Active' },
-      { key: 'onset', label: 'Onset date', type: 'date', def: () => isoOf(TODAY) },
+      { key: 'condition', label: 'Condition', type: 'select', options: ['Acute', 'Chronic'], required: true },
+      { key: 'onset', label: 'Start date', type: 'date', def: () => isoOf(TODAY) },
     ],
     save: (c, f) => {
       const d = DX_CODES.find(x => x.icd10 + ' ' + x.description === f.dx) || {};
-      addPageRow(c.client_id, 'Diagnosis', { client_dx_id: newId('CDX'), icd10: d.icd10, description: d.description, precedence: f.precedence, status: f.status, onset_date: f.onset || null });
+      addRecord('diagnoses', { client_dx_id: newId('CDX'), client_id: c.client_id, icd10: d.icd10, snomed_ct: d.snomed_ct, description: d.description,
+        diagnosis_type: dxType(d.icd10 || ''), behavioral: dxType(d.icd10 || '') !== 'Medical', precedence: f.precedence, status: f.status,
+        condition: f.condition, onset_date: f.onset || null, end_date: null, program: c.program, diagnosed_by_staff_id: ME.id, ...enteredNow() });
       return { title: 'Diagnosis added', detail: d.icd10 + ' · ' + f.status };
     },
   },
   'Problem List': {
-    noun: 'Problem', rows: c => pageRows(c.client_id, 'Problem List').concat(c.problems || []),
-    cols: [['Problem', r => r.name], ['Category', r => r.category || '—'], ['Status', r => r.status], ['Onset', r => r.onset_date ? fmtDate(r.onset_date) : '—']],
+    noun: 'Problem', rows: c => getProblems(c),
+    cols: [['Problem', r => r.name], ['Category', r => r.category || '—'], ['Status', r => r.status], ['Start', r => r.onset_date ? fmtDate(r.onset_date) : '—'],
+      ['End', r => r.end_date ? fmtDate(r.end_date) : '—'], ['Entered By', r => sName(r.entered_by_staff_id)]],
     fields: [
       { key: 'problem', label: 'Problem', type: 'select', options: (RD.problems || []).map(p => p.name), required: true, wide: true },
       { key: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive', 'Resolved'], required: true, def: 'Active' },
-      { key: 'onset', label: 'Onset date', type: 'date', def: () => isoOf(TODAY) },
+      { key: 'onset', label: 'Start date', type: 'date', def: () => isoOf(TODAY) },
     ],
     save: (c, f) => {
       const p = (RD.problems || []).find(x => x.name === f.problem) || {};
-      addPageRow(c.client_id, 'Problem List', { client_problem_id: newId('CPL'), name: f.problem, category: p.category, status: f.status, onset_date: f.onset || null });
+      addRecord('problems', { client_problem_id: newId('CPL'), client_id: c.client_id, problem_id: p.problem_id, name: f.problem, category: p.category,
+        status: f.status, onset_date: f.onset || null, end_date: null, program: c.program, ...enteredNow() });
       return { title: 'Problem added', detail: f.problem + ' · ' + f.status };
     },
   },
@@ -166,8 +174,7 @@ const MODULE_SPECS = {
   },
   'Appointments': {
     noun: 'Appointment',
-    rows: c => pageRows(c.client_id, 'Appointments').concat((RD.appointments || []).filter(a => a.client_id === c.client_id))
-      .sort((a, b) => String(b.date).localeCompare(String(a.date))),
+    rows: c => getAppointments(c).slice().sort((a, b) => String(b.date).localeCompare(String(a.date))),
     cols: [['Date', r => fmtDate(r.date)], ['Time', r => r.start_time ? noteTime('0000-00-00T' + r.start_time) : '—'], ['Reason', r => r.appointment_reason],
       ['With', r => sName(r.staff_id)], ['Meeting', r => r.meeting_type], ['Status', r => r.completion_status]],
     fields: [
@@ -388,6 +395,10 @@ const docTab = d => d.name + ' · ' + fmtDate(d.at);
 const docsFor = cid => clientDocs(cid, 10);
 const findDoc = (cid, module) => (module && module.indexOf('doc-') === 0 ? docsFor(cid).find(d => 'doc-' + slugify(d.id) === module) : null);
 const DOC_FILTERS = () => ({ client: ANY, author: ANY, type: ANY, status: ANY, from: isoOf(addDays(TODAY, -30)), to: isoOf(TODAY), q: '' });
+/* From a chart (the header's Clinical Notes): Documents opens filtered to
+   that client, over a longer window. Read once, when the page mounts. */
+let DOCS_PREFILL = null;
+const openDocumentsFor = (guard, client) => { DOCS_PREFILL = client.name; guard.go('/documents'); };
 
 function NewDocumentButton() {
   const guard = useGuard();
@@ -414,7 +425,11 @@ function NewDocumentButton() {
 
 function DocumentsPage() {
   const guard = useGuard();
-  const [f, setF] = useState(DOC_FILTERS);
+  const [f, setF] = useState(() => {
+    const d = DOC_FILTERS();
+    if (DOCS_PREFILL) { d.client = DOCS_PREFILL; d.from = isoOf(addDays(TODAY, -90)); DOCS_PREFILL = null; }
+    return d;
+  });
   const set = (k, v) => setF(x => ({ ...x, [k]: v }));
   /* Only charts the user can already open: outside-caseload documents appear
      once access has been requested. */

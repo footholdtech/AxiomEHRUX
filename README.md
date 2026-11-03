@@ -4,7 +4,7 @@ An interaction-design prototype for two problems raised on the LA County site
 visit. Built on the Radicle Health Design System, using the same tokens,
 components and chrome as the existing `axiom-ehr-prototype`.
 
-**Double-click `AxiomEHR-Prototype.html`.** One file, ~4.9 MB, nothing else
+**Double-click `AxiomEHR-Prototype.html`.** One file, ~6 MB, nothing else
 needed — no server, no Node, no internet, any browser. Styles, fonts, icons,
 reference data, React and Babel are all inlined.
 
@@ -23,7 +23,7 @@ Check in this order — in practice it has always been the first one.
 2. **Give it a second.** The splash (product name and a moving bar) appears in
    well under a tenth of a second. If you see the splash, it is working —
    Babel is compiling the app behind it.
-3. **Check the file size.** It should be about 4.9 MB. Email and chat clients
+3. **Check the file size.** It should be about 6 MB. Email and chat clients
    sometimes clip large attachments; a truncated copy says so on screen.
 
 ---
@@ -194,12 +194,27 @@ you won't get an intercept on those two paths.
 
 | File | What lives there |
 | --- | --- |
-| `src/00-core.jsx` | Theme, router, icons, avatar, buttons, checkbox, radio, dropdown, panel, toast |
+| `src/00-core.jsx` | Theme, router, icons, avatar, buttons, checkbox, radio, dropdown, panel, toast, `TabStrip`, `useElementWidth` / `useMedia` |
 | `src/10-data.jsx` | Projections over `window.REFDATA`; status vocabulary |
+| `src/15-uiconfig.jsx` | Client-header presets (admin) and personal preferences; the quick-view catalogue |
+| `src/16-records.jsx` | Records behind the quick views: fixture rows plus in-session edits |
+| `src/17-notifications.jsx` | Notification center store and counting rules |
 | `src/20-context.jsx` | Client context, the navigation guard, the intercept overlay |
-| `src/30-chrome.jsx` | Top bar, client switcher, persistent banner, left nav, sign-in |
-| `src/40-home.jsx` | Home, All Clients, non-client stubs |
-| `src/50-discharge.jsx` | Chart page and the Discharge Plan form |
+| `src/30-chrome.jsx` | Top bar, search, left nav, client page header and its pill pager, sign-in |
+| `src/32-quickviews.jsx` | Clinical quick views (allergies, medications, vitals, immunizations, injections, scored instruments) |
+| `src/33-serviceplans.jsx` | Service Plans quick view |
+| `src/34-notifications.jsx` | Bell, flyout and All Notifications page |
+| `src/35-record-views.jsx` | Record quick views: Diagnoses, Problems, Appointments, Clinical Notes, Assessments, Enrollment |
+| `src/36-notes.jsx` | Notes and documents opened on the chart |
+| `src/37-coversheet.jsx` | Cover Sheet page and the Demographics, Contact Info and Support Contacts quick views |
+| `src/38-ai-assistant.jsx` | AI Assistant drawer and Chat With Chart (see `AI-ASSISTANT-SPEC.md`) |
+| `src/40-home.jsx` | Home dashboard, All Clients, non-client stubs |
+| `src/45-ui-options.jsx` | Admin › User Interface Options and the client-header editor |
+| `src/46-attributes-admin.jsx` | Admin › Client Attributes |
+| `src/47-pages.jsx` | Section pages, Documents, record pages |
+| `src/48-quick-actions.jsx` | The header's round action buttons |
+| `src/49-communications.jsx` | Admin › Communications |
+| `src/50-discharge.jsx` | Chart page, Client Summary and the Discharge Plan form |
 | `src/60-summary.jsx` | The generated discharge summary |
 | `src/90-app.jsx` | Routes and mount |
 | `vendor/` | React, ReactDOM and Babel, vendored so nothing loads from a CDN |

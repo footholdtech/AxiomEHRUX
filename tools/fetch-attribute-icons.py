@@ -136,5 +136,8 @@ UI_ICONS = [
     ("Text Underline", "Underline"), ("Text Bullet List LTR", "Bulleted list"), ("Text Number List LTR", "Numbered list"),
     ("Link", "Link"), ("Attach", "Attach a file"), ("Emoji", "Emoji"), ("Bot", "AI avatar"), ("Chat Multiple", "Other messaging apps"),
     ("Lock Closed", "Locked by agency"), ("Flag", "High-priority attribute", "filled"), ("Shield Lock", "Secure portal"), ("Document Edit", "Draft in progress"),
+    ("Chat Sparkle", "Header AI assistant"), ("Arrow Up", "Send an AI prompt"), ("Calendar Today", "Prepare me for today"),
+    ("Calendar Week Numbers", "This week's schedule"), ("Task List LTR", "Outstanding tasks"), ("Arrow Counterclockwise", "Start a new conversation"),
+    ("Calendar Person", "Prepare me for my next session"), ("Document Bullet List Clock", "Documentation due"),
 ]
 write(UI_ICONS, ROOT / "assets" / "fluent-ui-icons.js", "ui", "Quick-action interface glyphs")
