@@ -34,7 +34,7 @@ Rendered on every client-specific page, full width, directly under the breadcrum
 | **Identity** — avatar, name with preferred name (e.g. `DeShawn "Dee" Carter`), status pill, pronouns, DOB with age | **Always** | Not configurable. The name takes the width it needs; the status pill sits directly after it. |
 | **Client Notes** button | **Always** | First in the action row; not configurable. Red badge top-right with the signed-in user's unread count. Opens an overlay of care-team notes about this client; each can be marked read/unread (§2a). |
 | **Actions toolbar** — round icon buttons | Configurable (on/off + which buttons) | Followed by two fixed controls whenever the toolbar is on: **More Actions** and **Chat With Chart**. Every round button shows a **tooltip** above it on hover/focus with its name. |
-| **Quick-view pills** | Expanded state only | Any number, in the admin's order. They take up to **two rows**; past that, **previous/next arrows** page through them ("1 of 2"). Paging browses — it doesn't change the open quick view. |
+| **Quick-view pills** | Expanded state only | Any number, in the admin's order. They take up to **two rows**; past that, **previous/next arrows** page through them ("1 of 2"). Paging browses — it doesn't change the open quick view. The page only jumps back to the open pill's page when the pills actually regroup (a resize), never because a shorter last page changed the header's height. |
 | **Expand Details / Collapse Details** toggle | Always | The only thing that changes expanded/collapsed. |
 | **Detail row** | Expanded state only | Content of the selected quick view. |
 | **Clinical Info strip** — weight, height, BMI, BP, and counts for allergies, vitals, problems, current meds; biological sex | Configurable (on/off) | Shown in both collapsed and expanded states when on. |
@@ -70,6 +70,13 @@ The same component, made denser so it doesn't take half the screen even when col
 - **Expand / collapse toggle:** sits on the DOB line and reads **Expand** / **Collapse**, so a collapsed header has no extra row for it. Its accessible name keeps "details".
 - **Quick-view pills:** one row with the previous/next arrows on the same line. The "1 of N" count is hidden.
 - **Clinical Info:** one line that scrolls sideways, instead of wrapping to four lines.
+
+**Quick-view content never runs past its column, at any width:**
+
+- **Values with no break points truncate.** An email address ends in an ellipsis inside its column, and the full address is the tooltip. A name or role in the Care Team box truncates the same way. Attribute marks are the exception above: they wrap, never truncate.
+- **Care Team is never narrower than one member** (a 120px tile plus padding). Beside a wide table, the table gives up the width.
+- **Narrow header:** record-table cells wrap and their side padding tightens from md to xs, so a seven-column table (Diagnoses) fits without scrolling.
+- **Phone layout:** record tables scroll sideways on their own, so the quick view's title and actions stay put. Vitals drop to two columns, cards and score tiles take the full width, and when a title and its actions don't fit on one line the actions move to a second line.
 
 The top bar follows the DS sizing spec:
 

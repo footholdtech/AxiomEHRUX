@@ -482,6 +482,46 @@ Behaviour and bug fixes completed and verified in-browser:
 - **Record pages.** Every module and page has a table and an **Add** that opens a form **on the page**, not a dialog, so the loop is visible: typing marks the page dirty, the breadcrumb and nav intercept, Save or Cancel makes it clean. Client modules render inside the chart; everything else is client-agnostic. Real specs for Allergy, Vitals, Immunization, Injection, Diagnosis, Problem List, Payor Assignment and Appointments; Prescription and the scored instruments keep their existing dialogs (prescribing and item-level scoring have real logic). Everything else uses sample entries with a date / status / entry form, labelled as sample data. Records save to the session store, so an allergy added on the Allergy page shows in the header count at once.
 - A deep-linked client switch now keeps the module or document that was asked for instead of dropping to the summary.
 
+### Quick actions, access requests, communications admin (2026-10-30)
+
+Specified in `CLIENT-HEADER-SPEC.md` §2c onward; code in `48-quick-actions.jsx`
+and `49-communications.jsx`. Client Access Requests ("break the glass") use
+clients outside the caseload from `tools/build-agency-clients.py` and ask for a
+reason in the client-switch intercept (`INTERCEPT-INTERACTION-SPEC.md`).
+
+### Record quick views, Cover Sheet, AI Assistant (2026-11-02)
+
+- **Record quick views** (`35-record-views.jsx`, `37-coversheet.jsx`) follow the
+  clinical views' pattern. Demographics, Contact Info and Support Contacts read
+  the new **Cover Sheet** page. Field lists are in `CLIENT-HEADER-SPEC.md`.
+- **Where Add goes is a product decision, not agency configuration.** The old
+  `QUICK_ADD` option is gone. Everything adds in the header except catalogue
+  entries marked `addOnPage` (PCL-5, AIMS) and notes, which open their page.
+- **General view IDs copy** (`CopyIdButton` in 30-chrome): "Copy to Clipboard"
+  tooltip, `.icon-btn` states, success toast naming the client. Inert in the
+  Admin preview (`client.records`).
+- **AI Assistant / Chat With Chart** (`38-ai-assistant.jsx`, spec in
+  `AI-ASSISTANT-SPEC.md`). One drawer, scoped to the chart when a client is in
+  context. Leaving the scope is Close Chart → `guard.clearClient()`, so unsaved
+  work still intercepts. `aiForget()` clears both conversations at sign-out.
+
+### Responsive layouts and quick-view overflow (2026-11-03)
+
+- **Card layouts fill wide screens; reading layouts cap.** `.page` caps at
+  1280px (was 1320); `.page--fluid` (Home, the chart page) doesn't. The chart's
+  `TabStrip` spans the window; every chart tab except the Client Summary sits in
+  `.page-capped`.
+- **Three columns from 1200px of content**, measured with `useElementWidth` on
+  the page, not the viewport — a 1280 window with the nav closed. Home keeps
+  its full-width table bands and pairs each list card with a two-column card
+  (`.home-span-wide`); equal thirds were tried and rejected because 395px cards
+  made Critical Info and Pending Labs scroll. The Client Summary goes
+  Needs Attention + Client Notes | Documentation, Messages, Appointments |
+  Engagement + Activity (`.cs--three`; the rail isn't sticky there).
+- **Quick-view overflow rules** are in `CLIENT-HEADER-SPEC.md` §2b. Swept every
+  view at 375 / 768 / 1024 / 1280 / 1440, in a chart and in the Admin preview
+  with all 24 views, by checking each element's box against its parent's.
+
 ## 4. Outstanding — needs the artboards
 
 Lisa's list, in her words, with what is blocking each:
@@ -535,17 +575,8 @@ python3 tools/serve.py                     # dev server, sends no-store
 `tools/build.py` must run after **any** change under `src/`, `styles/`,
 `assets/` or `vendor/`.
 
-| File | What lives there |
-|---|---|
-| `src/00-core.jsx` | Theme, router, icons, avatar, buttons, checkbox, radio, dropdown, panel, toast |
-| `src/10-data.jsx` | Projections over `window.REFDATA`; status vocabulary; caseload scoping; module list |
-| `src/20-context.jsx` | Client context, the navigation guard, the intercept overlay |
-| `src/30-chrome.jsx` | Top bar, client switcher, client banner, left nav, sign-in |
-| `src/40-home.jsx` | Home, All Clients, stubs, client-module picker |
-| `src/50-discharge.jsx` | Chart page and the Discharge Plan form |
-| `src/60-summary.jsx` | The generated discharge summary (active diagnoses/problems only — the selection intercept was removed 2026-09-28 at the customer's direction) |
-| `src/90-app.jsx` | Routes and mount |
-| `styles/discharge.css` | Everything new; loads after the shared `app.css` |
+The file-by-file map is in `README.md` → Working on it; keep that one table
+current rather than two.
 
 ### Traps already hit here — don't rediscover them
 
@@ -559,6 +590,20 @@ python3 tools/serve.py                     # dev server, sends no-store
 - **Never let `requestAnimationFrame` be the only path to a correct state** — it
   does not fire in a background or throttled tab. The bootstrap starts on
   whichever of rAF or a 150 ms timer fires first.
+- **`ResizeObserver` never fires in a throttled preview tab.** A layout that
+  only learns its width from the observer stays in its fallback forever.
+  `useElementWidth` measures once on mount for that reason. To test a callback
+  that depends on it, swap `window.ResizeObserver` for a stub you fire by hand,
+  then remount the component.
+- **An observer fires on height too.** `PillPager` re-measured when a one-row
+  last page shortened it, handed back an equal but new `pages` array, and the
+  keep-the-active-pill-visible effect snapped back to page 1. Only replace
+  measured state when it actually differs.
+- **Inline links ignore `text-overflow`.** `.cph-link` is `nowrap` with an
+  ellipsis, but as an inline `<a>` it ran into the next column. Wrap it in a
+  block (`.qvx-trunc`).
+- **A fixed-width child needs a floor on its shrinking parent.** The 120px
+  care-team tile spilled out of a `flex: 1 0 0` box that had shrunk to 111px.
 - **A blank page is usually a dead dev server**, not a broken build. Check
   `preview_list` before debugging the app.
 - **A blank preview is often a port collision, not a dead server.** Hit twice
