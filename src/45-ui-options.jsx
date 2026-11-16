@@ -127,9 +127,11 @@ const UI_OPTION_CARDS = [
     meta: () => THEMES.length + ' themes available',
   },
   {
-    key: 'tabs', title: 'Tab Sets', Preview: PvTabs, ready: false,
-    blurb: 'Which chart tabs a program sees, in what order, and which one a chart opens on.',
-    meta: () => 'Chart, module and dashboard tab sets',
+    key: 'tabs', title: 'Tab Sets', Preview: PvTabs, ready: true,
+    to: '/user-interface-options/tab-sets',
+    blurb: 'Which chart tabs each role sees, in what order, and which one a chart opens on. Client pages only, so a tab never leaves the chart.',
+    meta: cfg => cfg.tabSets.length + ' tab set' + (cfg.tabSets.length === 1 ? '' : 's') + ' · '
+      + cfg.tabSets.reduce((n, s) => n + s.roles.length, 0) + ' of ' + STAFF_ROLE_NAMES.length + ' roles assigned',
   },
 ];
 
@@ -314,7 +316,7 @@ function FieldsOption({ opt, view, onChange }) {
       <div className="qvo-field-opt" role="checkbox" aria-checked={on} tabIndex={0}
         onClick={() => toggle(ch)}
         onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(ch); } }}>
-        <Checkbox checked={on} onChange={() => {}} ariaLabel={ch} />
+        <Checkbox checked={on} onChange={() => {}} ariaLabel={ch} presentational />
         <span>{ch}</span>
       </div>
     );
@@ -473,6 +475,11 @@ const PREVIEW_CLIENT = {
   program: 'Preview Program', programId: null, siteName: 'Preview Site',
   enrollment_date: '2020-01-01', funding: 'Demo — Not Billed',
   residence: 'Toon Manor', housingType: 'Independent',
+  /* So the residential fields have something to preview. */
+  bed: { room: 'T-101', bed: 'A', unit_name: 'Unit 1 - Preview Housing', admit_date: '2026-08-01', attending_name: 'Goofy Goof',
+    admission_reason: 'Preview admission', legal_status: 'Voluntary', expected_discharge: '2026-12-01', precautions: null,
+    location: 'Preview Campus · Building A', roommates: ['Pluto Mouse (Bed B)'],
+    attendance: { status: 'Present', date: '2026-09-22', time: '07:05', today: true } },
   /* A care team of Disney characters can never be mistaken for a real
      assignment pulled off a real roster — see the `client.team ||
      careTeam(...)` fallback in `QuickViewBody`. */

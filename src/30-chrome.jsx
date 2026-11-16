@@ -36,6 +36,10 @@ const CLINICAL_FORMS = [
    in context rather than adopting one. */
 const NAV_SECTIONS = [
   { key: 'home', label: 'Home', icon: 'home', to: '/' },
+  /* A client page, like a module: it opens in the chart in context, or on
+     the client picker. Services group a client's workflows (an intake, a
+     discharge) with their steps and deadlines; see 56-services-staff.jsx. */
+  { key: 'services', label: 'Services', icon: 'uiTaskListLTR', module: 'Services' },
   {
     key: 'clients', label: 'Clients', icon: 'clients',
     categories: [
@@ -66,7 +70,9 @@ const NAV_SECTIONS = [
   {
     key: 'admin', label: 'Admin', icon: 'admin',
     categories: [
-      { label: 'Builders', items: ['Dynamic Form Builder', 'Dynamic Forms', 'Dynamic Report'] },
+      /* Service Builder and Due Date Rules sit together: a service subscribes
+         to due date rules, and a rule does nothing until a service does. */
+      { label: 'Builders', items: ['Dynamic Form Builder', 'Dynamic Forms', 'Dynamic Report', 'Service Builder', 'Due Date Rules'] },
     ],
     links: ['Announcement Centre', 'Daily Extract', 'Data Import', 'Encounter Form Management', 'Group Editor', 'HR', 'Patient/Employee Restriction', 'Program Management', 'Service Plan Field Manager', 'Specific Security', 'Support', 'User Interface Options'],
   },
@@ -87,7 +93,7 @@ const SECTION_PATH = { clients: '/clients', documents: '/documents', reports: '/
 const NAV_PLACE = (() => {
   const m = {};
   NAV_SECTIONS.forEach(s => {
-    if (s.to) return;
+    if (s.to || s.module) return;
     (s.categories || []).forEach(c => c.items.forEach(i => { if (!m[i]) m[i] = { section: s, category: c.label }; }));
     (s.links || []).forEach(l => { if (!m[l]) m[l] = { section: s, category: null }; });
   });
@@ -277,11 +283,14 @@ function TopNav({ onHamburger, navOpen, onPrefs }) {
     <header className={'topnav' + (tablet ? ' topnav--tablet' : '') + (mobile ? ' topnav--mobile' : '')}>
       <div className="tn-left">
         <button className={'hamburger' + (navOpen ? ' active' : '')} aria-label="Menu" aria-expanded={navOpen} onClick={onHamburger}><Icon name="menu" size={20} /></button>
-        {!mobile && (
-          <button className="org" onClick={() => guard.go('/')} title={'Go to ' + AGENCY.name + ' home'}>
-            <span className="logo-dot"><Icon name="plus" size={9} /></span> {AGENCY.name}
-          </button>
-        )}
+        {/* The agency's mark at every width — on a phone it's the only thing
+            saying whose system this is. There it sits beside the menu button
+            and takes whatever room the right-hand controls leave; the name
+            shortens with an ellipsis before the mark ever does. */}
+        <button className="org" onClick={() => guard.go('/')} title={'Go to ' + AGENCY.name + ' home'} aria-label={AGENCY.name + ' home'}>
+          <span className="logo-dot" aria-hidden="true"><Icon name="plus" size={9} /></span>
+          <span className="org-name">{AGENCY.name}</span>
+        </button>
         {!mobile && <GlobalSearch />}
       </div>
       <div className="tn-right">
@@ -657,7 +666,7 @@ function AttributesOverlay({ client, onClose }) {
       <div key={a.attribute_id + (why ? '-s' : '')} className={'attrmodal-opt' + (on ? ' is-on-chart' : '')} role="checkbox"
         aria-checked={checked} aria-disabled={on} tabIndex={on ? -1 : 0} onClick={act}
         onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); act(); } }}>
-        <Checkbox checked={checked} disabled={on} onChange={() => {}} ariaLabel={a.name} />
+        <Checkbox checked={checked} disabled={on} onChange={() => {}} ariaLabel={a.name} presentational />
         <span className="attrm-glyph"><AttrGlyph attr={a} /></span>
         <span className="attrmodal-opt-text">
           <span className="attrmodal-opt-name">{a.name}<AttrFlag attr={a} /><AttrInfo attr={a} /></span>
@@ -796,7 +805,39 @@ const GENERAL_FIELDS = {
   'Axiom ID': c => c.axiomId, 'CIN': c => c.cin, 'Shared Service ID': c => c.sharedServiceId,
   'MRN': c => c.mrn, 'Funding': c => c.funding, 'Residence': c => c.residence,
   'Housing Type': c => c.housingType, 'Primary Language': c => c.primary_language,
+  /* Residential episode (10-data.jsx `bed`). On a chart with no bed these read
+     "—": the field is the agency's choice, not a claim about the client. */
+  'Site / Building': c => (c.bed && c.bed.location) || locationOf(c),
+  'Room / Bed': c => c.bed && c.bed.room + ' · Bed ' + c.bed.bed,
+  /* Everyone else in the room, including children living with a parent in
+     family housing. A string, so the full list is the tooltip. */
+  'Roommates': c => {
+    if (!c.bed) return null;
+    const r = c.bed.roommates || roommatesOf(c).map(m => m.name + (m.kind === 'dependent' ? ' (' + m.relationship.toLowerCase() + ', ' + m.age + ')' : ' (Bed ' + m.bed + ')'));
+    return r.length ? r.join(', ') : 'None';
+  },
+  /* The latest Daily Attendance status and when it was taken. No record
+     today reads as Not recorded, with the last one for context. */
+  'Daily Attendance': c => {
+    if (!c.bed) return null;
+    const a = c.bed.attendance || attendanceOf(c.client_id);
+    if (!a) return <span className="badge status-warn">Not recorded</span>;
+    const when = (a.today ? 'Today' : fmtDate(a.date)) + ' ' + fmtTime(a.time);
+    return a.today
+      ? <span className="cph-att"><span className={'badge ' + ATTENDANCE_TONE[a.status]}>{a.status}</span> {when}</span>
+      : <span className="cph-att"><span className="badge status-warn">Not recorded today</span> Last: {a.status}, {when}</span>;
+  },
+  'Unit': c => c.bed && c.bed.unit_name,
+  'Admit Date': c => c.bed && fmtDate(c.bed.admit_date),
+  'Length of Stay': c => c.bed && daysSince(c.bed.admit_date) + ' days',
+  'Attending': c => c.bed && (c.bed.attending_name || sName(c.bed.attending_staff_id)),
+  'Admission Reason': c => c.bed && c.bed.admission_reason,
+  'Legal Status': c => c.bed && c.bed.legal_status,
+  'Expected Discharge': c => c.bed && (c.bed.expected_discharge === isoOf(TODAY) ? 'Today' : fmtDate(c.bed.expected_discharge)),
+  'Precautions': c => c.bed && (c.bed.precautions || 'None'),
 };
+const ATTENDANCE_TONE = { Present: 'status-active', 'On leave': 'status-info', Absent: 'status-warn' };
+const daysSince = iso =>Math.max(0, Math.round((TODAY - _parse(iso)) / 86400000));
 const GENERAL_COPYABLE = ['Axiom ID', 'CIN', 'MRN'];
 
 function AttrBox({ shown, onEdit }) {
@@ -1193,10 +1234,11 @@ function Breadcrumbs({ items }) {
     if (!it.to) return;
     const opts = it.client !== undefined ? { client: it.client } : {};
     if (it.to !== path) return guard.go(it.to, opts);
-    /* Already here. A chart crumb means "this client's summary": on another
-       tab, go back to it; on the summary, reload it. Either way it runs
-       through the guard, so unsaved work is still intercepted. */
-    if (it.chartHome && guard.chartTab && guard.chartTab !== CHART_HOME_TAB)
+    /* Already here. A chart crumb means "this chart's first tab", which
+       comes from the tab set, so the chart itself decides: on another tab it
+       goes back, on the first tab it reloads. Either way it runs through the
+       guard, so unsaved work is still intercepted. */
+    if (it.chartHome && guard.chartTab)
       return window.dispatchEvent(new Event('axiom-chart-home'));
     guard.request({ to: it.to, ...opts, onCommit: requestPageReload });
   };
@@ -1227,6 +1269,8 @@ function ChartChrome() {
   const c = guard.client;
   if (!c) return null;
   if (clientIdForPath(path) !== c.client_id) return null;
+  /* A worklist lays out its own header, beside its list. */
+  if (path.indexOf('/residential/worklist/') === 0) return null;
   return (
     <div className="chart-chrome">
       {/* Clients › <client> › <active tab>. The trail has to describe how you
@@ -1290,12 +1334,12 @@ function LeftNav({ open, navRef }) {
       <div className="leftnav-rail">
         <div className="ln-body">
           {NAV_SECTIONS.map(s => {
-            const hasChildren = !s.to;
-            const selected = hasChildren ? section === s.key : path === s.to;
+            const hasChildren = !s.to && !s.module;
+            const selected = hasChildren ? section === s.key : s.module ? /\/services$/.test(path) : path === s.to;
             return (
               <button key={s.key} className={'ln-item' + (selected ? ' selected' : '')}
                 aria-expanded={hasChildren ? section === s.key : undefined}
-                onClick={() => { if (!hasChildren) { setSection(null); return guard.go(s.to); } setSection(k => k === s.key ? null : s.key); }}>
+                onClick={() => { if (!hasChildren) { setSection(null); return s.module ? openModule(s.module) : guard.go(s.to); } setSection(k => k === s.key ? null : s.key); }}>
                 <span className="ln-left"><Icon name={s.icon} size={24} /><span className="ln-label">{s.label}</span></span>
                 {hasChildren && <Icon name="chevronRight" size={20} className="ln-chev" />}
               </button>
@@ -1366,6 +1410,7 @@ function PreferencesFlyout({ open, onClose }) {
   const draftOf = () => ({
     mode: themeCtx.mode, theme: themeCtx.theme,
     headerPreset: ui.prefs.headerPreset, collapsedByDefault: ui.prefs.collapsedByDefault !== false,
+    tabSet: ui.prefs.tabSet || 'auto',
   });
   const [draft, setDraft] = useState(draftOf);
   useEffect(() => { if (open) setDraft(draftOf()); }, [open]);
@@ -1381,7 +1426,18 @@ function PreferencesFlyout({ open, onClose }) {
   const patch = obj => setDraft(d => ({ ...d, ...obj }));
   const dirty = draft.mode !== themeCtx.mode || draft.theme !== themeCtx.theme
     || draft.headerPreset !== prefs.headerPreset
-    || draft.collapsedByDefault !== (prefs.collapsedByDefault !== false);
+    || draft.collapsedByDefault !== (prefs.collapsedByDefault !== false)
+    || draft.tabSet !== (prefs.tabSet || 'auto');
+
+  /* Tab sets work like headers: my role's set unless I pick another — an
+     active agency set, or one I made myself from the Tabs Set menu in a
+     chart. Ids, not names, because my own set can share a name with an
+     agency one. */
+  const { roleTabSet, agencyTabSets, myTabSets } = ui;
+  const tabOptions = [{ value: 'auto', label: 'Use my role’s tab set (' + roleTabSet.name + ')', sub: roleTabSet.tabs.length + ' tabs · set by your agency' }]
+    .concat(agencyTabSets.map(s => ({ value: s.id, label: s.name, sub: s.tabs.length + ' tabs · agency' })))
+    .concat(myTabSets.map(s => ({ value: s.id, label: s.name, sub: s.tabs.length + ' tabs · only you' })));
+  const tabValue = tabOptions.some(o => o.value === draft.tabSet) ? draft.tabSet : 'auto';
 
   /* Only a header actually in circulation can be picked here — one an admin
      has switched to inactive (often to test it before rolling it out) is not
@@ -1401,7 +1457,8 @@ function PreferencesFlyout({ open, onClose }) {
   const save = () => {
     themeCtx.setMode(draft.mode);
     themeCtx.setTheme(draft.theme);
-    ui.setPrefs({ headerPreset: draft.headerPreset, collapsedByDefault: draft.collapsedByDefault });
+    ui.setPrefs({ headerPreset: draft.headerPreset, collapsedByDefault: draft.collapsedByDefault,
+      tabSet: draft.tabSet === roleTabSet.id ? 'auto' : draft.tabSet });
     onClose();
   };
 
@@ -1428,6 +1485,14 @@ function PreferencesFlyout({ open, onClose }) {
             <div className="pref-note pref-note--tight">
               Opens every chart with the header collapsed. You can still expand it on any chart.
             </div>
+          </div>
+
+          <div className="pref-label">Tab Set</div>
+          <Dropdown id="pref-tabset-select" value={tabValue} options={tabOptions} display={(tabOptions.find(o => o.value === tabValue) || tabOptions[0]).label}
+            onChange={v => patch({ tabSet: v })} />
+          <div className="pref-note pref-note--tight">
+            The tabs every chart shows, and the one it opens on. You can also switch sets, or make your
+            own, from Tabs Set in any chart.
           </div>
 
           <div className="pref-label">Theme</div>
@@ -1458,6 +1523,17 @@ function AppShell({ children }) {
   const reload = usePageReload();
   const [prefsOpen, setPrefsOpen] = useState(false);
   const navRef = useRef(null);
+  /* A new page starts at its top. The window is the scroller, and a hash
+     route change doesn't reset it, so going from a long page (the
+     Residential census) to a chart used to land partway down the chart.
+     A layout effect, so the old offset is never painted on the new page. */
+  const path = usePath();
+  const lastPath = useRef(path);
+  React.useLayoutEffect(() => {
+    if (lastPath.current === path) return;
+    lastPath.current = path;
+    window.scrollTo(0, 0);
+  }, [path]);
 
   /* The rail (first panel) is not an overlay — it stays open across clicks
      and navigation, exactly like the clinician's own "keep navigation open"

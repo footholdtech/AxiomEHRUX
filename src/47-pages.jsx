@@ -269,38 +269,50 @@ function blankFor(spec) {
   (spec.fields || []).forEach(fd => { f[fd.key] = typeof fd.def === 'function' ? fd.def() : (fd.def || ''); });
   return f;
 }
-function PageForm({ spec, title, dirtyLabel, scope, onDone }) {
+/* A field counts only while it's showing (`when`), and a checklist (`checks`)
+   is answered once anything in it is ticked. Shared with the residential
+   worklist, which renders the same specs. */
+const fieldShown = (fd, f) => !fd.when || fd.when(f);
+const fieldMissing = (fd, f) => fd.required && fieldShown(fd, f)
+  && (Array.isArray(f[fd.key]) ? !f[fd.key].length : !String(f[fd.key] || '').trim());
+const specMissing = (spec, f) => (spec.fields || []).some(fd => fieldMissing(fd, f));
+function SpecFields({ spec, f, set, tried, idPrefix = 'pf' }) {
+  return (
+    <div className="pf-grid">
+      {spec.fields.filter(fd => fieldShown(fd, f)).map(fd => {
+        const e = tried && fieldMissing(fd, f) ? fd.label + ' is required.' : null;
+        if (fd.type === 'date') return <div key={fd.key} className={fd.wide ? 'pf-wide' : ''}><DateField label={fd.label} required={fd.required} quick={false} value={f[fd.key]} onChange={v => set(fd.key, v)} error={e} /></div>;
+        return (
+          <Field key={fd.key} label={fd.label} required={fd.required} error={e} wide={fd.wide} hint={fd.hint}>
+            {fd.type === 'select' ? <Dropdown value={f[fd.key]} options={optionsOf(fd)} placeholder="Please select an option" onChange={v => set(fd.key, v)} invalid={!!e} menuMinWidth={260} />
+              : fd.type === 'radio' ? <RadioGroup name={idPrefix + '-' + fd.key} options={optionsOf(fd)} value={f[fd.key]} onChange={v => set(fd.key, v)} invalid={!!e} />
+              : fd.type === 'checks' ? <CheckGroup options={optionsOf(fd)} value={f[fd.key] || []} onChange={v => set(fd.key, v)} columns={fd.columns} />
+              : fd.type === 'textarea' ? <TextArea value={f[fd.key]} onChange={v => set(fd.key, v)} rows={3} invalid={!!e} />
+              : <TextIn value={f[fd.key]} onChange={v => set(fd.key, fd.type === 'number' ? v.replace(/[^0-9.]/g, '') : v)} invalid={!!e} />}
+          </Field>
+        );
+      })}
+    </div>
+  );
+}
+function PageForm({ spec, title, dirtyLabel, scope, onDone, onSaved }) {
   const guard = useGuard();
   const [f, setF] = useState(() => blankFor(spec));
   const [tried, setTried] = useState(false);
   const set = (k, v) => { setF(x => ({ ...x, [k]: v })); guard.markDirty(dirtyLabel); };
-  const missing = fd => fd.required && !String(f[fd.key] || '').trim();
   const cancel = () => { guard.clearDirty(); onDone(); };
   const save = () => {
     setTried(true);
-    if ((spec.fields || []).some(missing)) return;
+    if (specMissing(spec, f)) return;
     const t = spec.save(scope, f);
     guard.clearDirty();
     guard.setToast({ status: 'success', ...t });
+    if (onSaved) onSaved();
     onDone();
   };
-  const err = fd => (tried && missing(fd) ? fd.label + ' is required.' : null);
   return (
     <Panel title={title}>
-      <div className="pf-grid">
-        {spec.fields.map(fd => {
-          const e = err(fd);
-          if (fd.type === 'date') return <div key={fd.key} className={fd.wide ? 'pf-wide' : ''}><DateField label={fd.label} required={fd.required} quick={false} value={f[fd.key]} onChange={v => set(fd.key, v)} error={e} /></div>;
-          return (
-            <Field key={fd.key} label={fd.label} required={fd.required} error={e} wide={fd.wide}>
-              {fd.type === 'select' ? <Dropdown value={f[fd.key]} options={optionsOf(fd)} placeholder="Please select an option" onChange={v => set(fd.key, v)} invalid={!!e} menuMinWidth={260} />
-                : fd.type === 'radio' ? <RadioGroup name={'pf-' + fd.key} options={optionsOf(fd)} value={f[fd.key]} onChange={v => set(fd.key, v)} invalid={!!e} />
-                : fd.type === 'textarea' ? <TextArea value={f[fd.key]} onChange={v => set(fd.key, v)} rows={3} invalid={!!e} />
-                : <TextIn value={f[fd.key]} onChange={v => set(fd.key, fd.type === 'number' ? v.replace(/[^0-9.]/g, '') : v)} invalid={!!e} />}
-            </Field>
-          );
-        })}
-      </div>
+      <SpecFields spec={spec} f={f} set={set} tried={tried} />
       <div className="pf-foot">
         <Button variant="secondary" onClick={cancel}>Cancel</Button>
         <Button variant="primary" onClick={save}>Save {spec.noun}</Button>
@@ -310,7 +322,7 @@ function PageForm({ spec, title, dirtyLabel, scope, onDone }) {
 }
 
 /* ---- Records: a table, and a way to add one ---------------------- */
-function RecordsBody({ spec, scope, label, rows, sampleNote }) {
+function RecordsBody({ spec, scope, label, rows, sampleNote, onSaved, banner }) {
   const [adding, setAdding] = useState(false);
   const [dialog, setDialog] = useState(false);
   const Dlg = spec.overlay;
@@ -318,7 +330,8 @@ function RecordsBody({ spec, scope, label, rows, sampleNote }) {
   const addLabel = 'Add ' + (spec.generic ? (spec.noun === 'Record' ? 'Record' : 'Entry') : spec.noun);
   return (
     <React.Fragment>
-      {adding && <PageForm spec={spec} scope={scope} dirtyLabel={label} title={'New ' + (spec.generic ? (spec.noun === 'Record' ? label + ' Record' : label + ' Entry') : spec.noun)} onDone={() => setAdding(false)} />}
+      {banner}
+      {adding && <PageForm spec={spec} scope={scope} dirtyLabel={label} onSaved={onSaved} title={'New ' + (spec.generic ? (spec.noun === 'Record' ? label + ' Record' : label + ' Entry') : spec.noun)} onDone={() => setAdding(false)} />}
       <Panel title={label + ' (' + rows.length + ')'}
         action={!adding && <Button size="sm" variant={adding ? 'secondary' : 'primary'} onClick={add}><Icon name="plus" size={14} /> {addLabel}</Button>}>
         {sampleNote && <div className="pf-sample">{sampleNote}</div>}
@@ -341,7 +354,9 @@ function RecordsBody({ spec, scope, label, rows, sampleNote }) {
 function ClientModulePage({ client, module }) {
   useRecordsVersion();
   const spec = specForModule(module);
+  /* Saving this page completes the matching step of an open service. */
   return <div className="pf-page"><RecordsBody spec={spec} scope={client} label={module} rows={spec.rows(client)}
+    banner={<SbStepBanner client={client} doc={module} />} onSaved={() => sbDocFiled(client.client_id, module, TODAY_ISO)}
     sampleNote={spec.generic ? 'Sample entries. This module’s own fields aren’t built in the prototype; the form shows the save and unsaved-changes flow.' : null} /></div>;
 }
 

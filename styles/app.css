@@ -661,7 +661,13 @@ input { font-family: inherit; }
 /* labeled form fields */
 .form-field { display: flex; flex-direction: column; gap: 6px; }
 .form-field > label { font-size: 12px; font-weight: 600; color: var(--foreground-secondary); }
-.form-input { display: flex; align-items: center; gap: 8px; border: 1px solid var(--border-input-control-primary-default, #b6c2c8); border-radius: var(--radius-sm); background: var(--background-surface-primary); padding: 8px var(--sp-md); }
+/* Every single-line control is 36px tall, the same as .dd-trigger, so a
+   number, a search box, a date and a dropdown line up in one row. The input
+   stretches to fill the box (a full-height click target), and a clear or
+   inline icon button is compacted so it can't make the box taller. */
+.form-input { display: flex; align-items: center; gap: 8px; min-height: 36px; border: 1px solid var(--border-input-control-primary-default, #b6c2c8); border-radius: var(--radius-sm); background: var(--background-surface-primary); padding: 3px var(--sp-md); }
+.form-input > input { align-self: stretch; }
+.form-input > .icon-btn, .form-input > .date-clear { padding: 3px; margin: -3px 0; }
 .form-input:focus-within { border-color: var(--background-interactive-primary-default); }
 .form-input input { border: none; outline: none; background: none; width: 100%; font-size: 13px; color: var(--foreground-primary); font-family: var(--font-sans); }
 .form-input svg { color: var(--foreground-tertiary); flex: none; }

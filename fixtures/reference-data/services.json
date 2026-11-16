@@ -1,0 +1,4016 @@
+{
+  "_meta": {
+    "description": "Admin > Service Builder seed: building block libraries, templates, versioned services, staff specific security, and a few service instances for synthetic clients. Agency configuration plus fictional client links only. 100% fictional.",
+    "fields": {
+      "templates": [
+        "template_id",
+        "name",
+        "collection",
+        "source",
+        "updated",
+        "config"
+      ],
+      "services": [
+        "service_id",
+        "name",
+        "started_from",
+        "status",
+        "created",
+        "versions"
+      ],
+      "versions": [
+        "version",
+        "effective",
+        "changed",
+        "changed_by",
+        "note",
+        "config"
+      ],
+      "config": [
+        "description",
+        "roles",
+        "programs",
+        "sites",
+        "codes",
+        "payors",
+        "funding",
+        "dx_set",
+        "precedence",
+        "sensitivity",
+        "duration_min",
+        "steps",
+        "deadline_rule_id"
+      ],
+      "steps": [
+        "step_id",
+        "kind",
+        "name",
+        "required",
+        "rule_ids",
+        "after"
+      ],
+      "instances": [
+        "instance_id",
+        "client_id",
+        "service_id",
+        "version",
+        "date_of_service",
+        "anchor_date",
+        "started_by",
+        "status",
+        "steps"
+      ]
+    }
+  },
+  "blocks": {
+    "service_codes": [
+      {
+        "code_id": "SC-90791",
+        "code": "90791",
+        "description": "Psychiatric diagnostic evaluation",
+        "unit": "per evaluation"
+      },
+      {
+        "code_id": "SC-90832",
+        "code": "90832",
+        "description": "Psychotherapy, 30 minutes",
+        "unit": "per session"
+      },
+      {
+        "code_id": "SC-90834",
+        "code": "90834",
+        "description": "Psychotherapy, 45 minutes",
+        "unit": "per session"
+      },
+      {
+        "code_id": "SC-90837",
+        "code": "90837",
+        "description": "Psychotherapy, 60 minutes",
+        "unit": "per session"
+      },
+      {
+        "code_id": "SC-90847",
+        "code": "90847",
+        "description": "Family psychotherapy, client present",
+        "unit": "per session"
+      },
+      {
+        "code_id": "SC-90839",
+        "code": "90839",
+        "description": "Psychotherapy for crisis, first 60 minutes",
+        "unit": "per session"
+      },
+      {
+        "code_id": "SC-H0031",
+        "code": "H0031",
+        "description": "Mental health assessment, non-physician",
+        "unit": "per assessment"
+      },
+      {
+        "code_id": "SC-H0032",
+        "code": "H0032",
+        "description": "Mental health service plan development, non-physician",
+        "unit": "per plan"
+      },
+      {
+        "code_id": "SC-T1017",
+        "code": "T1017",
+        "description": "Targeted case management",
+        "unit": "per 15 minutes"
+      },
+      {
+        "code_id": "SC-H0038",
+        "code": "H0038",
+        "description": "Self-help / peer services",
+        "unit": "per 15 minutes"
+      },
+      {
+        "code_id": "SC-H2011",
+        "code": "H2011",
+        "description": "Crisis intervention service",
+        "unit": "per 15 minutes"
+      },
+      {
+        "code_id": "SC-H2015",
+        "code": "H2015",
+        "description": "Comprehensive community support services",
+        "unit": "per 15 minutes"
+      }
+    ],
+    "modifiers": [
+      {
+        "modifier": "HA",
+        "description": "Child / adolescent program"
+      },
+      {
+        "modifier": "HE",
+        "description": "Mental health program"
+      },
+      {
+        "modifier": "HF",
+        "description": "Substance use program"
+      },
+      {
+        "modifier": "HO",
+        "description": "Master's degree level"
+      },
+      {
+        "modifier": "95",
+        "description": "Synchronous telehealth"
+      }
+    ],
+    "diagnosis_sets": [
+      {
+        "set_id": "DXS-BH",
+        "name": "Any behavioral health diagnosis",
+        "codes": "F01–F99"
+      },
+      {
+        "set_id": "DXS-MOOD",
+        "name": "Depressive and anxiety disorders",
+        "codes": "F32–F33, F41"
+      },
+      {
+        "set_id": "DXS-SUD",
+        "name": "Substance use disorders",
+        "codes": "F10–F19"
+      },
+      {
+        "set_id": "DXS-TRAUMA",
+        "name": "Trauma and stressor-related disorders",
+        "codes": "F43"
+      },
+      {
+        "set_id": "DXS-CHILD",
+        "name": "Child and adolescent conditions",
+        "codes": "F32–F33, F43, F90–F98"
+      },
+      {
+        "set_id": "DXS-SMI",
+        "name": "Serious mental illness",
+        "codes": "F20–F29, F31, F33"
+      }
+    ],
+    "precedence": [
+      {
+        "precedence_id": "DXP-EPISODE",
+        "name": "Primary on the client’s current episode",
+        "description": "Uses the diagnosis ranked Primary on the client’s open episode in the program the service is performed in."
+      },
+      {
+        "precedence_id": "DXP-SET",
+        "name": "Highest-ranked in this service’s set",
+        "description": "Uses the highest-ranked active diagnosis that falls in the service’s diagnosis set. If none does, staff choose."
+      },
+      {
+        "precedence_id": "DXP-STAFF",
+        "name": "Staff choose on the note",
+        "description": "Staff pick one of the client’s active diagnoses that falls in the service’s diagnosis set."
+      }
+    ],
+    "sensitivity": [
+      {
+        "sensitivity_id": "SEN-STD",
+        "name": "Standard",
+        "requires_document": null
+      },
+      {
+        "sensitivity_id": "SEN-MH",
+        "name": "Sensitive — mental health",
+        "requires_document": null
+      },
+      {
+        "sensitivity_id": "SEN-PART2",
+        "name": "Sensitive — substance use (42 CFR Part 2)",
+        "requires_document": "Release of Information"
+      }
+    ],
+    "documents": [
+      {
+        "name": "Progress Note",
+        "category": "Note",
+        "default_rule_id": null
+      },
+      {
+        "name": "Psychotherapy Progress Note",
+        "category": "Note",
+        "default_rule_id": null
+      },
+      {
+        "name": "Therapy Note",
+        "category": "Note",
+        "default_rule_id": null
+      },
+      {
+        "name": "Case Management Note",
+        "category": "Note",
+        "default_rule_id": null
+      },
+      {
+        "name": "Crisis Follow-Up Note",
+        "category": "Note",
+        "default_rule_id": null
+      },
+      {
+        "name": "Peer Support Note",
+        "category": "Note",
+        "default_rule_id": null
+      },
+      {
+        "name": "Nurse Progress Note",
+        "category": "Note",
+        "default_rule_id": null
+      },
+      {
+        "name": "Hospital Discharge Follow-Up",
+        "category": "Note",
+        "default_rule_id": "DDR-004"
+      },
+      {
+        "name": "Psychiatric Evaluation",
+        "category": "Assessment",
+        "default_rule_id": null
+      },
+      {
+        "name": "Psychosocial Assessment Note",
+        "category": "Assessment",
+        "default_rule_id": null
+      },
+      {
+        "name": "CANS",
+        "category": "Assessment",
+        "default_rule_id": "DDR-001"
+      },
+      {
+        "name": "PHQ",
+        "category": "Assessment",
+        "default_rule_id": "DDR-007"
+      },
+      {
+        "name": "Suicide Risk Screening",
+        "category": "Assessment",
+        "default_rule_id": "DDR-008"
+      },
+      {
+        "name": "PRAPARE",
+        "category": "Assessment",
+        "default_rule_id": null
+      },
+      {
+        "name": "Informed Consent",
+        "category": "Consent",
+        "default_rule_id": "DDR-002"
+      },
+      {
+        "name": "Release of Information",
+        "category": "Consent",
+        "default_rule_id": "DDR-002"
+      },
+      {
+        "name": "Service Plan",
+        "category": "Plan",
+        "default_rule_id": "DDR-003"
+      },
+      {
+        "name": "Support & Safety Plan",
+        "category": "Plan",
+        "default_rule_id": null
+      },
+      {
+        "name": "Discharge Plan",
+        "category": "Plan",
+        "default_rule_id": null
+      },
+      {
+        "name": "Closure",
+        "category": "Form",
+        "default_rule_id": null
+      },
+      {
+        "name": "Client Satisfaction Survey",
+        "category": "Form",
+        "default_rule_id": null
+      },
+      {
+        "name": "Quality of Life Questionnaire",
+        "category": "Form",
+        "default_rule_id": "DDR-002"
+      }
+    ],
+    "appointment_types": [
+      {
+        "name": "Initial Session",
+        "default_rule_id": "DDR-005"
+      },
+      {
+        "name": "Follow-Up Session",
+        "default_rule_id": null
+      },
+      {
+        "name": "Post-Discharge Follow-Up",
+        "default_rule_id": "DDR-004"
+      },
+      {
+        "name": "Service Plan Review Meeting",
+        "default_rule_id": "DDR-003"
+      }
+    ],
+    "cpt_only_payors": [
+      "PAYER-MEDICAREB",
+      "PAYER-ANTHEM",
+      "PAYER-UHC"
+    ]
+  },
+  "templates": [
+    {
+      "template_id": "TPL-THERAPY",
+      "name": "Standard Therapy",
+      "collection": "Medicaid Outpatient",
+      "source": "implementation",
+      "updated": "2026-05-12",
+      "config": {
+        "description": "Individual psychotherapy. One note; billed by session length.",
+        "roles": [
+          "Clinical Provider / Therapist",
+          "Social Worker",
+          "Clinical Director"
+        ],
+        "programs": [],
+        "sites": [],
+        "codes": [
+          {
+            "code_id": "SC-90834",
+            "units": 1,
+            "modifiers": []
+          }
+        ],
+        "payors": [
+          "PAYER-OHMEDICAID",
+          "PAYER-COUNTY-MH",
+          "PAYER-ANTHEM",
+          "PAYER-UHC"
+        ],
+        "funding": [
+          "FUND-MEDICAID",
+          "FUND-COUNTY",
+          "FUND-COMMERCIAL"
+        ],
+        "dx_set": "DXS-BH",
+        "precedence": "DXP-EPISODE",
+        "sensitivity": "Standard",
+        "duration_min": 45,
+        "steps": [
+          {
+            "step_id": "STP-001",
+            "kind": "Document",
+            "name": "Psychotherapy Progress Note",
+            "required": true,
+            "rule_ids": [],
+            "after": null
+          }
+        ],
+        "deadline_rule_id": null
+      }
+    },
+    {
+      "template_id": "TPL-CM",
+      "name": "Standard Case Management",
+      "collection": "Medicaid Outpatient",
+      "source": "implementation",
+      "updated": "2026-05-12",
+      "config": {
+        "description": "Targeted case management, billed in 15-minute units.",
+        "roles": [
+          "Case Manager",
+          "Social Worker",
+          "Housing Supervisor"
+        ],
+        "programs": [],
+        "sites": [],
+        "codes": [
+          {
+            "code_id": "SC-T1017",
+            "units": 2,
+            "modifiers": []
+          }
+        ],
+        "payors": [
+          "PAYER-OHMEDICAID",
+          "PAYER-COUNTY-MH"
+        ],
+        "funding": [
+          "FUND-MEDICAID",
+          "FUND-COUNTY"
+        ],
+        "dx_set": "DXS-BH",
+        "precedence": "DXP-SET",
+        "sensitivity": "Standard",
+        "duration_min": 30,
+        "steps": [
+          {
+            "step_id": "STP-002",
+            "kind": "Document",
+            "name": "Case Management Note",
+            "required": true,
+            "rule_ids": [],
+            "after": null
+          }
+        ],
+        "deadline_rule_id": null
+      }
+    },
+    {
+      "template_id": "TPL-PEER",
+      "name": "Peer Support Session",
+      "collection": "Medicaid Outpatient",
+      "source": "implementation",
+      "updated": "2026-05-12",
+      "config": {
+        "description": "Peer support, billed in 15-minute units.",
+        "roles": [
+          "Peer Support Specialist"
+        ],
+        "programs": [],
+        "sites": [],
+        "codes": [
+          {
+            "code_id": "SC-H0038",
+            "units": 2,
+            "modifiers": []
+          }
+        ],
+        "payors": [
+          "PAYER-OHMEDICAID",
+          "PAYER-COUNTY-MH"
+        ],
+        "funding": [
+          "FUND-MEDICAID",
+          "FUND-COUNTY"
+        ],
+        "dx_set": "DXS-BH",
+        "precedence": "DXP-SET",
+        "sensitivity": "Standard",
+        "duration_min": 30,
+        "steps": [
+          {
+            "step_id": "STP-003",
+            "kind": "Document",
+            "name": "Peer Support Note",
+            "required": true,
+            "rule_ids": [],
+            "after": null
+          }
+        ],
+        "deadline_rule_id": null
+      }
+    },
+    {
+      "template_id": "TPL-CHECKIN",
+      "name": "Post Class Check-In",
+      "collection": "Medicaid Outpatient",
+      "source": "implementation",
+      "updated": "2026-05-12",
+      "config": {
+        "description": "A short check-in after a group class. One progress note.",
+        "roles": [
+          "Clinical Provider / Therapist",
+          "Social Worker",
+          "Case Manager",
+          "Peer Support Specialist"
+        ],
+        "programs": [],
+        "sites": [],
+        "codes": [
+          {
+            "code_id": "SC-H2015",
+            "units": 1,
+            "modifiers": []
+          }
+        ],
+        "payors": [
+          "PAYER-OHMEDICAID",
+          "PAYER-COUNTY-MH"
+        ],
+        "funding": [
+          "FUND-MEDICAID",
+          "FUND-COUNTY"
+        ],
+        "dx_set": "DXS-BH",
+        "precedence": "DXP-SET",
+        "sensitivity": "Standard",
+        "duration_min": 15,
+        "steps": [
+          {
+            "step_id": "STP-004",
+            "kind": "Document",
+            "name": "Progress Note",
+            "required": true,
+            "rule_ids": [],
+            "after": null
+          }
+        ],
+        "deadline_rule_id": null
+      }
+    },
+    {
+      "template_id": "TPL-CRISIS-FU",
+      "name": "Crisis Follow-Up",
+      "collection": "Crisis Services",
+      "source": "implementation",
+      "updated": "2026-05-12",
+      "config": {
+        "description": "Follow-up after a crisis contact: the note and a risk screening.",
+        "roles": [
+          "Clinical Provider / Therapist",
+          "Social Worker",
+          "Nurse"
+        ],
+        "programs": [],
+        "sites": [],
+        "codes": [
+          {
+            "code_id": "SC-H2011",
+            "units": 2,
+            "modifiers": []
+          }
+        ],
+        "payors": [
+          "PAYER-OHMEDICAID",
+          "PAYER-COUNTY-MH"
+        ],
+        "funding": [
+          "FUND-MEDICAID",
+          "FUND-COUNTY"
+        ],
+        "dx_set": "DXS-BH",
+        "precedence": "DXP-EPISODE",
+        "sensitivity": "Sensitive — mental health",
+        "duration_min": 30,
+        "steps": [
+          {
+            "step_id": "STP-005",
+            "kind": "Document",
+            "name": "Crisis Follow-Up Note",
+            "required": true,
+            "rule_ids": [],
+            "after": null
+          },
+          {
+            "step_id": "STP-006",
+            "kind": "Document",
+            "name": "Suicide Risk Screening",
+            "required": true,
+            "rule_ids": [
+              "DDR-008"
+            ],
+            "after": null
+          }
+        ],
+        "deadline_rule_id": null
+      }
+    },
+    {
+      "template_id": "TPL-INTAKE",
+      "name": "Standard Intake",
+      "collection": "Medicaid Outpatient",
+      "source": "implementation",
+      "updated": "2026-05-12",
+      "config": {
+        "description": "Everything a new client needs, due within 14 days of referral.",
+        "roles": [
+          "Intake Coordinator",
+          "Clinical Provider / Therapist",
+          "Social Worker"
+        ],
+        "programs": [],
+        "sites": [],
+        "codes": [
+          {
+            "code_id": "SC-H0031",
+            "units": 1,
+            "modifiers": []
+          },
+          {
+            "code_id": "SC-H0032",
+            "units": 1,
+            "modifiers": []
+          }
+        ],
+        "payors": [
+          "PAYER-OHMEDICAID",
+          "PAYER-COUNTY-MH"
+        ],
+        "funding": [
+          "FUND-MEDICAID",
+          "FUND-COUNTY"
+        ],
+        "dx_set": "DXS-BH",
+        "precedence": "DXP-STAFF",
+        "sensitivity": "Standard",
+        "duration_min": null,
+        "steps": [
+          {
+            "step_id": "STP-007",
+            "kind": "Document",
+            "name": "Informed Consent",
+            "required": true,
+            "rule_ids": [
+              "DDR-002"
+            ],
+            "after": null
+          },
+          {
+            "step_id": "STP-008",
+            "kind": "Document",
+            "name": "Release of Information",
+            "required": true,
+            "rule_ids": [
+              "DDR-002"
+            ],
+            "after": null
+          },
+          {
+            "step_id": "STP-009",
+            "kind": "Document",
+            "name": "Psychosocial Assessment Note",
+            "required": true,
+            "rule_ids": [],
+            "after": null
+          },
+          {
+            "step_id": "STP-010",
+            "kind": "Document",
+            "name": "PHQ",
+            "required": false,
+            "rule_ids": [
+              "DDR-007"
+            ],
+            "after": null
+          },
+          {
+            "step_id": "STP-011",
+            "kind": "Document",
+            "name": "Service Plan",
+            "required": true,
+            "rule_ids": [
+              "DDR-003"
+            ],
+            "after": null
+          },
+          {
+            "step_id": "STP-012",
+            "kind": "Appointment",
+            "name": "Initial Session",
+            "required": true,
+            "rule_ids": [
+              "DDR-005"
+            ],
+            "after": null
+          }
+        ],
+        "deadline_rule_id": "DDR-011"
+      }
+    },
+    {
+      "template_id": "TPL-CRISIS-INTAKE",
+      "name": "Crisis Intake",
+      "collection": "Crisis Services",
+      "source": "implementation",
+      "updated": "2026-05-12",
+      "config": {
+        "description": "Intake for a crisis admission, due within 5 days of referral.",
+        "roles": [
+          "Intake Coordinator",
+          "Clinical Provider / Therapist",
+          "Social Worker"
+        ],
+        "programs": [],
+        "sites": [],
+        "codes": [
+          {
+            "code_id": "SC-H0031",
+            "units": 1,
+            "modifiers": []
+          },
+          {
+            "code_id": "SC-H2011",
+            "units": 4,
+            "modifiers": []
+          }
+        ],
+        "payors": [
+          "PAYER-OHMEDICAID",
+          "PAYER-COUNTY-MH"
+        ],
+        "funding": [
+          "FUND-MEDICAID",
+          "FUND-COUNTY"
+        ],
+        "dx_set": "DXS-BH",
+        "precedence": "DXP-STAFF",
+        "sensitivity": "Sensitive — mental health",
+        "duration_min": null,
+        "steps": [
+          {
+            "step_id": "STP-013",
+            "kind": "Document",
+            "name": "Informed Consent",
+            "required": true,
+            "rule_ids": [
+              "DDR-002"
+            ],
+            "after": null
+          },
+          {
+            "step_id": "STP-014",
+            "kind": "Document",
+            "name": "Suicide Risk Screening",
+            "required": true,
+            "rule_ids": [
+              "DDR-008"
+            ],
+            "after": null
+          },
+          {
+            "step_id": "STP-015",
+            "kind": "Document",
+            "name": "Psychosocial Assessment Note",
+            "required": true,
+            "rule_ids": [],
+            "after": null
+          },
+          {
+            "step_id": "STP-016",
+            "kind": "Document",
+            "name": "Support & Safety Plan",
+            "required": true,
+            "rule_ids": [],
+            "after": null
+          },
+          {
+            "step_id": "STP-017",
+            "kind": "Document",
+            "name": "Service Plan",
+            "required": true,
+            "rule_ids": [
+              "DDR-003"
+            ],
+            "after": null
+          }
+        ],
+        "deadline_rule_id": "DDR-010"
+      }
+    },
+    {
+      "template_id": "TPL-DISCHARGE",
+      "name": "Residential Discharge",
+      "collection": "Residential",
+      "source": "implementation",
+      "updated": "2026-05-12",
+      "config": {
+        "description": "Discharge paperwork and the 7-day follow-up. Not billed.",
+        "roles": [
+          "Social Worker",
+          "Case Manager",
+          "Clinical Provider / Therapist",
+          "Nurse"
+        ],
+        "programs": [],
+        "sites": [],
+        "codes": [],
+        "payors": [],
+        "funding": [],
+        "dx_set": "DXS-BH",
+        "precedence": "DXP-EPISODE",
+        "sensitivity": "Standard",
+        "duration_min": null,
+        "steps": [
+          {
+            "step_id": "STP-018",
+            "kind": "Document",
+            "name": "Discharge Plan",
+            "required": true,
+            "rule_ids": [],
+            "after": null
+          },
+          {
+            "step_id": "STP-019",
+            "kind": "Document",
+            "name": "Closure",
+            "required": true,
+            "rule_ids": [],
+            "after": null
+          },
+          {
+            "step_id": "STP-020",
+            "kind": "Document",
+            "name": "Client Satisfaction Survey",
+            "required": false,
+            "rule_ids": [],
+            "after": null
+          },
+          {
+            "step_id": "STP-021",
+            "kind": "Appointment",
+            "name": "Post-Discharge Follow-Up",
+            "required": true,
+            "rule_ids": [
+              "DDR-004"
+            ],
+            "after": null
+          }
+        ],
+        "deadline_rule_id": "DDR-012"
+      }
+    },
+    {
+      "template_id": "TPL-REVIEW",
+      "name": "Annual Treatment Review",
+      "collection": "Medicaid Outpatient",
+      "source": "implementation",
+      "updated": "2026-05-12",
+      "config": {
+        "description": "The yearly plan review, with the consents and screening that renew with it.",
+        "roles": [
+          "Clinical Provider / Therapist",
+          "Social Worker",
+          "Case Manager"
+        ],
+        "programs": [],
+        "sites": [],
+        "codes": [
+          {
+            "code_id": "SC-H0032",
+            "units": 1,
+            "modifiers": []
+          }
+        ],
+        "payors": [
+          "PAYER-OHMEDICAID",
+          "PAYER-COUNTY-MH"
+        ],
+        "funding": [
+          "FUND-MEDICAID",
+          "FUND-COUNTY"
+        ],
+        "dx_set": "DXS-BH",
+        "precedence": "DXP-EPISODE",
+        "sensitivity": "Standard",
+        "duration_min": null,
+        "steps": [
+          {
+            "step_id": "STP-022",
+            "kind": "Document",
+            "name": "Service Plan",
+            "required": true,
+            "rule_ids": [
+              "DDR-003"
+            ],
+            "after": null
+          },
+          {
+            "step_id": "STP-023",
+            "kind": "Document",
+            "name": "PHQ",
+            "required": true,
+            "rule_ids": [
+              "DDR-007"
+            ],
+            "after": null
+          },
+          {
+            "step_id": "STP-024",
+            "kind": "Document",
+            "name": "Informed Consent",
+            "required": true,
+            "rule_ids": [
+              "DDR-002"
+            ],
+            "after": null
+          },
+          {
+            "step_id": "STP-025",
+            "kind": "Document",
+            "name": "Release of Information",
+            "required": true,
+            "rule_ids": [
+              "DDR-002"
+            ],
+            "after": null
+          }
+        ],
+        "deadline_rule_id": "DDR-002"
+      }
+    },
+    {
+      "template_id": "TPL-FAMILY",
+      "name": "Child & Family Therapy",
+      "collection": "Horizon Wellness",
+      "source": "agency",
+      "updated": "2026-08-02",
+      "config": {
+        "description": "Family therapy for children and youth, with the CANS that goes with it.",
+        "roles": [
+          "Clinical Provider / Therapist",
+          "Social Worker"
+        ],
+        "programs": [],
+        "sites": [],
+        "codes": [
+          {
+            "code_id": "SC-90847",
+            "units": 1,
+            "modifiers": [
+              "HA"
+            ]
+          }
+        ],
+        "payors": [
+          "PAYER-OHMEDICAID",
+          "PAYER-COUNTY-MH"
+        ],
+        "funding": [
+          "FUND-MEDICAID",
+          "FUND-COUNTY"
+        ],
+        "dx_set": "DXS-CHILD",
+        "precedence": "DXP-EPISODE",
+        "sensitivity": "Standard",
+        "duration_min": 50,
+        "steps": [
+          {
+            "step_id": "STP-026",
+            "kind": "Document",
+            "name": "Therapy Note",
+            "required": true,
+            "rule_ids": [],
+            "after": null
+          },
+          {
+            "step_id": "STP-027",
+            "kind": "Document",
+            "name": "CANS",
+            "required": true,
+            "rule_ids": [
+              "DDR-001"
+            ],
+            "after": null
+          }
+        ],
+        "deadline_rule_id": null
+      }
+    },
+    {
+      "template_id": "TPL-SUD",
+      "name": "SUD Individual Counseling",
+      "collection": "Horizon Wellness",
+      "source": "agency",
+      "updated": "2026-06-30",
+      "config": {
+        "description": "Substance use counseling. Part 2 protected, so a release is part of it.",
+        "roles": [
+          "Clinical Provider / Therapist",
+          "Social Worker"
+        ],
+        "programs": [],
+        "sites": [],
+        "codes": [
+          {
+            "code_id": "SC-90832",
+            "units": 1,
+            "modifiers": [
+              "HF"
+            ]
+          }
+        ],
+        "payors": [
+          "PAYER-OHMEDICAID",
+          "PAYER-SABG"
+        ],
+        "funding": [
+          "FUND-MEDICAID",
+          "FUND-STATE-BLOCK"
+        ],
+        "dx_set": "DXS-SUD",
+        "precedence": "DXP-SET",
+        "sensitivity": "Sensitive — substance use (42 CFR Part 2)",
+        "duration_min": 30,
+        "steps": [
+          {
+            "step_id": "STP-028",
+            "kind": "Document",
+            "name": "Progress Note",
+            "required": true,
+            "rule_ids": [],
+            "after": null
+          },
+          {
+            "step_id": "STP-029",
+            "kind": "Document",
+            "name": "Release of Information",
+            "required": true,
+            "rule_ids": [
+              "DDR-002"
+            ],
+            "after": null
+          }
+        ],
+        "deadline_rule_id": null
+      }
+    }
+  ],
+  "services": [
+    {
+      "service_id": "SVC-001",
+      "name": "Individual Therapy 60m",
+      "started_from": "TPL-THERAPY",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Standard Therapy.",
+          "config": {
+            "description": "Individual psychotherapy. One note; billed by session length.",
+            "roles": [
+              "Clinical Provider / Therapist",
+              "Social Worker",
+              "Clinical Director"
+            ],
+            "programs": [
+              "PRG-GEN-THX",
+              "PRG-OUTP-01",
+              "PRG-COUNSEL"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-90837",
+                "units": 1,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH",
+              "PAYER-ANTHEM"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY",
+              "FUND-COMMERCIAL"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-EPISODE",
+            "sensitivity": "Standard",
+            "duration_min": 60,
+            "steps": [
+              {
+                "step_id": "STP-030",
+                "kind": "Document",
+                "name": "Psychotherapy Progress Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        },
+        {
+          "version": 2,
+          "effective": "2026-01-01",
+          "changed": "2025-12-10",
+          "changed_by": "ST-2010",
+          "note": "UnitedHealthcare contract signed.",
+          "config": {
+            "description": "Individual psychotherapy. One note; billed by session length.",
+            "roles": [
+              "Clinical Provider / Therapist",
+              "Social Worker",
+              "Clinical Director"
+            ],
+            "programs": [
+              "PRG-GEN-THX",
+              "PRG-OUTP-01",
+              "PRG-COUNSEL"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-90837",
+                "units": 1,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH",
+              "PAYER-ANTHEM",
+              "PAYER-UHC"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY",
+              "FUND-COMMERCIAL"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-EPISODE",
+            "sensitivity": "Standard",
+            "duration_min": 60,
+            "steps": [
+              {
+                "step_id": "STP-030",
+                "kind": "Document",
+                "name": "Psychotherapy Progress Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        },
+        {
+          "version": 3,
+          "effective": "2026-07-01",
+          "changed": "2026-06-12",
+          "changed_by": "ST-2007",
+          "note": "Medicaid now requires the HO modifier for master’s-level clinicians.",
+          "config": {
+            "description": "Individual psychotherapy. One note; billed by session length.",
+            "roles": [
+              "Clinical Provider / Therapist",
+              "Social Worker",
+              "Clinical Director"
+            ],
+            "programs": [
+              "PRG-GEN-THX",
+              "PRG-OUTP-01",
+              "PRG-COUNSEL"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-90837",
+                "units": 1,
+                "modifiers": [
+                  "HO"
+                ]
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH",
+              "PAYER-ANTHEM",
+              "PAYER-UHC"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY",
+              "FUND-COMMERCIAL"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-EPISODE",
+            "sensitivity": "Standard",
+            "duration_min": 60,
+            "steps": [
+              {
+                "step_id": "STP-030",
+                "kind": "Document",
+                "name": "Psychotherapy Progress Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-002",
+      "name": "Individual Therapy 45m",
+      "started_from": "TPL-THERAPY",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Standard Therapy.",
+          "config": {
+            "description": "Individual psychotherapy. One note; billed by session length.",
+            "roles": [
+              "Clinical Provider / Therapist",
+              "Social Worker",
+              "Clinical Director"
+            ],
+            "programs": [
+              "PRG-GEN-THX",
+              "PRG-OUTP-01",
+              "PRG-COUNSEL",
+              "PRG-IOP-01"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-90834",
+                "units": 1,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH",
+              "PAYER-ANTHEM",
+              "PAYER-UHC"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY",
+              "FUND-COMMERCIAL"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-EPISODE",
+            "sensitivity": "Standard",
+            "duration_min": 45,
+            "steps": [
+              {
+                "step_id": "STP-031",
+                "kind": "Document",
+                "name": "Psychotherapy Progress Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-003",
+      "name": "Individual Therapy 30m",
+      "started_from": "TPL-THERAPY",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Standard Therapy.",
+          "config": {
+            "description": "Individual psychotherapy. One note; billed by session length.",
+            "roles": [
+              "Clinical Provider / Therapist",
+              "Social Worker",
+              "Clinical Director"
+            ],
+            "programs": [
+              "PRG-GEN-THX",
+              "PRG-OUTP-01",
+              "PRG-COUNSEL"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-90832",
+                "units": 1,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH",
+              "PAYER-ANTHEM",
+              "PAYER-UHC"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY",
+              "FUND-COMMERCIAL"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-EPISODE",
+            "sensitivity": "Standard",
+            "duration_min": 30,
+            "steps": [
+              {
+                "step_id": "STP-032",
+                "kind": "Document",
+                "name": "Psychotherapy Progress Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-004",
+      "name": "Telehealth Therapy 45m",
+      "started_from": "TPL-THERAPY",
+      "status": "active",
+      "created": "2026-02-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2026-02-01",
+          "changed": "2026-02-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Standard Therapy.",
+          "config": {
+            "description": "Individual psychotherapy. One note; billed by session length.",
+            "roles": [
+              "Clinical Provider / Therapist",
+              "Social Worker",
+              "Clinical Director"
+            ],
+            "programs": [
+              "PRG-GEN-THX",
+              "PRG-OUTP-01"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-90834",
+                "units": 1,
+                "modifiers": [
+                  "95"
+                ]
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH",
+              "PAYER-ANTHEM",
+              "PAYER-UHC"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY",
+              "FUND-COMMERCIAL"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-EPISODE",
+            "sensitivity": "Standard",
+            "duration_min": 45,
+            "steps": [
+              {
+                "step_id": "STP-033",
+                "kind": "Document",
+                "name": "Psychotherapy Progress Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-005",
+      "name": "Residential Individual Therapy 45m",
+      "started_from": "TPL-THERAPY",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Standard Therapy.",
+          "config": {
+            "description": "Individual psychotherapy. One note; billed by session length.",
+            "roles": [
+              "Clinical Provider / Therapist",
+              "Social Worker",
+              "Clinical Director"
+            ],
+            "programs": [
+              "PRG-RES-01"
+            ],
+            "sites": [
+              "SITE-RES-A",
+              "SITE-RES-B"
+            ],
+            "codes": [
+              {
+                "code_id": "SC-90834",
+                "units": 1,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-EPISODE",
+            "sensitivity": "Standard",
+            "duration_min": 45,
+            "steps": [
+              {
+                "step_id": "STP-034",
+                "kind": "Document",
+                "name": "Psychotherapy Progress Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-006",
+      "name": "Case Management 15m",
+      "started_from": "TPL-CM",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Standard Case Management.",
+          "config": {
+            "description": "Targeted case management, billed in 15-minute units.",
+            "roles": [
+              "Case Manager",
+              "Social Worker",
+              "Housing Supervisor"
+            ],
+            "programs": [
+              "PRG-GEN-THX",
+              "PRG-OUTP-01",
+              "PRG-COUNSEL",
+              "PRG-RES-01",
+              "PRG-IOP-01",
+              "PRG-PEER-01"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-T1017",
+                "units": 1,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-SET",
+            "sensitivity": "Standard",
+            "duration_min": 15,
+            "steps": [
+              {
+                "step_id": "STP-035",
+                "kind": "Document",
+                "name": "Case Management Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        },
+        {
+          "version": 2,
+          "effective": "2026-10-01",
+          "changed": "2026-09-15",
+          "changed_by": "ST-2007",
+          "note": "Community Wellness Foundation grant starts October 1.",
+          "config": {
+            "description": "Targeted case management, billed in 15-minute units.",
+            "roles": [
+              "Case Manager",
+              "Social Worker",
+              "Housing Supervisor"
+            ],
+            "programs": [
+              "PRG-GEN-THX",
+              "PRG-OUTP-01",
+              "PRG-COUNSEL",
+              "PRG-RES-01",
+              "PRG-IOP-01",
+              "PRG-PEER-01"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-T1017",
+                "units": 1,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH",
+              "PAYER-COMMUNITY-FDN"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY",
+              "FUND-GRANT"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-SET",
+            "sensitivity": "Standard",
+            "duration_min": 15,
+            "steps": [
+              {
+                "step_id": "STP-035",
+                "kind": "Document",
+                "name": "Case Management Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-007",
+      "name": "Case Management 30m",
+      "started_from": "TPL-CM",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Standard Case Management.",
+          "config": {
+            "description": "Targeted case management, billed in 15-minute units.",
+            "roles": [
+              "Case Manager",
+              "Social Worker",
+              "Housing Supervisor"
+            ],
+            "programs": [
+              "PRG-GEN-THX",
+              "PRG-OUTP-01",
+              "PRG-COUNSEL",
+              "PRG-RES-01",
+              "PRG-IOP-01",
+              "PRG-PEER-01"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-T1017",
+                "units": 2,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-SET",
+            "sensitivity": "Standard",
+            "duration_min": 30,
+            "steps": [
+              {
+                "step_id": "STP-036",
+                "kind": "Document",
+                "name": "Case Management Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-008",
+      "name": "Housing Case Management 30m",
+      "started_from": "TPL-CM",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Standard Case Management.",
+          "config": {
+            "description": "Targeted case management, billed in 15-minute units.",
+            "roles": [
+              "Housing Supervisor",
+              "Case Manager"
+            ],
+            "programs": [
+              "PRG-RES-01"
+            ],
+            "sites": [
+              "SITE-RES-A",
+              "SITE-RES-B"
+            ],
+            "codes": [
+              {
+                "code_id": "SC-T1017",
+                "units": 2,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY",
+              "FUND-HUD"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-SET",
+            "sensitivity": "Standard",
+            "duration_min": 30,
+            "steps": [
+              {
+                "step_id": "STP-037",
+                "kind": "Document",
+                "name": "Case Management Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-009",
+      "name": "Crisis Case Management 15m",
+      "started_from": "TPL-CM",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Standard Case Management.",
+          "config": {
+            "description": "Targeted case management, billed in 15-minute units.",
+            "roles": [
+              "Case Manager",
+              "Social Worker",
+              "Housing Supervisor"
+            ],
+            "programs": [
+              "PRG-CRISIS-01"
+            ],
+            "sites": [
+              "SITE-CRISIS-01"
+            ],
+            "codes": [
+              {
+                "code_id": "SC-T1017",
+                "units": 1,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-SET",
+            "sensitivity": "Sensitive — mental health",
+            "duration_min": 15,
+            "steps": [
+              {
+                "step_id": "STP-038",
+                "kind": "Document",
+                "name": "Case Management Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-010",
+      "name": "Peer Support 30m",
+      "started_from": "TPL-PEER",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Peer Support Session.",
+          "config": {
+            "description": "Peer support, billed in 15-minute units.",
+            "roles": [
+              "Peer Support Specialist"
+            ],
+            "programs": [
+              "PRG-PEER-01",
+              "PRG-RES-01"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-H0038",
+                "units": 2,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-SET",
+            "sensitivity": "Standard",
+            "duration_min": 30,
+            "steps": [
+              {
+                "step_id": "STP-039",
+                "kind": "Document",
+                "name": "Peer Support Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-011",
+      "name": "Peer Support 60m",
+      "started_from": "TPL-PEER",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Peer Support Session.",
+          "config": {
+            "description": "Peer support, billed in 15-minute units.",
+            "roles": [
+              "Peer Support Specialist"
+            ],
+            "programs": [
+              "PRG-PEER-01"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-H0038",
+                "units": 4,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-SET",
+            "sensitivity": "Standard",
+            "duration_min": 60,
+            "steps": [
+              {
+                "step_id": "STP-040",
+                "kind": "Document",
+                "name": "Peer Support Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-012",
+      "name": "Recovery Coaching 30m",
+      "started_from": "TPL-PEER",
+      "status": "active",
+      "created": "2026-04-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2026-04-01",
+          "changed": "2026-04-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Peer Support Session; adds the quality of life questionnaire.",
+          "config": {
+            "description": "Peer support, billed in 15-minute units.",
+            "roles": [
+              "Peer Support Specialist"
+            ],
+            "programs": [
+              "PRG-IOP-01",
+              "PRG-PEER-01"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-H0038",
+                "units": 2,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-SET",
+            "sensitivity": "Standard",
+            "duration_min": 30,
+            "steps": [
+              {
+                "step_id": "STP-041",
+                "kind": "Document",
+                "name": "Peer Support Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-042",
+                "kind": "Document",
+                "name": "Quality of Life Questionnaire",
+                "required": false,
+                "rule_ids": [
+                  "DDR-002"
+                ],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-013",
+      "name": "Standard 15m Post Class Check-In",
+      "started_from": "TPL-CHECKIN",
+      "status": "active",
+      "created": "2026-03-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2026-03-01",
+          "changed": "2026-03-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Post Class Check-In.",
+          "config": {
+            "description": "A short check-in after a group class. One progress note.",
+            "roles": [
+              "Clinical Provider / Therapist",
+              "Social Worker",
+              "Case Manager",
+              "Peer Support Specialist"
+            ],
+            "programs": [
+              "PRG-IOP-01",
+              "PRG-OUTP-01",
+              "PRG-GEN-THX"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-H2015",
+                "units": 1,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-SET",
+            "sensitivity": "Standard",
+            "duration_min": 15,
+            "steps": [
+              {
+                "step_id": "STP-044",
+                "kind": "Document",
+                "name": "Progress Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        },
+        {
+          "version": 2,
+          "effective": "2026-10-01",
+          "changed": "2026-09-18",
+          "changed_by": "ST-2010",
+          "note": "Offers the PHQ when a check-in raises concern.",
+          "config": {
+            "description": "A short check-in after a group class. One progress note.",
+            "roles": [
+              "Clinical Provider / Therapist",
+              "Social Worker",
+              "Case Manager",
+              "Peer Support Specialist"
+            ],
+            "programs": [
+              "PRG-IOP-01",
+              "PRG-OUTP-01",
+              "PRG-GEN-THX"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-H2015",
+                "units": 1,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-SET",
+            "sensitivity": "Standard",
+            "duration_min": 15,
+            "steps": [
+              {
+                "step_id": "STP-044",
+                "kind": "Document",
+                "name": "Progress Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-045",
+                "kind": "Document",
+                "name": "PHQ",
+                "required": false,
+                "rule_ids": [
+                  "DDR-007"
+                ],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-031",
+      "name": "Residential Check-In 15m",
+      "started_from": "TPL-CHECKIN",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Post Class Check-In, for residential programs.",
+          "config": {
+            "description": "A short check-in after a group class. One progress note.",
+            "roles": [
+              "Social Worker",
+              "Case Manager",
+              "Clinical Provider / Therapist",
+              "Housing Supervisor",
+              "Nurse"
+            ],
+            "programs": [
+              "PRG-RES-01"
+            ],
+            "sites": [
+              "SITE-RES-A",
+              "SITE-RES-B"
+            ],
+            "codes": [
+              {
+                "code_id": "SC-H2015",
+                "units": 1,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-SET",
+            "sensitivity": "Standard",
+            "duration_min": 15,
+            "steps": [
+              {
+                "step_id": "STP-046",
+                "kind": "Document",
+                "name": "Progress Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-014",
+      "name": "Standard 30m Post Class Check-In",
+      "started_from": "TPL-CHECKIN",
+      "status": "draft",
+      "created": "2026-09-10",
+      "versions": [
+        {
+          "version": 1,
+          "effective": null,
+          "changed": "2026-09-10",
+          "changed_by": "ST-2010",
+          "note": "Created from Post Class Check-In.",
+          "config": {
+            "description": "A short check-in after a group class. One progress note.",
+            "roles": [
+              "Clinical Provider / Therapist",
+              "Social Worker",
+              "Case Manager",
+              "Peer Support Specialist"
+            ],
+            "programs": [
+              "PRG-IOP-01"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-H2015",
+                "units": 2,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-SET",
+            "sensitivity": "Standard",
+            "duration_min": 30,
+            "steps": [
+              {
+                "step_id": "STP-047",
+                "kind": "Document",
+                "name": "Progress Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-015",
+      "name": "Crisis Follow-Up 15m",
+      "started_from": "TPL-CRISIS-FU",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Crisis Follow-Up.",
+          "config": {
+            "description": "Follow-up after a crisis contact: the note and a risk screening.",
+            "roles": [
+              "Clinical Provider / Therapist",
+              "Social Worker",
+              "Nurse"
+            ],
+            "programs": [
+              "PRG-CRISIS-01",
+              "PRG-IOP-01"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-H2011",
+                "units": 1,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-EPISODE",
+            "sensitivity": "Sensitive — mental health",
+            "duration_min": 15,
+            "steps": [
+              {
+                "step_id": "STP-048",
+                "kind": "Document",
+                "name": "Crisis Follow-Up Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-049",
+                "kind": "Document",
+                "name": "Suicide Risk Screening",
+                "required": true,
+                "rule_ids": [
+                  "DDR-008"
+                ],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-016",
+      "name": "Crisis Follow-Up 30m",
+      "started_from": "TPL-CRISIS-FU",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Crisis Follow-Up.",
+          "config": {
+            "description": "Follow-up after a crisis contact: the note and a risk screening.",
+            "roles": [
+              "Clinical Provider / Therapist",
+              "Social Worker",
+              "Nurse"
+            ],
+            "programs": [
+              "PRG-CRISIS-01"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-H2011",
+                "units": 2,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-EPISODE",
+            "sensitivity": "Sensitive — mental health",
+            "duration_min": 30,
+            "steps": [
+              {
+                "step_id": "STP-050",
+                "kind": "Document",
+                "name": "Crisis Follow-Up Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-051",
+                "kind": "Document",
+                "name": "Suicide Risk Screening",
+                "required": true,
+                "rule_ids": [
+                  "DDR-008"
+                ],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-017",
+      "name": "Standard Intake",
+      "started_from": "TPL-INTAKE",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Standard Intake.",
+          "config": {
+            "description": "Everything a new client needs, due within 14 days of referral.",
+            "roles": [
+              "Intake Coordinator",
+              "Clinical Provider / Therapist",
+              "Social Worker"
+            ],
+            "programs": [
+              "PRG-GEN-THX",
+              "PRG-OUTP-01",
+              "PRG-COUNSEL"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-H0031",
+                "units": 1,
+                "modifiers": []
+              },
+              {
+                "code_id": "SC-H0032",
+                "units": 1,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-STAFF",
+            "sensitivity": "Standard",
+            "duration_min": null,
+            "steps": [
+              {
+                "step_id": "STP-052",
+                "kind": "Document",
+                "name": "Informed Consent",
+                "required": true,
+                "rule_ids": [
+                  "DDR-002"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-053",
+                "kind": "Document",
+                "name": "Release of Information",
+                "required": true,
+                "rule_ids": [
+                  "DDR-002"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-054",
+                "kind": "Document",
+                "name": "Psychosocial Assessment Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-055",
+                "kind": "Document",
+                "name": "PHQ",
+                "required": false,
+                "rule_ids": [
+                  "DDR-007"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-056",
+                "kind": "Document",
+                "name": "Service Plan",
+                "required": true,
+                "rule_ids": [
+                  "DDR-003"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-057",
+                "kind": "Appointment",
+                "name": "Initial Session",
+                "required": true,
+                "rule_ids": [
+                  "DDR-005"
+                ],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": "DDR-011"
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-018",
+      "name": "Residential Admission Intake",
+      "started_from": "TPL-INTAKE",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Standard Intake.",
+          "config": {
+            "description": "Everything a new client needs, due within 14 days of referral.",
+            "roles": [
+              "Intake Coordinator",
+              "Social Worker",
+              "Case Manager"
+            ],
+            "programs": [
+              "PRG-RES-01"
+            ],
+            "sites": [
+              "SITE-RES-A",
+              "SITE-RES-B"
+            ],
+            "codes": [
+              {
+                "code_id": "SC-H0031",
+                "units": 1,
+                "modifiers": []
+              },
+              {
+                "code_id": "SC-H0032",
+                "units": 1,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-STAFF",
+            "sensitivity": "Standard",
+            "duration_min": null,
+            "steps": [
+              {
+                "step_id": "STP-058",
+                "kind": "Document",
+                "name": "Informed Consent",
+                "required": true,
+                "rule_ids": [
+                  "DDR-002"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-059",
+                "kind": "Document",
+                "name": "Release of Information",
+                "required": true,
+                "rule_ids": [
+                  "DDR-002"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-060",
+                "kind": "Document",
+                "name": "Psychosocial Assessment Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-061",
+                "kind": "Document",
+                "name": "PHQ",
+                "required": false,
+                "rule_ids": [
+                  "DDR-007"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-062",
+                "kind": "Document",
+                "name": "Service Plan",
+                "required": true,
+                "rule_ids": [
+                  "DDR-003"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-063",
+                "kind": "Appointment",
+                "name": "Initial Session",
+                "required": true,
+                "rule_ids": [
+                  "DDR-005"
+                ],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": "DDR-011"
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-019",
+      "name": "IOP Intake",
+      "started_from": "TPL-INTAKE",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Standard Intake.",
+          "config": {
+            "description": "Everything a new client needs, due within 14 days of referral.",
+            "roles": [
+              "Intake Coordinator",
+              "Clinical Provider / Therapist",
+              "Social Worker"
+            ],
+            "programs": [
+              "PRG-IOP-01"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-H0031",
+                "units": 1,
+                "modifiers": []
+              },
+              {
+                "code_id": "SC-H0032",
+                "units": 1,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-STAFF",
+            "sensitivity": "Standard",
+            "duration_min": null,
+            "steps": [
+              {
+                "step_id": "STP-064",
+                "kind": "Document",
+                "name": "Informed Consent",
+                "required": true,
+                "rule_ids": [
+                  "DDR-002"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-065",
+                "kind": "Document",
+                "name": "Release of Information",
+                "required": true,
+                "rule_ids": [
+                  "DDR-002"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-066",
+                "kind": "Document",
+                "name": "Psychosocial Assessment Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-067",
+                "kind": "Document",
+                "name": "PHQ",
+                "required": false,
+                "rule_ids": [
+                  "DDR-007"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-068",
+                "kind": "Document",
+                "name": "Service Plan",
+                "required": true,
+                "rule_ids": [
+                  "DDR-003"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-069",
+                "kind": "Appointment",
+                "name": "Initial Session",
+                "required": true,
+                "rule_ids": [
+                  "DDR-005"
+                ],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": "DDR-011"
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-020",
+      "name": "Teen Crisis Intake",
+      "started_from": "TPL-CRISIS-INTAKE",
+      "status": "active",
+      "created": "2026-05-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2026-05-01",
+          "changed": "2026-05-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Crisis Intake; adds the release and the CANS for youth.",
+          "config": {
+            "description": "Intake for a crisis admission, due within 5 days of referral.",
+            "roles": [
+              "Intake Coordinator",
+              "Clinical Provider / Therapist",
+              "Social Worker"
+            ],
+            "programs": [
+              "PRG-CRISIS-01",
+              "PRG-GEN-THX"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-H0031",
+                "units": 1,
+                "modifiers": [
+                  "HA"
+                ]
+              },
+              {
+                "code_id": "SC-H2011",
+                "units": 4,
+                "modifiers": [
+                  "HA"
+                ]
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-CHILD",
+            "precedence": "DXP-STAFF",
+            "sensitivity": "Sensitive — mental health",
+            "duration_min": null,
+            "steps": [
+              {
+                "step_id": "STP-070",
+                "kind": "Document",
+                "name": "Informed Consent",
+                "required": true,
+                "rule_ids": [
+                  "DDR-002"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-071",
+                "kind": "Document",
+                "name": "Release of Information",
+                "required": true,
+                "rule_ids": [
+                  "DDR-002"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-072",
+                "kind": "Document",
+                "name": "Suicide Risk Screening",
+                "required": true,
+                "rule_ids": [
+                  "DDR-008"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-073",
+                "kind": "Document",
+                "name": "Psychosocial Assessment Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-074",
+                "kind": "Document",
+                "name": "CANS",
+                "required": true,
+                "rule_ids": [
+                  "DDR-001"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-075",
+                "kind": "Document",
+                "name": "Support & Safety Plan",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-076",
+                "kind": "Document",
+                "name": "Service Plan",
+                "required": true,
+                "rule_ids": [
+                  "DDR-003"
+                ],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": "DDR-010"
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-021",
+      "name": "Adult Crisis Intake",
+      "started_from": "TPL-CRISIS-INTAKE",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Crisis Intake.",
+          "config": {
+            "description": "Intake for a crisis admission, due within 5 days of referral.",
+            "roles": [
+              "Intake Coordinator",
+              "Clinical Provider / Therapist",
+              "Social Worker"
+            ],
+            "programs": [
+              "PRG-CRISIS-01"
+            ],
+            "sites": [
+              "SITE-CRISIS-01"
+            ],
+            "codes": [
+              {
+                "code_id": "SC-H0031",
+                "units": 1,
+                "modifiers": []
+              },
+              {
+                "code_id": "SC-H2011",
+                "units": 4,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-STAFF",
+            "sensitivity": "Sensitive — mental health",
+            "duration_min": null,
+            "steps": [
+              {
+                "step_id": "STP-082",
+                "kind": "Document",
+                "name": "Informed Consent",
+                "required": true,
+                "rule_ids": [
+                  "DDR-002"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-083",
+                "kind": "Document",
+                "name": "Suicide Risk Screening",
+                "required": true,
+                "rule_ids": [
+                  "DDR-008"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-084",
+                "kind": "Document",
+                "name": "Psychosocial Assessment Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-085",
+                "kind": "Document",
+                "name": "Support & Safety Plan",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-086",
+                "kind": "Document",
+                "name": "Service Plan",
+                "required": true,
+                "rule_ids": [
+                  "DDR-003"
+                ],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": "DDR-010"
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-022",
+      "name": "Residential Discharge",
+      "started_from": "TPL-DISCHARGE",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Residential Discharge.",
+          "config": {
+            "description": "Discharge paperwork and the 7-day follow-up. Not billed.",
+            "roles": [
+              "Social Worker",
+              "Case Manager",
+              "Clinical Provider / Therapist",
+              "Nurse"
+            ],
+            "programs": [
+              "PRG-RES-01"
+            ],
+            "sites": [
+              "SITE-RES-A",
+              "SITE-RES-B"
+            ],
+            "codes": [],
+            "payors": [],
+            "funding": [],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-EPISODE",
+            "sensitivity": "Standard",
+            "duration_min": null,
+            "steps": [
+              {
+                "step_id": "STP-087",
+                "kind": "Document",
+                "name": "Discharge Plan",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-088",
+                "kind": "Document",
+                "name": "Closure",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-089",
+                "kind": "Document",
+                "name": "Client Satisfaction Survey",
+                "required": false,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-090",
+                "kind": "Appointment",
+                "name": "Post-Discharge Follow-Up",
+                "required": true,
+                "rule_ids": [
+                  "DDR-004"
+                ],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": "DDR-012"
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-023",
+      "name": "IOP Step-Down Discharge",
+      "started_from": "TPL-DISCHARGE",
+      "status": "draft",
+      "created": "2026-09-02",
+      "versions": [
+        {
+          "version": 1,
+          "effective": null,
+          "changed": "2026-09-02",
+          "changed_by": "ST-2010",
+          "note": "Created from Residential Discharge.",
+          "config": {
+            "description": "Discharge paperwork and the 7-day follow-up. Not billed.",
+            "roles": [
+              "Social Worker",
+              "Case Manager",
+              "Clinical Provider / Therapist",
+              "Nurse"
+            ],
+            "programs": [
+              "PRG-IOP-01"
+            ],
+            "sites": [],
+            "codes": [],
+            "payors": [],
+            "funding": [],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-EPISODE",
+            "sensitivity": "Standard",
+            "duration_min": null,
+            "steps": [
+              {
+                "step_id": "STP-091",
+                "kind": "Document",
+                "name": "Discharge Plan",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-092",
+                "kind": "Document",
+                "name": "Closure",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-093",
+                "kind": "Document",
+                "name": "Client Satisfaction Survey",
+                "required": false,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-094",
+                "kind": "Appointment",
+                "name": "Post-Discharge Follow-Up",
+                "required": true,
+                "rule_ids": [
+                  "DDR-004"
+                ],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": "DDR-012"
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-024",
+      "name": "Annual Treatment Review",
+      "started_from": "TPL-REVIEW",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Annual Treatment Review.",
+          "config": {
+            "description": "The yearly plan review, with the consents and screening that renew with it.",
+            "roles": [
+              "Clinical Provider / Therapist",
+              "Social Worker",
+              "Case Manager"
+            ],
+            "programs": [
+              "PRG-GEN-THX",
+              "PRG-OUTP-01",
+              "PRG-COUNSEL"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-H0032",
+                "units": 1,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-EPISODE",
+            "sensitivity": "Standard",
+            "duration_min": null,
+            "steps": [
+              {
+                "step_id": "STP-095",
+                "kind": "Document",
+                "name": "Service Plan",
+                "required": true,
+                "rule_ids": [
+                  "DDR-003"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-096",
+                "kind": "Document",
+                "name": "PHQ",
+                "required": true,
+                "rule_ids": [
+                  "DDR-007"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-097",
+                "kind": "Document",
+                "name": "Informed Consent",
+                "required": true,
+                "rule_ids": [
+                  "DDR-002"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-098",
+                "kind": "Document",
+                "name": "Release of Information",
+                "required": true,
+                "rule_ids": [
+                  "DDR-002"
+                ],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": "DDR-002"
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-025",
+      "name": "Residential Treatment Review",
+      "started_from": "TPL-REVIEW",
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from Annual Treatment Review; reviewed on the service plan cycle instead.",
+          "config": {
+            "description": "The yearly plan review, with the consents and screening that renew with it.",
+            "roles": [
+              "Clinical Provider / Therapist",
+              "Social Worker",
+              "Case Manager"
+            ],
+            "programs": [
+              "PRG-RES-01"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-H0032",
+                "units": 1,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-EPISODE",
+            "sensitivity": "Standard",
+            "duration_min": null,
+            "steps": [
+              {
+                "step_id": "STP-099",
+                "kind": "Document",
+                "name": "Service Plan",
+                "required": true,
+                "rule_ids": [
+                  "DDR-003"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-100",
+                "kind": "Document",
+                "name": "PHQ",
+                "required": true,
+                "rule_ids": [
+                  "DDR-007"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-101",
+                "kind": "Document",
+                "name": "Informed Consent",
+                "required": true,
+                "rule_ids": [
+                  "DDR-002"
+                ],
+                "after": null
+              },
+              {
+                "step_id": "STP-102",
+                "kind": "Document",
+                "name": "Release of Information",
+                "required": true,
+                "rule_ids": [
+                  "DDR-002"
+                ],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": "DDR-003"
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-026",
+      "name": "Child & Family Therapy 50m",
+      "started_from": "TPL-FAMILY",
+      "status": "active",
+      "created": "2026-08-02",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2026-08-02",
+          "changed": "2026-08-02",
+          "changed_by": "ST-2010",
+          "note": "Created from Child & Family Therapy.",
+          "config": {
+            "description": "Family therapy for children and youth, with the CANS that goes with it.",
+            "roles": [
+              "Clinical Provider / Therapist",
+              "Social Worker"
+            ],
+            "programs": [
+              "PRG-GEN-THX",
+              "PRG-CRISIS-01"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-90847",
+                "units": 1,
+                "modifiers": [
+                  "HA"
+                ]
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-CHILD",
+            "precedence": "DXP-EPISODE",
+            "sensitivity": "Standard",
+            "duration_min": 50,
+            "steps": [
+              {
+                "step_id": "STP-103",
+                "kind": "Document",
+                "name": "Therapy Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-104",
+                "kind": "Document",
+                "name": "CANS",
+                "required": true,
+                "rule_ids": [
+                  "DDR-001"
+                ],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-027",
+      "name": "SUD Individual Counseling 30m",
+      "started_from": "TPL-SUD",
+      "status": "active",
+      "created": "2026-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2026-07-01",
+          "changed": "2026-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from SUD Individual Counseling.",
+          "config": {
+            "description": "Substance use counseling. Part 2 protected, so a release is part of it.",
+            "roles": [
+              "Clinical Provider / Therapist",
+              "Social Worker"
+            ],
+            "programs": [
+              "PRG-IOP-01",
+              "PRG-RES-01"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-90832",
+                "units": 1,
+                "modifiers": [
+                  "HF"
+                ]
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-SABG"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-STATE-BLOCK"
+            ],
+            "dx_set": "DXS-SUD",
+            "precedence": "DXP-SET",
+            "sensitivity": "Sensitive — substance use (42 CFR Part 2)",
+            "duration_min": 30,
+            "steps": [
+              {
+                "step_id": "STP-105",
+                "kind": "Document",
+                "name": "Progress Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-106",
+                "kind": "Document",
+                "name": "Release of Information",
+                "required": true,
+                "rule_ids": [
+                  "DDR-002"
+                ],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-028",
+      "name": "SUD Individual Counseling 45m",
+      "started_from": "TPL-SUD",
+      "status": "inactive",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from SUD Individual Counseling.",
+          "config": {
+            "description": "Substance use counseling. Part 2 protected, so a release is part of it.",
+            "roles": [
+              "Clinical Provider / Therapist",
+              "Social Worker"
+            ],
+            "programs": [
+              "PRG-IOP-01"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-90834",
+                "units": 1,
+                "modifiers": [
+                  "HF"
+                ]
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-SABG"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-STATE-BLOCK"
+            ],
+            "dx_set": "DXS-SUD",
+            "precedence": "DXP-SET",
+            "sensitivity": "Sensitive — substance use (42 CFR Part 2)",
+            "duration_min": 45,
+            "steps": [
+              {
+                "step_id": "STP-107",
+                "kind": "Document",
+                "name": "Progress Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              },
+              {
+                "step_id": "STP-108",
+                "kind": "Document",
+                "name": "Release of Information",
+                "required": true,
+                "rule_ids": [
+                  "DDR-002"
+                ],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-032",
+      "name": "Post Reassignment Satisfaction Survey",
+      "started_from": null,
+      "status": "active",
+      "created": "2026-04-11",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2026-04-11",
+          "changed": "2026-04-11",
+          "changed_by": "ST-2007",
+          "note": "Created from scratch.",
+          "config": {
+            "description": "Asks the client how the change of provider went. Not billed.",
+            "roles": [
+              "Case Manager",
+              "Social Worker",
+              "Clinical Provider / Therapist"
+            ],
+            "programs": [
+              "PRG-GEN-THX",
+              "PRG-OUTP-01",
+              "PRG-COUNSEL",
+              "PRG-IOP-01"
+            ],
+            "sites": [],
+            "codes": [],
+            "payors": [],
+            "funding": [],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-EPISODE",
+            "sensitivity": "Standard",
+            "duration_min": null,
+            "steps": [
+              {
+                "step_id": "STP-109",
+                "kind": "Document",
+                "name": "Client Satisfaction Survey",
+                "required": true,
+                "rule_ids": [
+                  "DDR-006"
+                ],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-029",
+      "name": "Psychiatric Evaluation",
+      "started_from": null,
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from scratch.",
+          "config": {
+            "description": "The prescriber’s initial evaluation.",
+            "roles": [
+              "Psychiatric Provider"
+            ],
+            "programs": [
+              "PRG-GEN-THX",
+              "PRG-OUTP-01",
+              "PRG-COUNSEL",
+              "PRG-RES-01",
+              "PRG-IOP-01",
+              "PRG-CRISIS-01",
+              "PRG-PEER-01"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-90791",
+                "units": 1,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH",
+              "PAYER-MEDICAREB",
+              "PAYER-ANTHEM",
+              "PAYER-UHC"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY",
+              "FUND-MEDICARE",
+              "FUND-COMMERCIAL"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-STAFF",
+            "sensitivity": "Standard",
+            "duration_min": 60,
+            "steps": [
+              {
+                "step_id": "STP-110",
+                "kind": "Document",
+                "name": "Psychiatric Evaluation",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    },
+    {
+      "service_id": "SVC-030",
+      "name": "Nurse Visit",
+      "started_from": null,
+      "status": "active",
+      "created": "2025-07-01",
+      "versions": [
+        {
+          "version": 1,
+          "effective": "2025-07-01",
+          "changed": "2025-07-01",
+          "changed_by": "ST-2010",
+          "note": "Created from scratch.",
+          "config": {
+            "description": "A nursing contact: vitals, medication check, education.",
+            "roles": [
+              "Nurse"
+            ],
+            "programs": [
+              "PRG-RES-01",
+              "PRG-IOP-01",
+              "PRG-CRISIS-01"
+            ],
+            "sites": [],
+            "codes": [
+              {
+                "code_id": "SC-H2015",
+                "units": 1,
+                "modifiers": []
+              }
+            ],
+            "payors": [
+              "PAYER-OHMEDICAID",
+              "PAYER-COUNTY-MH"
+            ],
+            "funding": [
+              "FUND-MEDICAID",
+              "FUND-COUNTY"
+            ],
+            "dx_set": "DXS-BH",
+            "precedence": "DXP-EPISODE",
+            "sensitivity": "Standard",
+            "duration_min": 15,
+            "steps": [
+              {
+                "step_id": "STP-111",
+                "kind": "Document",
+                "name": "Nurse Progress Note",
+                "required": true,
+                "rule_ids": [],
+                "after": null
+              }
+            ],
+            "deadline_rule_id": null
+          }
+        }
+      ]
+    }
+  ],
+  "staff_security": [
+    {
+      "staff_id": "ST-2001",
+      "programs": [
+        "PRG-GEN-THX",
+        "PRG-OUTP-01",
+        "PRG-COUNSEL",
+        "PRG-RES-01",
+        "PRG-IOP-01",
+        "PRG-CRISIS-01",
+        "PRG-PEER-01"
+      ],
+      "sites": [
+        "SITE-MAIN-01",
+        "SITE-MAIN-02"
+      ],
+      "sensitivity": [
+        "Standard",
+        "Sensitive — mental health"
+      ]
+    },
+    {
+      "staff_id": "ST-2002",
+      "programs": [
+        "PRG-GEN-THX",
+        "PRG-OUTP-01",
+        "PRG-COUNSEL",
+        "PRG-RES-01",
+        "PRG-IOP-01",
+        "PRG-CRISIS-01",
+        "PRG-PEER-01"
+      ],
+      "sites": [
+        "SITE-MAIN-01",
+        "SITE-MAIN-02",
+        "SITE-CRISIS-01"
+      ],
+      "sensitivity": [
+        "Standard",
+        "Sensitive — mental health",
+        "Sensitive — substance use (42 CFR Part 2)"
+      ]
+    },
+    {
+      "staff_id": "ST-2003",
+      "programs": [
+        "PRG-GEN-THX",
+        "PRG-OUTP-01",
+        "PRG-COUNSEL",
+        "PRG-RES-01",
+        "PRG-IOP-01",
+        "PRG-CRISIS-01"
+      ],
+      "sites": [
+        "SITE-MAIN-01",
+        "SITE-MAIN-02",
+        "SITE-RES-A",
+        "SITE-CRISIS-01"
+      ],
+      "sensitivity": [
+        "Standard",
+        "Sensitive — mental health"
+      ]
+    },
+    {
+      "staff_id": "ST-2004",
+      "programs": [
+        "PRG-RES-01",
+        "PRG-PEER-01"
+      ],
+      "sites": [
+        "SITE-RES-A",
+        "SITE-RES-B"
+      ],
+      "sensitivity": [
+        "Standard"
+      ]
+    },
+    {
+      "staff_id": "ST-2005",
+      "programs": [
+        "PRG-RES-01"
+      ],
+      "sites": [
+        "SITE-RES-A",
+        "SITE-RES-B"
+      ],
+      "sensitivity": [
+        "Standard"
+      ]
+    },
+    {
+      "staff_id": "ST-2006",
+      "programs": [
+        "PRG-GEN-THX",
+        "PRG-OUTP-01",
+        "PRG-COUNSEL",
+        "PRG-IOP-01"
+      ],
+      "sites": [
+        "SITE-MAIN-01",
+        "SITE-MAIN-02"
+      ],
+      "sensitivity": [
+        "Standard",
+        "Sensitive — mental health",
+        "Sensitive — substance use (42 CFR Part 2)"
+      ]
+    },
+    {
+      "staff_id": "ST-2007",
+      "programs": [
+        "PRG-GEN-THX",
+        "PRG-OUTP-01",
+        "PRG-COUNSEL",
+        "PRG-RES-01",
+        "PRG-IOP-01",
+        "PRG-CRISIS-01",
+        "PRG-PEER-01"
+      ],
+      "sites": [
+        "SITE-MAIN-01",
+        "SITE-MAIN-02",
+        "SITE-RES-A",
+        "SITE-RES-B",
+        "SITE-CRISIS-01"
+      ],
+      "sensitivity": [
+        "Standard",
+        "Sensitive — mental health",
+        "Sensitive — substance use (42 CFR Part 2)"
+      ]
+    },
+    {
+      "staff_id": "ST-2008",
+      "programs": [
+        "PRG-RES-01",
+        "PRG-IOP-01"
+      ],
+      "sites": [
+        "SITE-RES-B"
+      ],
+      "sensitivity": [
+        "Standard",
+        "Sensitive — mental health"
+      ]
+    },
+    {
+      "staff_id": "ST-2009",
+      "programs": [
+        "PRG-GEN-THX",
+        "PRG-OUTP-01",
+        "PRG-COUNSEL",
+        "PRG-RES-01",
+        "PRG-IOP-01",
+        "PRG-CRISIS-01",
+        "PRG-PEER-01"
+      ],
+      "sites": [
+        "SITE-MAIN-01",
+        "SITE-MAIN-02"
+      ],
+      "sensitivity": [
+        "Standard"
+      ]
+    },
+    {
+      "staff_id": "ST-2010",
+      "programs": [
+        "PRG-GEN-THX",
+        "PRG-OUTP-01",
+        "PRG-COUNSEL",
+        "PRG-RES-01",
+        "PRG-IOP-01",
+        "PRG-CRISIS-01",
+        "PRG-PEER-01"
+      ],
+      "sites": [
+        "SITE-MAIN-01",
+        "SITE-MAIN-02",
+        "SITE-RES-A",
+        "SITE-RES-B",
+        "SITE-CRISIS-01"
+      ],
+      "sensitivity": [
+        "Standard",
+        "Sensitive — mental health",
+        "Sensitive — substance use (42 CFR Part 2)"
+      ]
+    }
+  ],
+  "instances": [
+    {
+      "instance_id": "SI-001",
+      "client_id": "CL-100235",
+      "service_id": "SVC-022",
+      "version": 1,
+      "date_of_service": "2026-09-22",
+      "anchor_date": "2026-09-22",
+      "started_by": "ST-2003",
+      "status": "open",
+      "steps": [
+        {
+          "step_id": "STP-087",
+          "status": "todo",
+          "done_on": null
+        },
+        {
+          "step_id": "STP-088",
+          "status": "todo",
+          "done_on": null
+        },
+        {
+          "step_id": "STP-089",
+          "status": "todo",
+          "done_on": null
+        },
+        {
+          "step_id": "STP-090",
+          "status": "done",
+          "done_on": "2026-09-22"
+        }
+      ]
+    },
+    {
+      "instance_id": "SI-002",
+      "client_id": "CL-100235",
+      "service_id": "SVC-005",
+      "version": 1,
+      "date_of_service": "2026-09-15",
+      "anchor_date": "2026-09-15",
+      "started_by": "ST-2003",
+      "status": "complete",
+      "steps": [
+        {
+          "step_id": "STP-034",
+          "status": "done",
+          "done_on": "2026-09-15"
+        }
+      ]
+    },
+    {
+      "instance_id": "SI-003",
+      "client_id": "CL-100235",
+      "service_id": "SVC-005",
+      "version": 1,
+      "date_of_service": "2026-09-08",
+      "anchor_date": "2026-09-08",
+      "started_by": "ST-2003",
+      "status": "complete",
+      "steps": [
+        {
+          "step_id": "STP-034",
+          "status": "done",
+          "done_on": "2026-09-08"
+        }
+      ]
+    },
+    {
+      "instance_id": "SI-004",
+      "client_id": "CL-100235",
+      "service_id": "SVC-025",
+      "version": 1,
+      "date_of_service": "2026-03-02",
+      "anchor_date": "2026-03-02",
+      "started_by": "ST-2004",
+      "status": "complete",
+      "steps": [
+        {
+          "step_id": "STP-099",
+          "status": "done",
+          "done_on": "2026-03-02"
+        },
+        {
+          "step_id": "STP-100",
+          "status": "done",
+          "done_on": "2026-03-02"
+        },
+        {
+          "step_id": "STP-101",
+          "status": "done",
+          "done_on": "2026-03-04"
+        },
+        {
+          "step_id": "STP-102",
+          "status": "done",
+          "done_on": "2026-03-04"
+        }
+      ]
+    },
+    {
+      "instance_id": "SI-005",
+      "client_id": "CL-100239",
+      "service_id": "SVC-024",
+      "version": 1,
+      "date_of_service": "2026-09-21",
+      "anchor_date": "2021-11-30",
+      "started_by": "ST-2003",
+      "status": "open",
+      "steps": [
+        {
+          "step_id": "STP-095",
+          "status": "todo",
+          "done_on": null
+        },
+        {
+          "step_id": "STP-096",
+          "status": "done",
+          "done_on": "2026-09-21"
+        },
+        {
+          "step_id": "STP-097",
+          "status": "todo",
+          "done_on": null
+        },
+        {
+          "step_id": "STP-098",
+          "status": "todo",
+          "done_on": null
+        }
+      ]
+    },
+    {
+      "instance_id": "SI-006",
+      "client_id": "CL-100239",
+      "service_id": "SVC-001",
+      "version": 3,
+      "date_of_service": "2026-09-14",
+      "anchor_date": "2026-09-14",
+      "started_by": "ST-2003",
+      "status": "complete",
+      "steps": [
+        {
+          "step_id": "STP-030",
+          "status": "done",
+          "done_on": "2026-09-14"
+        }
+      ]
+    },
+    {
+      "instance_id": "SI-007",
+      "client_id": "CL-100236",
+      "service_id": "SVC-001",
+      "version": 3,
+      "date_of_service": "2026-09-17",
+      "anchor_date": "2026-09-17",
+      "started_by": "ST-2003",
+      "status": "complete",
+      "steps": [
+        {
+          "step_id": "STP-030",
+          "status": "done",
+          "done_on": "2026-09-17"
+        }
+      ]
+    },
+    {
+      "instance_id": "SI-008",
+      "client_id": "CL-100236",
+      "service_id": "SVC-001",
+      "version": 2,
+      "date_of_service": "2026-06-25",
+      "anchor_date": "2026-06-25",
+      "started_by": "ST-2003",
+      "status": "complete",
+      "steps": [
+        {
+          "step_id": "STP-030",
+          "status": "done",
+          "done_on": "2026-06-25"
+        }
+      ]
+    }
+  ]
+}

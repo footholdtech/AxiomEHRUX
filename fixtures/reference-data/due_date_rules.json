@@ -1,0 +1,370 @@
+{
+  "_meta": {
+    "description": "Admin > Due Date Rules seed: when documentation is due relative to a service date, how often, and how early staff are warned; plus the populations each program serves. Agency configuration only; no client data. 100% fictional.",
+    "fields": {
+      "rules": [
+        "rule_id",
+        "name",
+        "status",
+        "first_due",
+        "anchor",
+        "repeat",
+        "warn",
+        "scope",
+        "allow_cancel",
+        "allow_start_override",
+        "updated",
+        "updated_by_staff_id"
+      ],
+      "program_populations": [
+        "program_id",
+        "populations"
+      ]
+    }
+  },
+  "populations": [
+    "Children & youth",
+    "Transition-age youth",
+    "Adults",
+    "Older adults"
+  ],
+  "program_populations": [
+    {
+      "program_id": "PRG-GEN-THX",
+      "populations": [
+        "Children & youth",
+        "Adults"
+      ]
+    },
+    {
+      "program_id": "PRG-OUTP-01",
+      "populations": [
+        "Adults",
+        "Older adults"
+      ]
+    },
+    {
+      "program_id": "PRG-COUNSEL",
+      "populations": [
+        "Transition-age youth",
+        "Adults"
+      ]
+    },
+    {
+      "program_id": "PRG-RES-01",
+      "populations": [
+        "Adults"
+      ]
+    },
+    {
+      "program_id": "PRG-IOP-01",
+      "populations": [
+        "Transition-age youth",
+        "Adults"
+      ]
+    },
+    {
+      "program_id": "PRG-CRISIS-01",
+      "populations": [
+        "Children & youth",
+        "Transition-age youth",
+        "Adults",
+        "Older adults"
+      ]
+    },
+    {
+      "program_id": "PRG-PEER-01",
+      "populations": [
+        "Adults",
+        "Older adults"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "rule_id": "DDR-001",
+      "name": "IBHIS CANS Reassessment",
+      "status": "active",
+      "first_due": {
+        "n": 6,
+        "unit": "months"
+      },
+      "anchor": "ibhis-enroll",
+      "repeat": {
+        "n": 6,
+        "unit": "months"
+      },
+      "warn": {
+        "n": 30,
+        "unit": "days"
+      },
+      "scope": {
+        "type": "population",
+        "population": "Children & youth"
+      },
+      "allow_cancel": false,
+      "allow_start_override": false,
+      "updated": "2026-07-02",
+      "updated_by_staff_id": "ST-2010"
+    },
+    {
+      "rule_id": "DDR-002",
+      "name": "Standard Annual Consent",
+      "status": "active",
+      "first_due": {
+        "n": 12,
+        "unit": "months"
+      },
+      "anchor": "program-enroll",
+      "repeat": {
+        "n": 12,
+        "unit": "months"
+      },
+      "warn": {
+        "n": 2,
+        "unit": "months"
+      },
+      "scope": {
+        "type": "all"
+      },
+      "allow_cancel": false,
+      "allow_start_override": false,
+      "updated": "2026-06-18",
+      "updated_by_staff_id": "ST-2010"
+    },
+    {
+      "rule_id": "DDR-003",
+      "name": "Service Plan Review",
+      "status": "active",
+      "first_due": {
+        "n": 30,
+        "unit": "days"
+      },
+      "anchor": "program-enroll",
+      "repeat": {
+        "n": 6,
+        "unit": "months"
+      },
+      "warn": {
+        "n": 14,
+        "unit": "days"
+      },
+      "scope": {
+        "type": "all"
+      },
+      "allow_cancel": false,
+      "allow_start_override": true,
+      "updated": "2026-08-14",
+      "updated_by_staff_id": "ST-2010"
+    },
+    {
+      "rule_id": "DDR-004",
+      "name": "Post-Discharge Follow-Up",
+      "status": "active",
+      "first_due": {
+        "n": 7,
+        "unit": "days"
+      },
+      "anchor": "discharge",
+      "repeat": null,
+      "warn": {
+        "n": 2,
+        "unit": "days"
+      },
+      "scope": {
+        "type": "all"
+      },
+      "allow_cancel": true,
+      "allow_start_override": false,
+      "updated": "2026-05-30",
+      "updated_by_staff_id": "ST-2007"
+    },
+    {
+      "rule_id": "DDR-005",
+      "name": "First Contact After Assignment",
+      "status": "active",
+      "first_due": {
+        "n": 10,
+        "unit": "days"
+      },
+      "anchor": "assignment",
+      "repeat": null,
+      "warn": {
+        "n": 3,
+        "unit": "days"
+      },
+      "scope": {
+        "type": "all"
+      },
+      "allow_cancel": false,
+      "allow_start_override": false,
+      "updated": "2026-04-11",
+      "updated_by_staff_id": "ST-2007"
+    },
+    {
+      "rule_id": "DDR-006",
+      "name": "Post Reassignment Satisfaction",
+      "status": "active",
+      "first_due": {
+        "n": 30,
+        "unit": "days"
+      },
+      "anchor": "reassignment",
+      "repeat": null,
+      "warn": {
+        "n": 7,
+        "unit": "days"
+      },
+      "scope": {
+        "type": "all"
+      },
+      "allow_cancel": true,
+      "allow_start_override": false,
+      "updated": "2026-04-11",
+      "updated_by_staff_id": "ST-2007"
+    },
+    {
+      "rule_id": "DDR-007",
+      "name": "Quarterly Adult Screening",
+      "status": "active",
+      "first_due": {
+        "n": 3,
+        "unit": "months"
+      },
+      "anchor": "client-enroll",
+      "repeat": {
+        "n": 3,
+        "unit": "months"
+      },
+      "warn": {
+        "n": 14,
+        "unit": "days"
+      },
+      "scope": {
+        "type": "population",
+        "population": "Adults"
+      },
+      "allow_cancel": false,
+      "allow_start_override": false,
+      "updated": "2026-03-03",
+      "updated_by_staff_id": "ST-2010"
+    },
+    {
+      "rule_id": "DDR-008",
+      "name": "Bi-Weekly High Acuity Assessments",
+      "status": "active",
+      "first_due": {
+        "n": 2,
+        "unit": "weeks"
+      },
+      "anchor": "program-enroll",
+      "repeat": {
+        "n": 2,
+        "unit": "weeks"
+      },
+      "warn": {
+        "n": 2,
+        "unit": "days"
+      },
+      "scope": {
+        "type": "programs",
+        "programs": [
+          "PRG-CRISIS-01",
+          "PRG-IOP-01"
+        ]
+      },
+      "allow_cancel": false,
+      "allow_start_override": false,
+      "updated": "2026-09-01",
+      "updated_by_staff_id": "ST-2010"
+    },
+    {
+      "rule_id": "DDR-009",
+      "name": "Intake Assessment (Retired)",
+      "status": "inactive",
+      "first_due": {
+        "n": 30,
+        "unit": "days"
+      },
+      "anchor": "referral",
+      "repeat": null,
+      "warn": {
+        "n": 7,
+        "unit": "days"
+      },
+      "scope": {
+        "type": "all"
+      },
+      "allow_cancel": false,
+      "allow_start_override": false,
+      "updated": "2026-01-20",
+      "updated_by_staff_id": "ST-2010"
+    },
+    {
+      "rule_id": "DDR-010",
+      "name": "Crisis Intake Within 5 Days",
+      "status": "active",
+      "first_due": {
+        "n": 5,
+        "unit": "days"
+      },
+      "anchor": "referral",
+      "repeat": null,
+      "warn": {
+        "n": 2,
+        "unit": "days"
+      },
+      "scope": {
+        "type": "all"
+      },
+      "allow_cancel": false,
+      "allow_start_override": false,
+      "updated": "2026-05-01",
+      "updated_by_staff_id": "ST-2007"
+    },
+    {
+      "rule_id": "DDR-011",
+      "name": "Intake Within 14 Days",
+      "status": "active",
+      "first_due": {
+        "n": 14,
+        "unit": "days"
+      },
+      "anchor": "referral",
+      "repeat": null,
+      "warn": {
+        "n": 4,
+        "unit": "days"
+      },
+      "scope": {
+        "type": "all"
+      },
+      "allow_cancel": false,
+      "allow_start_override": false,
+      "updated": "2026-05-01",
+      "updated_by_staff_id": "ST-2007"
+    },
+    {
+      "rule_id": "DDR-012",
+      "name": "Discharge Paperwork Within 3 Days",
+      "status": "active",
+      "first_due": {
+        "n": 3,
+        "unit": "days"
+      },
+      "anchor": "discharge",
+      "repeat": null,
+      "warn": {
+        "n": 1,
+        "unit": "days"
+      },
+      "scope": {
+        "type": "all"
+      },
+      "allow_cancel": false,
+      "allow_start_override": false,
+      "updated": "2026-05-01",
+      "updated_by_staff_id": "ST-2007"
+    }
+  ]
+}

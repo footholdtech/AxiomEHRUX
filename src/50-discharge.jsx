@@ -5,8 +5,9 @@
 
 /* Client Summary is the landing tab for every chart: opening someone's record
    should show you the record, not drop you straight into a form. */
-const CHART_HOME_TAB = 'Client Summary';
-const CHART_TABS = [CHART_HOME_TAB, 'Dynamic Progress Notes', 'Discharge Plan', 'Problem List', 'Quality Management', 'Psychiatric Evaluation', 'Psychotherapy Progress Note'];
+/* CHART_HOME_TAB lives in 10-data.jsx now, beside the module list, because the
+   tab-set catalogue (15-uiconfig.jsx) is built from both. Which tabs a chart
+   shows, and which one it opens on, comes from the active tab set. */
 const OUTCOME_OPTIONS = ['Full Resolution', 'Partial Resolution', 'No Resolution'];
 const WHY_DISCHARGED = ['Voluntary Discharge', 'In-Voluntary Discharge'];
 
@@ -73,13 +74,15 @@ function MultiSelect({ value = [], options, onChange, placeholder = 'Please sele
   const toggle = o => onChange(value.indexOf(o) !== -1 ? value.filter(x => x !== o) : value.concat([o]));
   return (
     <div className="dd" ref={ref}>
-      <button type="button" className={'dd-trigger' + (open ? ' open' : '') + (invalid ? ' invalid' : '')} onClick={() => setOpen(o => !o)} aria-expanded={open}>
+      <button type="button" className={'dd-trigger' + (open ? ' open' : '') + (invalid ? ' invalid' : '')} onClick={() => setOpen(o => !o)}
+        onKeyDown={openOnArrow(open, setOpen)} aria-haspopup="listbox" aria-expanded={open}>
         <span className={value.length ? 'dd-value' : 'dd-placeholder'}>{value.length ? value.join(', ') : placeholder}</span>
         <Icon name="chevronDown" size={16} />
       </button>
-      {open && <FloatMenu anchorRef={ref} menuRef={menuRef} className="dd-menu" onClose={() => setOpen(false)}><div className="dd-list">{options.map(o => (
-        <div key={o} className={'dd-opt' + (value.indexOf(o) !== -1 ? ' active' : '')} onClick={() => toggle(o)}>
-          <Checkbox checked={value.indexOf(o) !== -1} onChange={() => toggle(o)} label={o} />
+      {open && <FloatMenu anchorRef={ref} menuRef={menuRef} className="dd-menu" onClose={() => setOpen(false)}><div className="dd-list" role="listbox" aria-multiselectable="true">{options.map(o => (
+        <div key={o} className={'dd-opt' + (value.indexOf(o) !== -1 ? ' active' : '')} role="option" aria-selected={value.indexOf(o) !== -1} tabIndex={-1} aria-label={o}
+          onClick={() => toggle(o)} onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(o); } }}>
+          <Checkbox checked={value.indexOf(o) !== -1} onChange={() => {}} label={o} presentational />
         </div>
       ))}</div></FloatMenu>}
     </div>
@@ -217,6 +220,8 @@ function DischargePlan({ client, config, onOpenModule }) {
     setStage(null);
     if (didFile) {
       setFiled({ at: TODAY, status: config.requiresApproval ? 'Pended to Manager' : 'Complete', selection });
+      /* Completes the Discharge Plan step of an open service, if there is one. */
+      sbDocFiled(client.client_id, 'Discharge Plan', isoOf(TODAY));
       guard.clearDirty();
       guard.setToast({
         status: 'success',
@@ -863,10 +868,19 @@ function AccessGate({ client }) {
 
 function ChartPage({ id, module, config }) {
   const guard = useGuard();
+  /* The tabs come from the active tab set, and a chart opens on its first
+     one. That's Client Summary in every seed set, but an agency or a staff
+     member can move it or take it out. */
+  const { tabSet } = useUIConfig();
+  const home = tabSet.tabs[0] || CHART_HOME_TAB;
   /* `doc-…` opens one document from the Documents list as its own tab. */
   const doc = findDoc(id, module);
-  const tabFor = () => (doc ? docTab(doc) : (module && CLIENT_MODULES[module]) || CHART_HOME_TAB);
+  const tabFor = () => (doc ? docTab(doc) : (module && CLIENT_MODULES[module]) || home);
   const [tab, setTab] = useState(tabFor);
+  /* Pages open in this chart that aren't in the set: opened from More, the
+     left nav, a notification or a deep link. They stay as temporary tabs,
+     after a divider, until closed or until you open a different client. */
+  const [extras, setExtras] = useState([]);
   const client = CLIENT_BY_ID[id];
   /* The URL names the module, so a chart reached from the left nav opens on it
      rather than always on the overview. */
@@ -875,7 +889,12 @@ function ChartPage({ id, module, config }) {
      happened to be standing — so every switch resets to the overview. The
      same goes for leaving a module URL for the bare chart URL (the client
      breadcrumb): that means the summary. */
-  useEffect(() => { setTab(tabFor()); }, [id, module]);
+  useEffect(() => { setTab(tabFor()); setExtras([]); }, [id, module]);
+  /* Whatever you're on is always a tab. Switching to a set that lacks the
+     current page keeps it, as a temporary tab, rather than moving you. */
+  useEffect(() => {
+    if (tabSet.tabs.indexOf(tab) === -1 && extras.indexOf(tab) === -1) setExtras(x => x.concat([tab]));
+  }, [tab, tabSet, extras]);
   /* Publish the active tab so the breadcrumb in the app shell can name it, and
      clear it on the way out so a stale tab never trails a different page. */
   const { setChartTab } = guard;
@@ -928,7 +947,20 @@ function ChartPage({ id, module, config }) {
        the same guard, so unsaved work is intercepted. */
     guard.request({ client: id, onCommit: () => setTab(t) });
   };
-  toHome.current = () => switchTab(CHART_HOME_TAB);
+  /* The client crumb means "this chart's first tab". Already there, it
+     reloads the page, through the guard like everything else. */
+  toHome.current = () => (tab === home
+    ? guard.request({ to: '/chart/' + id, client: id, onCommit: requestPageReload })
+    : switchTab(home));
+  const closeExtra = t => {
+    if (t !== tab) return setExtras(x => x.filter(e => e !== t));
+    /* Closing the tab you're on moves you to its neighbour, the way closing
+       a browser tab does, and goes through the guard first. */
+    const list = tabSet.tabs.concat(extras.filter(e => tabSet.tabs.indexOf(e) === -1));
+    const i = list.indexOf(t);
+    const next = list[i + 1] || list[i - 1] || home;
+    guard.request({ client: id, onCommit: () => { setTab(next); setExtras(x => x.filter(e => e !== t)); } });
+  };
 
   return (
     <div className="page page--fluid">
@@ -942,7 +974,11 @@ function ChartPage({ id, module, config }) {
       {/* The tabs span the page like the header above them; the summary's
           cards fill it too. Every other tab is a form or a table, held at
           1280px so lines and rows stay readable on a wide monitor. */}
-      <TabStrip className="chart-tabs" tabs={CHART_TABS.indexOf(tab) === -1 ? CHART_TABS.concat([tab]) : CHART_TABS} active={tab} onSelect={switchTab} />
+      {/* The DS tabs set (4666:71569): the set's tabs scroll in one row;
+          More, Edit and Tabs Set sit at the right. See 53-tabsets.jsx. */}
+      <ChartTabBar className="chart-tabs" tabs={tabSet.tabs}
+        extras={extras.indexOf(tab) === -1 && tabSet.tabs.indexOf(tab) === -1 ? extras.concat([tab]) : extras}
+        active={tab} onSelect={switchTab} onCloseExtra={closeExtra} />
 
       {tab === CHART_HOME_TAB
         ? <ClientSummary client={client} onOpenTab={switchTab} />
@@ -952,7 +988,9 @@ function ChartPage({ id, module, config }) {
         ? <DocumentView client={client} doc={doc} />
         : tab === 'Cover Sheet'
         ? <CoverSheetPage key={id} client={client} />
-        : START_NOTE_TYPES.indexOf(tab) !== -1 || getNoteCtx(id, tab)
+        : tab === 'Services'
+        ? <ClientServicesPage key={id} client={client} onOpenTab={switchTab} />
+        : sbIsNoteDoc(tab) || getNoteCtx(id, tab)
         ? <NotePage key={id + tab} client={client} doc={tab} />
         /* Every other module: its records and a form to add one. */
         : <ClientModulePage key={id + tab} client={client} module={tab} />}</div>}

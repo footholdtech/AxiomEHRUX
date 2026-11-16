@@ -75,7 +75,7 @@ function notifAll() {
     done: NSESSION.done[n.notification_id] || null,
     nudged: !!NSESSION.nudged[n.notification_id],
     draft: NSESSION.draft[n.notification_id] || null,
-  })).concat(noteNotifs());
+  })).concat(noteNotifs(), typeof worklistNotifs === 'function' ? worklistNotifs() : []);
 }
 const _ts = iso => new Date(iso).getTime();
 /* Counted = it needs me: open tasks, unread urgent alerts, and unread
@@ -212,6 +212,8 @@ const TASK_ACTIONS = {
   message: { primary: 'Reply', verb: 'Replied', more: ['done', 'chart'] },
   referral: { primary: 'Confirm Intake Date', verb: 'Intake date confirmed', more: ['done', 'chart'] },
   incomplete: { primary: 'Continue Note', verb: null, more: [] },
+  /* An unfinished residential worklist (52-residential.jsx). */
+  worklist: { primary: 'Resume Worklist', verb: null, more: [] },
 };
 
 /* ---- Delivery preferences --------------------------------------------

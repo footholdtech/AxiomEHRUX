@@ -1,0 +1,1035 @@
+{
+  "_meta": {
+    "description": "Maple Grove residential census: ten additional fictional residents, a bed assignment for all fourteen residential clients, vitals, allergies and legal-status attributes for the new residents, children in family housing, and Daily Attendance records.",
+    "fictional": true
+  },
+  "records": {
+    "residents": [
+      {
+        "client_id": "CL-100401",
+        "mrn": "MRN0001401",
+        "first_name": "Gabriel",
+        "last_name": "Okonkwo",
+        "preferred_name": "Gabe",
+        "dob": "1983-05-14",
+        "gender": "Male",
+        "race": null,
+        "ethnicity": null,
+        "primary_language": "English",
+        "email": "gabriel.okonkwo.demo@example.com",
+        "phone": "555-030-0401",
+        "address": {
+          "line1": "700 Maple Grove Way",
+          "city": "Millbrook",
+          "state": "OH",
+          "zip": "45602"
+        },
+        "program_ids": [
+          "PRG-RES-01"
+        ],
+        "site_id": "SITE-RES-A",
+        "enrollment_date": "2026-06-10",
+        "status": "Active"
+      },
+      {
+        "client_id": "CL-100402",
+        "mrn": "MRN0001402",
+        "first_name": "Luis",
+        "last_name": "Echeverría",
+        "preferred_name": null,
+        "dob": "1991-08-29",
+        "gender": "Male",
+        "race": null,
+        "ethnicity": null,
+        "primary_language": "Spanish",
+        "email": "luis.echeverria.demo@example.com",
+        "phone": "555-030-0402",
+        "address": {
+          "line1": "700 Maple Grove Way",
+          "city": "Millbrook",
+          "state": "OH",
+          "zip": "45602"
+        },
+        "program_ids": [
+          "PRG-RES-01"
+        ],
+        "site_id": "SITE-RES-A",
+        "enrollment_date": "2026-07-11",
+        "status": "Active"
+      },
+      {
+        "client_id": "CL-100403",
+        "mrn": "MRN0001403",
+        "first_name": "Peter",
+        "last_name": "Halvorsen",
+        "preferred_name": null,
+        "dob": "1969-02-03",
+        "gender": "Male",
+        "race": null,
+        "ethnicity": null,
+        "primary_language": "English",
+        "email": "peter.halvorsen.demo@example.com",
+        "phone": "555-030-0403",
+        "address": {
+          "line1": "700 Maple Grove Way",
+          "city": "Millbrook",
+          "state": "OH",
+          "zip": "45602"
+        },
+        "program_ids": [
+          "PRG-RES-01"
+        ],
+        "site_id": "SITE-RES-A",
+        "enrollment_date": "2026-08-12",
+        "status": "Active"
+      },
+      {
+        "client_id": "CL-100404",
+        "mrn": "MRN0001404",
+        "first_name": "Jordan",
+        "last_name": "Reyes-Whitlock",
+        "preferred_name": null,
+        "dob": "1998-12-21",
+        "gender": "Non-binary",
+        "race": null,
+        "ethnicity": null,
+        "primary_language": "English",
+        "email": "jordan.reyes-whitlock.demo@example.com",
+        "phone": "555-030-0404",
+        "address": {
+          "line1": "700 Maple Grove Way",
+          "city": "Millbrook",
+          "state": "OH",
+          "zip": "45602"
+        },
+        "program_ids": [
+          "PRG-RES-01"
+        ],
+        "site_id": "SITE-RES-A",
+        "enrollment_date": "2026-06-13",
+        "status": "Active"
+      },
+      {
+        "client_id": "CL-100405",
+        "mrn": "MRN0001405",
+        "first_name": "Andre",
+        "last_name": "Baptiste",
+        "preferred_name": null,
+        "dob": "1976-10-09",
+        "gender": "Male",
+        "race": null,
+        "ethnicity": null,
+        "primary_language": "Haitian Creole",
+        "email": "andre.baptiste.demo@example.com",
+        "phone": "555-030-0405",
+        "address": {
+          "line1": "700 Maple Grove Way",
+          "city": "Millbrook",
+          "state": "OH",
+          "zip": "45602"
+        },
+        "program_ids": [
+          "PRG-RES-01"
+        ],
+        "site_id": "SITE-RES-A",
+        "enrollment_date": "2026-07-14",
+        "status": "Active"
+      },
+      {
+        "client_id": "CL-100406",
+        "mrn": "MRN0001406",
+        "first_name": "Naomi",
+        "last_name": "Feldstein",
+        "preferred_name": null,
+        "dob": "1987-04-17",
+        "gender": "Female",
+        "race": null,
+        "ethnicity": null,
+        "primary_language": "English",
+        "email": "naomi.feldstein.demo@example.com",
+        "phone": "555-030-0406",
+        "address": {
+          "line1": "702 Maple Grove Way",
+          "city": "Millbrook",
+          "state": "OH",
+          "zip": "45602"
+        },
+        "program_ids": [
+          "PRG-RES-01"
+        ],
+        "site_id": "SITE-RES-B",
+        "enrollment_date": "2026-08-15",
+        "status": "Active"
+      },
+      {
+        "client_id": "CL-100407",
+        "mrn": "MRN0001407",
+        "first_name": "Keisha",
+        "last_name": "Monroe",
+        "preferred_name": "Kiki",
+        "dob": "1995-06-30",
+        "gender": "Female",
+        "race": null,
+        "ethnicity": null,
+        "primary_language": "English",
+        "email": "keisha.monroe.demo@example.com",
+        "phone": "555-030-0407",
+        "address": {
+          "line1": "702 Maple Grove Way",
+          "city": "Millbrook",
+          "state": "OH",
+          "zip": "45602"
+        },
+        "program_ids": [
+          "PRG-RES-01"
+        ],
+        "site_id": "SITE-RES-B",
+        "enrollment_date": "2026-06-16",
+        "status": "Active"
+      },
+      {
+        "client_id": "CL-100408",
+        "mrn": "MRN0001408",
+        "first_name": "Rosa",
+        "last_name": "Villanueva",
+        "preferred_name": null,
+        "dob": "1972-09-12",
+        "gender": "Female",
+        "race": null,
+        "ethnicity": null,
+        "primary_language": "Spanish",
+        "email": "rosa.villanueva.demo@example.com",
+        "phone": "555-030-0408",
+        "address": {
+          "line1": "702 Maple Grove Way",
+          "city": "Millbrook",
+          "state": "OH",
+          "zip": "45602"
+        },
+        "program_ids": [
+          "PRG-RES-01"
+        ],
+        "site_id": "SITE-RES-B",
+        "enrollment_date": "2026-07-17",
+        "status": "Active"
+      },
+      {
+        "client_id": "CL-100409",
+        "mrn": "MRN0001409",
+        "first_name": "Mei",
+        "last_name": "Takahashi",
+        "preferred_name": null,
+        "dob": "2003-01-26",
+        "gender": "Female",
+        "race": null,
+        "ethnicity": null,
+        "primary_language": "English",
+        "email": "mei.takahashi.demo@example.com",
+        "phone": "555-030-0409",
+        "address": {
+          "line1": "702 Maple Grove Way",
+          "city": "Millbrook",
+          "state": "OH",
+          "zip": "45602"
+        },
+        "program_ids": [
+          "PRG-RES-01"
+        ],
+        "site_id": "SITE-RES-B",
+        "enrollment_date": "2026-08-18",
+        "status": "Active"
+      },
+      {
+        "client_id": "CL-100410",
+        "mrn": "MRN0001410",
+        "first_name": "Tanya",
+        "last_name": "Petrovic",
+        "preferred_name": null,
+        "dob": "1990-03-08",
+        "gender": "Female",
+        "race": null,
+        "ethnicity": null,
+        "primary_language": "English",
+        "email": "tanya.petrovic.demo@example.com",
+        "phone": "555-030-0410",
+        "address": {
+          "line1": "702 Maple Grove Way",
+          "city": "Millbrook",
+          "state": "OH",
+          "zip": "45602"
+        },
+        "program_ids": [
+          "PRG-RES-01"
+        ],
+        "site_id": "SITE-RES-B",
+        "enrollment_date": "2026-06-19",
+        "status": "Active"
+      }
+    ],
+    "beds": [
+      {
+        "client_id": "CL-100235",
+        "site_id": "SITE-RES-A",
+        "unit_id": "SITE-RES-A-UNIT-1",
+        "unit_name": "Unit 1 - Men's Housing",
+        "room": "A-101",
+        "bed": "A",
+        "admit_date": "2026-06-01",
+        "attending_staff_id": "ST-2002",
+        "admission_reason": "Alcohol use disorder, step-down after detox",
+        "legal_status": "Court Ordered Treatment",
+        "expected_discharge": "2026-09-22",
+        "precautions": null
+      },
+      {
+        "client_id": "CL-100241",
+        "site_id": "SITE-RES-A",
+        "unit_id": "SITE-RES-A-UNIT-1",
+        "unit_name": "Unit 1 - Men's Housing",
+        "room": "A-101",
+        "bed": "B",
+        "admit_date": "2026-07-12",
+        "attending_staff_id": "ST-2001",
+        "admission_reason": "Opioid use disorder on MAT",
+        "legal_status": "Voluntary",
+        "expected_discharge": "2026-11-12",
+        "precautions": null
+      },
+      {
+        "client_id": "CL-100401",
+        "site_id": "SITE-RES-A",
+        "unit_id": "SITE-RES-A-UNIT-1",
+        "unit_name": "Unit 1 - Men's Housing",
+        "room": "A-102",
+        "bed": "A",
+        "admit_date": "2026-08-23",
+        "attending_staff_id": "ST-2002",
+        "admission_reason": "Co-occurring depression and stimulant use",
+        "legal_status": "Court Ordered Treatment",
+        "expected_discharge": "2026-12-19",
+        "precautions": "Fall risk"
+      },
+      {
+        "client_id": "CL-100402",
+        "site_id": "SITE-RES-A",
+        "unit_id": "SITE-RES-A-UNIT-1",
+        "unit_name": "Unit 1 - Men's Housing",
+        "room": "A-102",
+        "bed": "B",
+        "admit_date": "2026-09-07",
+        "attending_staff_id": "ST-2001",
+        "admission_reason": "PTSD with alcohol use",
+        "legal_status": "Voluntary",
+        "expected_discharge": "2026-10-26",
+        "precautions": null
+      },
+      {
+        "client_id": "CL-100403",
+        "site_id": "SITE-RES-A",
+        "unit_id": "SITE-RES-A-UNIT-1",
+        "unit_name": "Unit 1 - Men's Housing",
+        "room": "A-103",
+        "bed": "A",
+        "admit_date": "2026-06-18",
+        "attending_staff_id": "ST-2002",
+        "admission_reason": "Bipolar disorder, stabilization after inpatient stay",
+        "legal_status": "Probation condition",
+        "expected_discharge": "2026-11-11",
+        "precautions": "Q15 observation"
+      },
+      {
+        "client_id": "CL-100238",
+        "site_id": "SITE-RES-B",
+        "unit_id": "SITE-RES-B-UNIT-1",
+        "unit_name": "Unit 1 - Women's Housing",
+        "room": "B-101",
+        "bed": "A",
+        "admit_date": "2026-07-02",
+        "attending_staff_id": "ST-2001",
+        "admission_reason": "Cannabis and alcohol use, court referral",
+        "legal_status": "Voluntary",
+        "expected_discharge": "2026-12-18",
+        "precautions": null
+      },
+      {
+        "client_id": "CL-100244",
+        "site_id": "SITE-RES-B",
+        "unit_id": "SITE-RES-B-UNIT-1",
+        "unit_name": "Unit 1 - Women's Housing",
+        "room": "B-101",
+        "bed": "B",
+        "admit_date": "2026-08-13",
+        "attending_staff_id": "ST-2002",
+        "admission_reason": "Alcohol use disorder, step-down after detox",
+        "legal_status": "Probation condition",
+        "expected_discharge": "2026-10-25",
+        "precautions": "Seizure precautions"
+      },
+      {
+        "client_id": "CL-100406",
+        "site_id": "SITE-RES-B",
+        "unit_id": "SITE-RES-B-UNIT-1",
+        "unit_name": "Unit 1 - Women's Housing",
+        "room": "B-102",
+        "bed": "A",
+        "admit_date": "2026-09-18",
+        "attending_staff_id": "ST-2001",
+        "admission_reason": "Opioid use disorder on MAT",
+        "legal_status": "Court Ordered Treatment",
+        "expected_discharge": "2026-11-10",
+        "precautions": null
+      },
+      {
+        "client_id": "CL-100407",
+        "site_id": "SITE-RES-B",
+        "unit_id": "SITE-RES-B-UNIT-1",
+        "unit_name": "Unit 1 - Women's Housing",
+        "room": "B-102",
+        "bed": "B",
+        "admit_date": "2026-06-08",
+        "attending_staff_id": "ST-2002",
+        "admission_reason": "Co-occurring depression and stimulant use",
+        "legal_status": "Voluntary",
+        "expected_discharge": "2026-12-17",
+        "precautions": null
+      },
+      {
+        "client_id": "CL-100408",
+        "site_id": "SITE-RES-B",
+        "unit_id": "SITE-RES-B-UNIT-1",
+        "unit_name": "Unit 1 - Women's Housing",
+        "room": "B-103",
+        "bed": "A",
+        "admit_date": "2026-07-19",
+        "attending_staff_id": "ST-2001",
+        "admission_reason": "PTSD with alcohol use",
+        "legal_status": "Probation condition",
+        "expected_discharge": "2026-10-24",
+        "precautions": null
+      },
+      {
+        "client_id": "CL-100404",
+        "site_id": "SITE-RES-A",
+        "unit_id": "SITE-RES-A-UNIT-2",
+        "unit_name": "Unit 2 - Step-Down Housing",
+        "room": "A-201",
+        "bed": "A",
+        "admit_date": "2026-08-03",
+        "attending_staff_id": "ST-2002",
+        "admission_reason": "Bipolar disorder, stabilization after inpatient stay",
+        "legal_status": "Voluntary",
+        "expected_discharge": "2026-11-09",
+        "precautions": "Fall risk"
+      },
+      {
+        "client_id": "CL-100405",
+        "site_id": "SITE-RES-A",
+        "unit_id": "SITE-RES-A-UNIT-2",
+        "unit_name": "Unit 2 - Step-Down Housing",
+        "room": "A-201",
+        "bed": "B",
+        "admit_date": "2026-09-14",
+        "attending_staff_id": "ST-2001",
+        "admission_reason": "Cannabis and alcohol use, court referral",
+        "legal_status": "Voluntary",
+        "expected_discharge": "2026-12-16",
+        "precautions": null
+      },
+      {
+        "client_id": "CL-100409",
+        "site_id": "SITE-RES-B",
+        "unit_id": "SITE-RES-B-UNIT-2",
+        "unit_name": "Unit 2 - Family Housing",
+        "room": "B-201",
+        "bed": "A",
+        "admit_date": "2026-06-25",
+        "attending_staff_id": "ST-2002",
+        "admission_reason": "Alcohol use disorder, step-down after detox",
+        "legal_status": "Court Ordered Treatment",
+        "expected_discharge": "2026-10-23",
+        "precautions": "Q15 observation"
+      },
+      {
+        "client_id": "CL-100410",
+        "site_id": "SITE-RES-B",
+        "unit_id": "SITE-RES-B-UNIT-2",
+        "unit_name": "Unit 2 - Family Housing",
+        "room": "B-202",
+        "bed": "A",
+        "admit_date": "2026-07-09",
+        "attending_staff_id": "ST-2001",
+        "admission_reason": "Opioid use disorder on MAT",
+        "legal_status": "Voluntary",
+        "expected_discharge": "2026-11-08",
+        "precautions": null
+      }
+    ],
+    "vitals": [
+      {
+        "vitals_id": "VIT-R001",
+        "client_id": "CL-100401",
+        "recorded_by_staff_id": "ST-2008",
+        "date_time": "2026-09-15T08:10:00",
+        "height_in": 62,
+        "weight_lbs": 128,
+        "bmi": 21.5,
+        "temp_f": 98.2,
+        "pulse_bpm": 66,
+        "resp_rate": 14,
+        "bp_systolic": 112,
+        "bp_diastolic": 70,
+        "o2_sat_pct": 96,
+        "pain_scale": 0
+      },
+      {
+        "vitals_id": "VIT-R002",
+        "client_id": "CL-100402",
+        "recorded_by_staff_id": "ST-2008",
+        "date_time": "2026-09-16T08:13:00",
+        "height_in": 67,
+        "weight_lbs": 145,
+        "bmi": 23.2,
+        "temp_f": 98.3,
+        "pulse_bpm": 73,
+        "resp_rate": 15,
+        "bp_systolic": 121,
+        "bp_diastolic": 75,
+        "o2_sat_pct": 97,
+        "pain_scale": 1
+      },
+      {
+        "vitals_id": "VIT-R003",
+        "client_id": "CL-100403",
+        "recorded_by_staff_id": "ST-2008",
+        "date_time": "2026-09-17T08:16:00",
+        "height_in": 72,
+        "weight_lbs": 162,
+        "bmi": 24.9,
+        "temp_f": 98.4,
+        "pulse_bpm": 80,
+        "resp_rate": 16,
+        "bp_systolic": 130,
+        "bp_diastolic": 80,
+        "o2_sat_pct": 98,
+        "pain_scale": 2
+      },
+      {
+        "vitals_id": "VIT-R004",
+        "client_id": "CL-100404",
+        "recorded_by_staff_id": "ST-2008",
+        "date_time": "2026-09-18T08:19:00",
+        "height_in": 65,
+        "weight_lbs": 179,
+        "bmi": 26.6,
+        "temp_f": 98.5,
+        "pulse_bpm": 87,
+        "resp_rate": 17,
+        "bp_systolic": 139,
+        "bp_diastolic": 85,
+        "o2_sat_pct": 99,
+        "pain_scale": 0
+      },
+      {
+        "vitals_id": "VIT-R005",
+        "client_id": "CL-100405",
+        "recorded_by_staff_id": "ST-2008",
+        "date_time": "2026-09-19T08:22:00",
+        "height_in": 70,
+        "weight_lbs": 196,
+        "bmi": 28.3,
+        "temp_f": 98.2,
+        "pulse_bpm": 70,
+        "resp_rate": 14,
+        "bp_systolic": 118,
+        "bp_diastolic": 74,
+        "o2_sat_pct": 96,
+        "pain_scale": 1
+      },
+      {
+        "vitals_id": "VIT-R006",
+        "client_id": "CL-100406",
+        "recorded_by_staff_id": "ST-2008",
+        "date_time": "2026-09-20T08:25:00",
+        "height_in": 63,
+        "weight_lbs": 143,
+        "bmi": 22.0,
+        "temp_f": 98.3,
+        "pulse_bpm": 77,
+        "resp_rate": 15,
+        "bp_systolic": 127,
+        "bp_diastolic": 79,
+        "o2_sat_pct": 97,
+        "pain_scale": 2
+      },
+      {
+        "vitals_id": "VIT-R007",
+        "client_id": "CL-100407",
+        "recorded_by_staff_id": "ST-2008",
+        "date_time": "2026-09-15T08:28:00",
+        "height_in": 68,
+        "weight_lbs": 160,
+        "bmi": 23.7,
+        "temp_f": 98.4,
+        "pulse_bpm": 84,
+        "resp_rate": 16,
+        "bp_systolic": 136,
+        "bp_diastolic": 84,
+        "o2_sat_pct": 98,
+        "pain_scale": 0
+      },
+      {
+        "vitals_id": "VIT-R008",
+        "client_id": "CL-100408",
+        "recorded_by_staff_id": "ST-2008",
+        "date_time": "2026-09-16T08:31:00",
+        "height_in": 73,
+        "weight_lbs": 177,
+        "bmi": 25.4,
+        "temp_f": 98.5,
+        "pulse_bpm": 67,
+        "resp_rate": 17,
+        "bp_systolic": 115,
+        "bp_diastolic": 73,
+        "o2_sat_pct": 99,
+        "pain_scale": 1
+      },
+      {
+        "vitals_id": "VIT-R009",
+        "client_id": "CL-100409",
+        "recorded_by_staff_id": "ST-2008",
+        "date_time": "2026-09-17T08:34:00",
+        "height_in": 66,
+        "weight_lbs": 194,
+        "bmi": 27.1,
+        "temp_f": 98.2,
+        "pulse_bpm": 74,
+        "resp_rate": 14,
+        "bp_systolic": 124,
+        "bp_diastolic": 78,
+        "o2_sat_pct": 96,
+        "pain_scale": 2
+      },
+      {
+        "vitals_id": "VIT-R010",
+        "client_id": "CL-100410",
+        "recorded_by_staff_id": "ST-2008",
+        "date_time": "2026-09-18T08:37:00",
+        "height_in": 71,
+        "weight_lbs": 141,
+        "bmi": 28.8,
+        "temp_f": 98.3,
+        "pulse_bpm": 81,
+        "resp_rate": 15,
+        "bp_systolic": 133,
+        "bp_diastolic": 83,
+        "o2_sat_pct": 97,
+        "pain_scale": 0
+      }
+    ],
+    "allergies": [
+      {
+        "allergy_id": "ALG-R001",
+        "client_id": "CL-100401",
+        "allergen": "Penicillin",
+        "allergen_category": "Drug Class",
+        "reaction": "Rash",
+        "severity_flag": "Moderate",
+        "medication_context": null,
+        "status": "Active"
+      },
+      {
+        "allergy_id": "ALG-R004",
+        "client_id": "CL-100404",
+        "allergen": "Peanuts",
+        "allergen_category": "Food",
+        "reaction": "Anaphylaxis",
+        "severity_flag": "High",
+        "medication_context": null,
+        "status": "Active"
+      },
+      {
+        "allergy_id": "ALG-R007",
+        "client_id": "CL-100407",
+        "allergen": "Latex",
+        "allergen_category": "Environmental",
+        "reaction": "Contact dermatitis",
+        "severity_flag": "Low",
+        "medication_context": null,
+        "status": "Active"
+      },
+      {
+        "allergy_id": "ALG-R010",
+        "client_id": "CL-100410",
+        "allergen": "Sulfa drugs",
+        "allergen_category": "Drug Class",
+        "reaction": "Hives",
+        "severity_flag": "Moderate",
+        "medication_context": null,
+        "status": "Active"
+      }
+    ],
+    "attributes": [
+      {
+        "assignment_id": "CA-R001",
+        "client_id": "CL-100401",
+        "attribute_id": "ATTR-COURTORDERED",
+        "start_date": "2026-08-23",
+        "end_date": null,
+        "added_by_staff_id": "ST-2004",
+        "added_at": "2026-08-23T10:00",
+        "removed": false,
+        "history": [
+          {
+            "action": "added",
+            "at": "2026-08-23T10:00",
+            "by_staff_id": "ST-2004",
+            "start_date": "2026-08-23",
+            "end_date": null,
+            "reason": null
+          }
+        ]
+      },
+      {
+        "assignment_id": "CA-R002",
+        "client_id": "CL-100403",
+        "attribute_id": "ATTR-PROBATION",
+        "start_date": "2026-06-18",
+        "end_date": null,
+        "added_by_staff_id": "ST-2004",
+        "added_at": "2026-06-18T10:00",
+        "removed": false,
+        "history": [
+          {
+            "action": "added",
+            "at": "2026-06-18T10:00",
+            "by_staff_id": "ST-2004",
+            "start_date": "2026-06-18",
+            "end_date": null,
+            "reason": null
+          }
+        ]
+      },
+      {
+        "assignment_id": "CA-R003",
+        "client_id": "CL-100406",
+        "attribute_id": "ATTR-COURTORDERED",
+        "start_date": "2026-09-18",
+        "end_date": null,
+        "added_by_staff_id": "ST-2004",
+        "added_at": "2026-09-18T10:00",
+        "removed": false,
+        "history": [
+          {
+            "action": "added",
+            "at": "2026-09-18T10:00",
+            "by_staff_id": "ST-2004",
+            "start_date": "2026-09-18",
+            "end_date": null,
+            "reason": null
+          }
+        ]
+      },
+      {
+        "assignment_id": "CA-R004",
+        "client_id": "CL-100408",
+        "attribute_id": "ATTR-PROBATION",
+        "start_date": "2026-07-19",
+        "end_date": null,
+        "added_by_staff_id": "ST-2004",
+        "added_at": "2026-07-19T10:00",
+        "removed": false,
+        "history": [
+          {
+            "action": "added",
+            "at": "2026-07-19T10:00",
+            "by_staff_id": "ST-2004",
+            "start_date": "2026-07-19",
+            "end_date": null,
+            "reason": null
+          }
+        ]
+      },
+      {
+        "assignment_id": "CA-R005",
+        "client_id": "CL-100409",
+        "attribute_id": "ATTR-COURTORDERED",
+        "start_date": "2026-06-25",
+        "end_date": null,
+        "added_by_staff_id": "ST-2004",
+        "added_at": "2026-06-25T10:00",
+        "removed": false,
+        "history": [
+          {
+            "action": "added",
+            "at": "2026-06-25T10:00",
+            "by_staff_id": "ST-2004",
+            "start_date": "2026-06-25",
+            "end_date": null,
+            "reason": null
+          }
+        ]
+      }
+    ],
+    "dependents": [
+      {
+        "dependent_id": "DEP-001",
+        "parent_client_id": "CL-100409",
+        "first_name": "Hana",
+        "last_name": "Takahashi",
+        "dob": "2022-05-03",
+        "relationship": "Child",
+        "site_id": "SITE-RES-B",
+        "room": "B-201",
+        "bed": "B"
+      },
+      {
+        "dependent_id": "DEP-002",
+        "parent_client_id": "CL-100410",
+        "first_name": "Luka",
+        "last_name": "Petrovic",
+        "dob": "2019-11-20",
+        "relationship": "Child",
+        "site_id": "SITE-RES-B",
+        "room": "B-202",
+        "bed": "B"
+      },
+      {
+        "dependent_id": "DEP-003",
+        "parent_client_id": "CL-100410",
+        "first_name": "Ana",
+        "last_name": "Petrovic",
+        "dob": "2023-02-14",
+        "relationship": "Child",
+        "site_id": "SITE-RES-B",
+        "room": "B-202",
+        "bed": "C"
+      }
+    ],
+    "attendance": [
+      {
+        "subject_id": "CL-100235",
+        "date": "2026-09-21",
+        "time": "20:30",
+        "status": "Present",
+        "by_staff_id": "ST-2004"
+      },
+      {
+        "subject_id": "CL-100235",
+        "date": "2026-09-22",
+        "time": "07:05",
+        "status": "Present",
+        "by_staff_id": "ST-2008"
+      },
+      {
+        "subject_id": "CL-100241",
+        "date": "2026-09-21",
+        "time": "20:31",
+        "status": "Present",
+        "by_staff_id": "ST-2005"
+      },
+      {
+        "subject_id": "CL-100241",
+        "date": "2026-09-22",
+        "time": "07:07",
+        "status": "Present",
+        "by_staff_id": "ST-2008"
+      },
+      {
+        "subject_id": "CL-100401",
+        "date": "2026-09-21",
+        "time": "20:32",
+        "status": "Present",
+        "by_staff_id": "ST-2004"
+      },
+      {
+        "subject_id": "CL-100401",
+        "date": "2026-09-22",
+        "time": "07:09",
+        "status": "Present",
+        "by_staff_id": "ST-2008"
+      },
+      {
+        "subject_id": "CL-100402",
+        "date": "2026-09-21",
+        "time": "20:33",
+        "status": "Present",
+        "by_staff_id": "ST-2005"
+      },
+      {
+        "subject_id": "CL-100403",
+        "date": "2026-09-21",
+        "time": "20:34",
+        "status": "Present",
+        "by_staff_id": "ST-2004"
+      },
+      {
+        "subject_id": "CL-100403",
+        "date": "2026-09-22",
+        "time": "07:13",
+        "status": "Present",
+        "by_staff_id": "ST-2008"
+      },
+      {
+        "subject_id": "CL-100238",
+        "date": "2026-09-21",
+        "time": "20:35",
+        "status": "Present",
+        "by_staff_id": "ST-2005"
+      },
+      {
+        "subject_id": "CL-100238",
+        "date": "2026-09-22",
+        "time": "07:15",
+        "status": "On leave",
+        "by_staff_id": "ST-2008"
+      },
+      {
+        "subject_id": "CL-100244",
+        "date": "2026-09-21",
+        "time": "20:36",
+        "status": "Present",
+        "by_staff_id": "ST-2004"
+      },
+      {
+        "subject_id": "CL-100244",
+        "date": "2026-09-22",
+        "time": "07:17",
+        "status": "Present",
+        "by_staff_id": "ST-2008"
+      },
+      {
+        "subject_id": "CL-100406",
+        "date": "2026-09-21",
+        "time": "20:37",
+        "status": "Present",
+        "by_staff_id": "ST-2005"
+      },
+      {
+        "subject_id": "CL-100406",
+        "date": "2026-09-22",
+        "time": "07:19",
+        "status": "Present",
+        "by_staff_id": "ST-2008"
+      },
+      {
+        "subject_id": "CL-100407",
+        "date": "2026-09-21",
+        "time": "20:38",
+        "status": "Present",
+        "by_staff_id": "ST-2004"
+      },
+      {
+        "subject_id": "CL-100408",
+        "date": "2026-09-21",
+        "time": "20:39",
+        "status": "Present",
+        "by_staff_id": "ST-2005"
+      },
+      {
+        "subject_id": "CL-100408",
+        "date": "2026-09-22",
+        "time": "07:23",
+        "status": "Present",
+        "by_staff_id": "ST-2008"
+      },
+      {
+        "subject_id": "CL-100404",
+        "date": "2026-09-21",
+        "time": "20:40",
+        "status": "Present",
+        "by_staff_id": "ST-2004"
+      },
+      {
+        "subject_id": "CL-100404",
+        "date": "2026-09-22",
+        "time": "07:25",
+        "status": "Present",
+        "by_staff_id": "ST-2008"
+      },
+      {
+        "subject_id": "CL-100405",
+        "date": "2026-09-21",
+        "time": "20:41",
+        "status": "Present",
+        "by_staff_id": "ST-2005"
+      },
+      {
+        "subject_id": "CL-100405",
+        "date": "2026-09-22",
+        "time": "07:27",
+        "status": "Present",
+        "by_staff_id": "ST-2008"
+      },
+      {
+        "subject_id": "CL-100409",
+        "date": "2026-09-21",
+        "time": "20:42",
+        "status": "Present",
+        "by_staff_id": "ST-2004"
+      },
+      {
+        "subject_id": "CL-100409",
+        "date": "2026-09-22",
+        "time": "07:29",
+        "status": "Present",
+        "by_staff_id": "ST-2008"
+      },
+      {
+        "subject_id": "CL-100410",
+        "date": "2026-09-21",
+        "time": "20:43",
+        "status": "Present",
+        "by_staff_id": "ST-2005"
+      },
+      {
+        "subject_id": "CL-100410",
+        "date": "2026-09-22",
+        "time": "07:31",
+        "status": "Present",
+        "by_staff_id": "ST-2008"
+      },
+      {
+        "subject_id": "DEP-001",
+        "date": "2026-09-21",
+        "time": "20:44",
+        "status": "Present",
+        "by_staff_id": "ST-2004"
+      },
+      {
+        "subject_id": "DEP-001",
+        "date": "2026-09-22",
+        "time": "07:33",
+        "status": "Present",
+        "by_staff_id": "ST-2008"
+      },
+      {
+        "subject_id": "DEP-002",
+        "date": "2026-09-21",
+        "time": "20:45",
+        "status": "Present",
+        "by_staff_id": "ST-2005"
+      },
+      {
+        "subject_id": "DEP-002",
+        "date": "2026-09-22",
+        "time": "07:35",
+        "status": "Present",
+        "by_staff_id": "ST-2008"
+      },
+      {
+        "subject_id": "DEP-003",
+        "date": "2026-09-21",
+        "time": "20:46",
+        "status": "Present",
+        "by_staff_id": "ST-2004"
+      },
+      {
+        "subject_id": "DEP-003",
+        "date": "2026-09-22",
+        "time": "07:37",
+        "status": "Present",
+        "by_staff_id": "ST-2008"
+      }
+    ]
+  }
+}

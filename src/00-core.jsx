@@ -134,7 +134,7 @@ const ICONS = {
   billing: 'M2 7h20v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zM2 7l2-3h16l2 3M2 11h20',
   admin: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm7.4-3a7.4 7.4 0 0 0-.1-1l2-1.6-2-3.4-2.4 1a7.3 7.3 0 0 0-1.7-1l-.4-2.5H9.2l-.4 2.5a7.3 7.3 0 0 0-1.7 1l-2.4-1-2 3.4L2.7 11a7.4 7.4 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7.3 7.3 0 0 0 1.7 1l.4 2.5h4.6l.4-2.5a7.3 7.3 0 0 0 1.7-1l2.4 1 2-3.4-2-1.6c.1-.3.1-.7.1-1Z',
   search: 'M21 21l-4.3-4.3M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z',
-  chevronRight: 'M9 6l6 6-6 6', chevronDown: 'M6 9l6 6 6-6', chevronUp: 'M18 15l-6-6-6 6',
+  chevronRight: 'M9 6l6 6-6 6', chevronLeft: 'M15 6l-6 6 6 6', chevronDown: 'M6 9l6 6 6-6', chevronUp: 'M18 15l-6-6-6 6',
   close: 'M18 6 6 18M6 6l12 12', check: 'M20 6 9 17l-5-5',
   logout: 'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9',
   user: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z',
@@ -172,6 +172,9 @@ const ICONS = {
   refill: 'M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5',
   ban: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM4.9 4.9l14.2 14.2',
   external: 'M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6',
+  /* Side panel collapse / expand (Lucide panel-left-close / -open). */
+  panelCollapse: 'M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM9 3v18M16 15l-3-3 3-3',
+  panelExpand: 'M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM9 3v18M14 9l3 3-3 3',
 };
 /* Filled outlines on the DS 20px grid (1px strokes, whole-pixel edges), for
    glyphs that sit beside the DS action-bar icons. A 24px stroke icon scaled to
@@ -295,8 +298,54 @@ function Tooltip({ label, children, placement = 'top', wide }) {
    page — add an allergy, read an assessment's answers, refill a medication.
    sm 480 · md 720 · lg 1040. DS modal header (2086:547) + standard footer. */
 let _ovlId = 0;
+/* Dialog focus (WCAG 2.1.2 No Keyboard Trap, 2.4.3 Focus Order). Opening
+   moves focus into the dialog (unless a field already took it with
+   autoFocus); Tab and Shift+Tab cycle inside it, so focus can't wander onto
+   the page behind the scrim; closing puts focus back where it was. Only the
+   topmost dialog traps, so a dialog opened from a dialog works. Escape and
+   the close button always leave, so the trap is never a dead end. */
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([tabindex="-1"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const DIALOG_STACK = [];
+const focusablesIn = el => Array.prototype.filter.call(el.querySelectorAll(FOCUSABLE), x => x.offsetParent !== null && x.getAttribute('aria-hidden') !== 'true');
+function useDialogFocus(ref, initialSelector) {
+  /* Read during the first render: by the time an effect runs, a field with
+     autoFocus inside the dialog has already taken focus. */
+  const [opener] = useState(() => document.activeElement);
+  useEffect(() => {
+    const prev = opener;
+    const me = {};
+    DIALOG_STACK.push(me);
+    const f = setTimeout(() => {
+      const el = ref.current;
+      if (!el || el.contains(document.activeElement)) return;
+      const scope = (initialSelector && el.querySelector(initialSelector)) || el;
+      const target = focusablesIn(scope)[0] || focusablesIn(el)[0];
+      if (target) target.focus();
+    }, 0);
+    const onKey = e => {
+      if (e.key !== 'Tab' || DIALOG_STACK[DIALOG_STACK.length - 1] !== me) return;
+      const el = ref.current; if (!el) return;
+      const list = focusablesIn(el); if (!list.length) return;
+      const first = list[0], last = list[list.length - 1], cur = document.activeElement;
+      /* A menu opened from the dialog lives outside it and handles its own Tab. */
+      if (cur && cur.closest && cur.closest('.float-menu')) return;
+      if (!el.contains(cur)) { e.preventDefault(); first.focus(); }
+      else if (e.shiftKey && cur === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && cur === last) { e.preventDefault(); first.focus(); }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      clearTimeout(f);
+      document.removeEventListener('keydown', onKey);
+      const ix = DIALOG_STACK.indexOf(me); if (ix !== -1) DIALOG_STACK.splice(ix, 1);
+      if (prev && prev.isConnected && prev.focus) prev.focus({ preventScroll: true });
+    };
+  }, []);
+}
 function Overlay({ title, subtitle, size = 'md', onClose, footer, children, bodyClassName }) {
   const [id] = useState(() => 'ovl-' + (++_ovlId));
+  const dlg = useRef(null);
+  useDialogFocus(dlg, '.ovl-body');
   useEffect(() => {
     const k = e => { if (e.key === 'Escape') { e.stopPropagation(); onClose(); } };
     window.addEventListener('keydown', k);
@@ -305,7 +354,7 @@ function Overlay({ title, subtitle, size = 'md', onClose, footer, children, body
   return ReactDOM.createPortal(
     <React.Fragment>
       <div className="modal-scrim" onClick={onClose} />
-      <div className={'ovl ovl--' + size} role="dialog" aria-modal="true" aria-labelledby={id}>
+      <div ref={dlg} className={'ovl ovl--' + size} role="dialog" aria-modal="true" aria-labelledby={id}>
         <div className="intercept-head" data-node-id="2086:547">
           <div className="modal-head-content">
             <h2 className="intercept-title" id={id}>{title}</h2>
@@ -323,12 +372,16 @@ function Overlay({ title, subtitle, size = 'md', onClose, footer, children, body
     </React.Fragment>,
   document.body);
 }
-function Checkbox({ checked, onChange, indeterminate, disabled, label, ariaLabel }) {
+/* `presentational`: the box is drawing only, because the row around it is
+   the control (role="checkbox" or "option", tabIndex 0, its own Space and
+   Enter). Without it the hidden input was a second Tab stop on every row. */
+function Checkbox({ checked, onChange, indeterminate, disabled, label, ariaLabel, presentational }) {
   const ref = useRef(null);
   useEffect(() => { if (ref.current) ref.current.indeterminate = !!indeterminate; }, [indeterminate]);
   return (
-    <label className={'rds-checkbox' + (disabled ? ' is-disabled' : '')} data-node-id="932:1397" aria-label={ariaLabel}>
-      <input ref={ref} type="checkbox" checked={!!checked} disabled={disabled} onChange={e => onChange && onChange(e.target.checked)} />
+    <label className={'rds-checkbox' + (disabled ? ' is-disabled' : '')} data-node-id="932:1397" aria-label={presentational ? undefined : ariaLabel} aria-hidden={presentational || undefined}>
+      <input ref={ref} type="checkbox" checked={!!checked} disabled={disabled} tabIndex={presentational ? -1 : undefined}
+        onChange={e => onChange && onChange(e.target.checked)} />
       <span className="rds-checkbox__box" aria-hidden="true"><Icon name="check" size={14} /></span>
       {label != null && label !== '' && <span className="rds-checkbox__label">{label}</span>}
     </label>
@@ -351,15 +404,50 @@ function Button({ variant = 'secondary', size, children, onClick, disabled, type
    dialog, table cell or scroll container can clip them — they always sit above
    the page, overlays included. They open below the trigger and flip above it
    when there isn't room, and follow the trigger while anything scrolls. */
-function FloatMenu({ anchorRef, menuRef, className, minWidth = 0, maxHeight = 280, role, children, onClose }) {
+/* `align="right"` lines the menu's right edge up with the trigger's — for
+   triggers at the right end of a toolbar, where a left-aligned menu would be
+   pushed back by the viewport edge and float free of its button. */
+/* KEYBOARD (WCAG 2.1.1 Keyboard, 2.4.3 Focus Order, 2.4.7 Focus Visible;
+   the WAI-ARIA APG listbox and menu patterns). Every popup gets the same
+   model, here, rather than each dropdown inventing its own:
+     - Opening moves focus in: to the search box if there is one, otherwise
+       the selected option, otherwise the first.
+     - Up and Down move between options; a search box sits above the first.
+       Home and End jump to the ends. Typing letters jumps to the next option
+       that starts with them.
+     - Enter and Space choose (a native button's click, or the option's own
+       handler).
+     - Escape closes. Tab closes too, and focus goes back to the trigger first,
+       so Tab carries on from the trigger in page order. The menu lives at the
+       end of <body>, so without that Tab would leave the page's order.
+     - Whenever the menu closes with focus inside it, focus returns to the
+       trigger instead of falling to <body>. */
+const MENU_ITEMS = 'button:not([disabled]):not(.icon-btn), [role="option"], [role="menuitem"], [role="menuitemcheckbox"], [role="checkbox"], [tabindex="0"]';
+const menuItems = el => Array.prototype.filter.call(el.querySelectorAll(MENU_ITEMS),
+  x => x.getAttribute('aria-disabled') !== 'true' && x.getAttribute('aria-hidden') !== 'true' && x.offsetParent !== null);
+const menuSearch = el => el.querySelector('input:not([type]), input[type="text"], input[type="search"]');
+const menuLabel = x => (x.querySelector('.dd-opt-label, .msd-opt-text, .tset-mi-label, .qa-opt-name') || x).textContent.trim().toLowerCase();
+/* The control that opened a menu: the anchor itself, or the first control in it. */
+const menuTrigger = anchorRef => {
+  const a = anchorRef && anchorRef.current;
+  if (!a) return null;
+  return a.matches('button, input, [tabindex]') ? a : a.querySelector('button, input, [tabindex]:not([tabindex="-1"])');
+};
+/* Up or Down on a closed dropdown opens it, as on a native <select>. */
+const openOnArrow = (open, setOpen) => e => {
+  if (open || (e.key !== 'ArrowDown' && e.key !== 'ArrowUp')) return;
+  e.preventDefault(); setOpen(true);
+};
+function FloatMenu({ anchorRef, menuRef, className, minWidth = 0, maxHeight = 280, role, children, onClose, align = 'left', autoFocus = true }) {
   const [pos, setPos] = useState(null);
   const natural = useRef(null);
+  const typed = useRef({ s: '', t: 0 });
   React.useLayoutEffect(() => {
     const place = () => {
       const a = anchorRef.current; if (!a) return;
       const r = a.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight, gap = 4, edge = 8;
       const width = Math.min(Math.max(r.width, minWidth), vw - edge * 2);
-      const left = Math.max(edge, Math.min(r.left, vw - edge - width));
+      const left = Math.max(edge, Math.min(align === 'right' ? r.right - width : r.left, vw - edge - width));
       const below = vh - r.bottom - gap - edge, above = r.top - gap - edge;
       /* Flip only when the menu's real height doesn't fit below. Measured once,
          on the hidden first render, before any max-height applies. */
@@ -375,10 +463,54 @@ function FloatMenu({ anchorRef, menuRef, className, minWidth = 0, maxHeight = 28
     /* Escape closes the menu, not the dialog it sits in. */
     const k = e => { if (e.key === 'Escape') { e.stopPropagation(); onClose && onClose(); } };
     window.addEventListener('keydown', k, true);
-    return () => { window.removeEventListener('resize', place); window.removeEventListener('scroll', place, true); window.removeEventListener('keydown', k, true); };
+    return () => {
+      window.removeEventListener('resize', place); window.removeEventListener('scroll', place, true); window.removeEventListener('keydown', k, true);
+      /* Closing with focus inside (a pick, Escape): give it back to the trigger. */
+      const m = menuRef && menuRef.current, t = menuTrigger(anchorRef);
+      if (m && m.contains(document.activeElement) && t && t.isConnected) t.focus({ preventScroll: true });
+    };
   }, []);
+  /* Once it's positioned and visible (a hidden element can't take focus). */
+  const placed = !!pos;
+  useEffect(() => {
+    if (!placed || !autoFocus) return;
+    /* A timeout, not requestAnimationFrame: rAF doesn't run in a background
+       tab, and by now the menu is already visible. */
+    const f = setTimeout(() => {
+      const m = menuRef && menuRef.current;
+      if (!m || m.contains(document.activeElement)) return;
+      const items = menuItems(m);
+      const target = menuSearch(m) || items.find(x => x.getAttribute('aria-selected') === 'true' || x.classList.contains('active') || x.classList.contains('is-current')) || items[0];
+      if (target) { target.focus({ preventScroll: true }); if (target.scrollIntoView) target.scrollIntoView({ block: 'nearest' }); }
+    }, 0);
+    return () => clearTimeout(f);
+  }, [placed]);
+  const onKeyDown = e => {
+    const m = menuRef && menuRef.current;
+    if (!m) return;
+    const items = menuItems(m), search = menuSearch(m), cur = document.activeElement;
+    const i = items.indexOf(cur), inSearch = cur === search;
+    const go = x => { if (!x) return; x.focus({ preventScroll: true }); if (x.scrollIntoView) x.scrollIntoView({ block: 'nearest' }); };
+    if (e.key === 'ArrowDown') { e.preventDefault(); go(i === -1 ? items[0] : items[Math.min(i + 1, items.length - 1)]); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); if (i > 0) go(items[i - 1]); else if (search && !inSearch) go(search); }
+    else if ((e.key === 'Home' || e.key === 'End') && !inSearch) { e.preventDefault(); go(e.key === 'Home' ? items[0] : items[items.length - 1]); }
+    else if (e.key === 'PageDown' || e.key === 'PageUp') { e.preventDefault(); go(items[Math.max(0, Math.min(items.length - 1, (i === -1 ? 0 : i) + (e.key === 'PageDown' ? 8 : -8)))]); }
+    else if (e.key === 'Tab') {
+      /* Not prevented: focus moves to the trigger, then Tab continues from there. */
+      const t = menuTrigger(anchorRef);
+      if (t) t.focus({ preventScroll: true });
+      onClose && onClose();
+    }
+    else if (!inSearch && e.key.length === 1 && e.key !== ' ' && !e.ctrlKey && !e.metaKey && !e.altKey && items.length) {
+      const now = Date.now(), st = typed.current;
+      st.s = now - st.t > 700 ? e.key.toLowerCase() : st.s + e.key.toLowerCase();
+      st.t = now;
+      const n = items.length, from = i === -1 ? 0 : i + (st.s.length === 1 ? 1 : 0);
+      for (let k2 = 0; k2 < n; k2++) { const x = items[(from + k2) % n]; if (menuLabel(x).indexOf(st.s) === 0) { e.preventDefault(); go(x); break; } }
+    }
+  };
   return ReactDOM.createPortal(
-    <div ref={menuRef} className={'float-menu ' + className} role={role}
+    <div ref={menuRef} className={'float-menu ' + className} role={role} onKeyDown={onKeyDown}
       style={pos ? { position: 'fixed', top: pos.top == null ? 'auto' : pos.top, bottom: pos.bottom == null ? 'auto' : pos.bottom,
         left: pos.left, width: pos.width, maxHeight: pos.maxHeight }
         : { position: 'fixed', top: 0, left: 0, visibility: 'hidden', width: Math.max(minWidth, anchorRef.current ? anchorRef.current.offsetWidth : 0) }}>{children}</div>,
@@ -403,7 +535,8 @@ function Dropdown({ value, options, onChange, placeholder = 'Please select...', 
   const shown = display || (cur ? cur.label : value);
   return (
     <div className="dd" ref={ref}>
-      <button id={id} type="button" className={'dd-trigger' + (open ? ' open' : '') + (invalid ? ' invalid' : '')} onClick={() => setOpen(o => !o)} aria-haspopup="listbox" aria-expanded={open}>
+      <button id={id} type="button" className={'dd-trigger' + (open ? ' open' : '') + (invalid ? ' invalid' : '')} onClick={() => setOpen(o => !o)}
+        onKeyDown={openOnArrow(open, setOpen)} aria-haspopup="listbox" aria-expanded={open}>
         <span className={value ? 'dd-value' : 'dd-placeholder'}>{shown || placeholder}</span>
         <Icon name="chevronDown" size={16} />
       </button>
@@ -411,7 +544,7 @@ function Dropdown({ value, options, onChange, placeholder = 'Please select...', 
         <FloatMenu anchorRef={ref} menuRef={menuRef} className="dd-menu" role="listbox" minWidth={menuMinWidth} maxHeight={footer ? 360 : 280} onClose={() => setOpen(false)}>
           <div className="dd-list">
             {opts.map(o => (
-              <button key={o.value} type="button" role="option" aria-selected={o.value === value} aria-disabled={o.disabled || undefined}
+              <button key={o.value} type="button" role="option" tabIndex={-1} aria-selected={o.value === value} aria-disabled={o.disabled || undefined}
                 className={'dd-opt' + (o.value === value ? ' active' : '') + (o.sub || o.tags ? ' dd-opt--rich' : '') + (o.disabled ? ' is-disabled' : '')}
                 onClick={() => { if (o.disabled) return; onChange(o.value); setOpen(false); }}>
                 {o.sub || o.tags ? (
@@ -462,7 +595,7 @@ function MultiSelectDropdown({ id, options, selected, onToggle, placeholder = 'S
   return (
     <div className="msd" ref={ref}>
       <button id={id} type="button" className={'dd-trigger' + (open ? ' open' : '')}
-        onClick={() => setOpen(o => !o)} aria-haspopup="listbox" aria-expanded={open}>
+        onClick={() => setOpen(o => !o)} onKeyDown={openOnArrow(open, setOpen)} aria-haspopup="listbox" aria-expanded={open}>
         <span className={selected.length ? 'dd-value' : 'dd-placeholder'}>{summary}</span>
         <Icon name="chevronDown" size={16} />
       </button>
@@ -482,10 +615,10 @@ function MultiSelectDropdown({ id, options, selected, onToggle, placeholder = 'S
                  nesting labels is invalid HTML that double-toggles in some
                  browsers — same fix as the attribute picker. */
               return (
-                <div key={o.value} className="msd-opt" role="checkbox" aria-checked={on} tabIndex={0}
+                <div key={o.value} className="msd-opt" role="option" aria-selected={on} tabIndex={-1}
                   onClick={() => onToggle(o.value)}
                   onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); onToggle(o.value); } }}>
-                  <Checkbox checked={on} onChange={() => {}} ariaLabel={o.label} />
+                  <Checkbox checked={on} onChange={() => {}} presentational />
                   <span className="msd-opt-text">{o.label}</span>
                   {o.meta && <span className="msd-opt-meta">{o.meta}</span>}
                 </div>
