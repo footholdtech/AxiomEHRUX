@@ -295,6 +295,23 @@ function ServiceBuilderPage({ view = 'services' }) {
 
 const SB_SHAPES = ['Any shape', 'Single document', 'Workflow'];
 const SB_STATUS_FILTERS = ['All statuses', 'Active', 'Draft', 'Inactive', 'Changing soon'];
+/* The library tables lay out for the width they actually get, not the
+   window's: beside a docked left nav a 1124px window leaves the table
+   ~800px. Measured on the table's own box (useElementWidth), they step down:
+     full     every column.
+     compact  status (or "built by") moves up beside the name; related
+              columns pair up (Programs and Roles); the Services Edit
+              button goes, because the name already opens the editor.
+     narrow   only the columns you scan by stay; the rest are secondary
+              lines under the name.
+     stack    phones: one column (plus the template actions), everything
+              as lines under the name, so nothing scrolls sideways. */
+function useSbTableTier(fullAt, compactAt, stackBelow = 520) {
+  const [ref, w] = useElementWidth();
+  const tier = w == null || w >= fullAt ? 'full' : w >= compactAt ? 'compact' : w >= stackBelow ? 'narrow' : 'stack';
+  return [ref, tier];
+}
+
 function SbServicesTable({ store }) {
   const guard = useGuard();
   const [rules] = useDueDateRules();
@@ -317,6 +334,7 @@ function SbServicesTable({ store }) {
   });
   const programOpts = [{ value: 'any', label: 'Any program' }].concat(CR_PROGRAMS.map(p => ({ value: p.id, label: p.name })));
   const open = x => guard.go(SB_BASE + '/services/' + x.service_id);
+  const [wrapRef, tier] = useSbTableTier(1040, 760);
   return (
     <Panel title={'Services (' + rows.length + (rows.length !== store.services.length ? ' of ' + store.services.length : '') + ')'}>
       <div className="cr-filters">
@@ -329,34 +347,60 @@ function SbServicesTable({ store }) {
         <div className="cr-filter"><Dropdown id="sb-shape" value={shape} options={SB_SHAPES} onChange={setShape} /></div>
         <div className="cr-filter"><Dropdown id="sb-status" value={status} options={SB_STATUS_FILTERS} onChange={setStatus} /></div>
       </div>
-      <div className="table-wrap">
-        <table className="data-table cr-table sb-table">
-          <thead><tr><th>Service</th><th>Staff Complete</th><th>Programs</th><th>Roles</th><th>Codes</th><th>Version</th><th>Status</th><th /></tr></thead>
+      <div className="table-wrap" ref={wrapRef}>
+        <table className={'data-table cr-table sb-table sb-table--' + tier}>
+          <thead><tr>
+            <th>Service</th>{tier !== 'stack' && <th>Staff Complete</th>}
+            {tier === 'full' ? <React.Fragment><th>Programs</th><th>Roles</th></React.Fragment> : tier === 'compact' && <th>Programs and Roles</th>}
+            {(tier === 'full' || tier === 'compact') && <th>Codes</th>}
+            {tier !== 'stack' && <th>Version</th>}
+            {tier === 'full' && <React.Fragment><th>Status</th><th><span className="sr-only">Actions</span></th></React.Fragment>}
+          </tr></thead>
           <tbody>
             {rows.map(x => {
               const c = sbCfg(x), cur = sbInEffect(x), next = sbScheduled(x)[0];
               const tpl = sbTemplateName(store, x.started_from);
               const dl = c.steps.length > 1 && rules.find(r => r.id === c.deadline_rule_id);
+              const codes = c.codes.length
+                ? c.codes.map((k, i) => <React.Fragment key={k.code_id}>{i ? ', ' : ''}<span className="sb-nowrap">{sbCodeLabel(k)}</span></React.Fragment>)
+                : <span className="chc-list-empty">Not billed</span>;
               return (
                 <tr key={x.service_id}>
                   <td className="wrap cr-col-name">
-                    <button className="lnk chc-list-name" onClick={() => open(x)}>{x.name}</button>
+                    <span className="sb-name-row">
+                      <button className="lnk chc-list-name" onClick={() => open(x)}>{x.name}</button>
+                      {tier !== 'full' && sbStatusBadge(x.status)}
+                    </span>
                     <div className="chc-list-desc">{x.started_from ? (tpl ? 'Started from ' + tpl : 'Started from a deleted template') : 'Built from scratch'}</div>
+                    {(tier === 'narrow' || tier === 'stack') && <div className="chc-list-desc">{sbProgramsLabel(c.programs)} · {sbJoin(c.roles, 1)}</div>}
+                    {tier === 'stack' && <React.Fragment>
+                      <div className="chc-list-desc">{sbStepsLabel(c)} · {codes}</div>
+                      <div className="chc-list-desc">{cur ? 'Version ' + cur.version + ' since ' + fmtDate(cur.effective) : 'Not live yet'}</div>
+                      {next && <div className="chc-list-desc sb-next">Version {next.version} on {fmtDate(next.effective)}</div>}
+                    </React.Fragment>}
                   </td>
-                  <td className="wrap">
+                  {tier !== 'stack' && <td className="wrap sb-col-steps">
                     {sbStepsLabel(c)}
                     <div className="chc-list-desc">{c.steps.length > 1 ? (dl ? 'Due ' + sbDeadlineShort(dl) : 'No deadline') : (c.steps[0] ? c.steps[0].name : '')}</div>
-                  </td>
-                  <td className="wrap">{sbProgramsLabel(c.programs)}</td>
-                  <td className="wrap">{sbJoin(c.roles, 1)}</td>
-                  <td className="wrap">{c.codes.length ? c.codes.map(sbCodeLabel).join(', ') : <span className="chc-list-empty">Not billed</span>}</td>
-                  <td className="wrap">
+                    {tier === 'narrow' && <div className="chc-list-desc">{codes}</div>}
+                  </td>}
+                  {tier === 'full' && <React.Fragment>
+                    <td className="wrap sb-col-who">{sbProgramsLabel(c.programs)}</td>
+                    <td className="wrap sb-col-who">{sbJoin(c.roles, 1)}</td>
+                  </React.Fragment>}
+                  {tier === 'compact' && (
+                    <td className="wrap sb-col-who">{sbProgramsLabel(c.programs)}<div className="chc-list-desc">{sbJoin(c.roles, 1)}</div></td>
+                  )}
+                  {(tier === 'full' || tier === 'compact') && <td className="wrap sb-col-codes">{codes}</td>}
+                  {tier !== 'stack' && <td>
                     {cur ? 'Version ' + cur.version : 'Not live yet'}
                     {cur && <div className="chc-list-desc">Since {fmtDate(cur.effective)}</div>}
                     {next && <div className="chc-list-desc sb-next">Version {next.version} on {fmtDate(next.effective)}</div>}
-                  </td>
-                  <td>{sbStatusBadge(x.status)}</td>
-                  <td><Button size="sm" variant="secondary" onClick={() => open(x)}>Edit</Button></td>
+                  </td>}
+                  {tier === 'full' && <React.Fragment>
+                    <td>{sbStatusBadge(x.status)}</td>
+                    <td><Button size="sm" variant="secondary" onClick={() => open(x)}>Edit</Button></td>
+                  </React.Fragment>}
                 </tr>
               );
             })}
@@ -374,6 +418,7 @@ function SbTemplatesTable({ store, onUse }) {
   const s = q.trim().toLowerCase();
   const rows = store.templates.filter(t => !s || (t.name + ' ' + t.collection + ' ' + t.config.steps.map(x => x.name).join(' ')).toLowerCase().indexOf(s) !== -1);
   const open = t => guard.go(SB_BASE + '/templates/' + t.template_id);
+  const [wrapRef, tier] = useSbTableTier(1000, 700);
   return (
     <Panel title={'Templates (' + rows.length + ')'}>
       <div className="chc-note">
@@ -387,23 +432,40 @@ function SbTemplatesTable({ store, onUse }) {
           {q && <button type="button" className="icon-btn" aria-label="Clear search" onClick={() => setQ('')}><Icon name="close" size={13} /></button>}
         </div>
       </div>
-      <div className="table-wrap">
-        <table className="data-table cr-table sb-table">
-          <thead><tr><th>Template</th><th>Collection</th><th>Built By</th><th>Staff Complete</th><th>Services Made From It</th><th>Last Changed</th><th /></tr></thead>
+      <div className="table-wrap" ref={wrapRef}>
+        <table className={'data-table cr-table sb-table sb-table--' + tier}>
+          <thead><tr>
+            <th>Template</th>
+            {tier === 'full' && <React.Fragment><th>Collection</th><th>Built By</th></React.Fragment>}
+            {(tier === 'full' || tier === 'compact') && <React.Fragment><th>Staff Complete</th><th>Services Made From It</th></React.Fragment>}
+            {tier === 'full' && <th>Last Changed</th>}
+            <th><span className="sr-only">Actions</span></th>
+          </tr></thead>
           <tbody>
             {rows.map(t => {
               const made = store.services.filter(x => x.started_from === t.template_id).length;
+              const madeTxt = made ? sbPlural(made, 'service') : <span className="chc-list-empty">None yet</span>;
+              const built = <span className={'badge ' + (t.source === 'implementation' ? 'status-info' : 'status-neutral')}>{t.source === 'implementation' ? 'Implementation team' : 'Your agency'}</span>;
               return (
                 <tr key={t.template_id}>
                   <td className="wrap cr-col-name">
-                    <button className="lnk chc-list-name" onClick={() => open(t)}>{t.name || 'Untitled Template'}</button>
+                    <span className="sb-name-row">
+                      <button className="lnk chc-list-name" onClick={() => open(t)}>{t.name || 'Untitled Template'}</button>
+                      {tier !== 'full' && built}
+                    </span>
                     {t.config.description && <div className="chc-list-desc">{t.config.description}</div>}
+                    {tier !== 'full' && <div className="chc-list-desc">{(t.collection || 'No collection') + ' · changed ' + fmtDate(t.updated)}</div>}
+                    {(tier === 'narrow' || tier === 'stack') && <div className="chc-list-desc">{sbStepsLabel(t.config)} · {made ? 'used by ' + sbPlural(made, 'service') : 'not used yet'}</div>}
                   </td>
-                  <td className="wrap">{t.collection || '—'}</td>
-                  <td><span className={'badge ' + (t.source === 'implementation' ? 'status-info' : 'status-neutral')}>{t.source === 'implementation' ? 'Implementation team' : 'Your agency'}</span></td>
-                  <td className="wrap">{sbStepsLabel(t.config)}</td>
-                  <td>{made ? sbPlural(made, 'service') : <span className="chc-list-empty">None yet</span>}</td>
-                  <td>{fmtDate(t.updated)}</td>
+                  {tier === 'full' && <React.Fragment>
+                    <td className="wrap">{t.collection || '—'}</td>
+                    <td>{built}</td>
+                  </React.Fragment>}
+                  {(tier === 'full' || tier === 'compact') && <React.Fragment>
+                    <td className="wrap sb-col-steps">{sbStepsLabel(t.config)}</td>
+                    <td>{madeTxt}</td>
+                  </React.Fragment>}
+                  {tier === 'full' && <td>{fmtDate(t.updated)}</td>}
                   <td className="sb-row-acts">
                     <Button size="sm" variant="secondary" onClick={() => onUse(t)}>Use</Button>
                     <Button size="sm" variant="ghost" onClick={() => open(t)}>Edit</Button>

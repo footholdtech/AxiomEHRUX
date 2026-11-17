@@ -306,7 +306,9 @@ input { font-family: inherit; }
 .select .chev { color: var(--foreground-input-control-default); }
 
 /* ================= Badges / chips ================= */
-.badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 10px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600; background: var(--background-surface-secondary); color: var(--foreground-secondary); }
+/* A badge sets its own type: placed inside a page title it would otherwise
+   inherit the display serif and the heading's line height. */
+.badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 10px; border-radius: var(--radius-full); font-family: var(--font-sans); font-size: 12px; font-weight: 600; line-height: 16px; letter-spacing: normal; background: var(--background-surface-secondary); color: var(--foreground-secondary); }
 .badge.dot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 .badge.status-active { background: #E9FBE7; color: #1F7A32; }
 .badge.status-inactive { background: #FDECEC; color: #B3261E; }

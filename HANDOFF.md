@@ -612,6 +612,19 @@ code is in `src/55-service-builder.jsx`; staff code is in
   only) is locked: `aria-disabled` keeps it focusable for its tooltip. It
   replaced the rail's What Staff See and Check a Staff Member lists on
   2026-11-16, because admins found them redundant and hard to follow.
+- **The Services and Templates tables lay out for their own width**
+  (`useSbTableTier`), not the window's, because a docked nav leaves a 1124px
+  window only ~800px of table. Full, then compact (status beside the name,
+  Programs and Roles paired, no Edit button), then narrow (secondary lines
+  under the name), then a single column on phones.
+- **`.badge` sets its own font family and line height.** Inside a page
+  title it used to inherit the display serif.
+- **`.chc .form-field + .form-field` adds 12px above the second field.**
+  That's right for stacked fields, but wrong in a row: it dropped Default
+  Duration 12px below Name. Any grid or flex row of fields inside a `.chc`
+  page needs `> .form-field + .form-field { margin-top: 0 }`, as
+  `.sb-basics` now has. A sweep of every route, dialog and drawer on
+  2026-11-17 (comparing input tops within each row) found no other cases.
 - **Templates only pre-fill.** New Service is three steps and lands as a
   Draft.
 - **Due date rules apply on steps, and on a workflow as its deadline.**
