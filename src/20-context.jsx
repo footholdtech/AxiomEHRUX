@@ -18,7 +18,9 @@
    pages, and navigating to one drops the chart context. */
 function clientIdForPath(to) {
   if (!to) return null;
-  const m = match('/chart/:id', to) || match('/chart/:id/:module', to);
+  /* A residential worklist puts one client in context at a time, exactly as
+     a chart does — the header, its actions and every save belong to them. */
+  const m = match('/chart/:id', to) || match('/chart/:id/:module', to) || match('/residential/worklist/:wl/:id', to);
   return m ? m.id : null;
 }
 const ROUTE_LABELS = {
@@ -77,7 +79,11 @@ function GuardProvider({ children }) {
     const full = { ...req, client: target };
     const reasons = [];
     if (dirty) reasons.push('unsaved');
-    if (clientId && target && target !== clientId) reasons.push('switch');
+    /* `worklist`: moving down a worklist's own list. The rail names who is
+       next and the worklist keeps any unsaved entry as a draft, so there is
+       nothing to confirm — asking at every client would undo the point of
+       the worklist. A Client Access Request still applies. */
+    if (clientId && target && target !== clientId && !req.worklist) reasons.push('switch');
     /* Leaving a chart only warrants an interruption if there is something to
        lose. Someone who opened a chart, read it and headed back to Home has
        taken no action worth confirming — the client is simply cleared. A

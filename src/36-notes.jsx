@@ -29,9 +29,24 @@ const NOTE_PLACES = ['Clinic office', 'Client’s home', 'Community', 'Hospital'
 function NotePage({ client, doc }) {
   /* Read the link once: it must not change under the clinician mid-note. */
   const [ctx] = useState(() => getNoteCtx(client.client_id, doc));
-  return ctx && ctx.mode === 'review'
-    ? <DocReview client={client} doc={doc} ctx={ctx} />
-    : <NoteEditor client={client} doc={doc} ctx={ctx} />;
+  const back = useBackToSummary(client);
+  /* Service first: a note that any service includes starts by asking which
+     service was performed and on what date (56-services-staff.jsx). A
+     draft remembers its choice; the Services page can pass one in. */
+  const [service, setService] = useState(() => {
+    const saved = getNoteDraft(client.client_id, doc);
+    return (saved && saved.fields.service) || takeSbSel(client.client_id, doc);
+  });
+  if (ctx && ctx.mode === 'review') return <DocReview client={client} doc={doc} ctx={ctx} />;
+  if (!service && sbServicesWithDoc(doc).length) return (
+    <Panel title={'Start ' + doc}>
+      <div className="note-page">
+        <NoteLinkBanner ctx={ctx} kind={ctx && ctx.mode === 'draft' ? 'draft' : 'new'} />
+        <ServiceStartForm client={client} doc={doc} onStart={setService} onCancel={back} startLabel="Start Note" />
+      </div>
+    </Panel>
+  );
+  return <NoteEditor client={client} doc={doc} ctx={ctx} service={service} onService={setService} />;
 }
 
 /* Where to go when a note is finished or abandoned: back to the summary,
@@ -60,17 +75,19 @@ function NoteLinkBanner({ ctx, kind }) {
   );
 }
 
-function NoteEditor({ client, doc, ctx }) {
+function NoteEditor({ client, doc, ctx, service, onService }) {
   const guard = useGuard();
   const back = useBackToSummary(client);
   const draft = ctx && ctx.mode === 'draft';
   const template = NOTE_TEMPLATES[doc] || NOTE_TEMPLATES['Progress Note'];
   const saved = getNoteDraft(client.client_id, doc);
   const [f, setF] = useState(() => saved ? { ...saved.fields } : ({
-    date: isoOf(TODAY), time: '10:00 AM', contact: '', place: '', minutes: '',
+    date: service ? service.date : isoOf(TODAY), time: '10:00 AM', contact: '', place: '',
+    minutes: service ? String(((sbServiceById(service.service_id) || { versions: [] }).versions.find(v => v.version === service.version) || { config: {} }).config.duration_min || '') : '',
     checks: {}, narrative: draft ? 'Met with ' + client.name.split(' ')[0] + ' for a scheduled session. ' : '', plan: '', attest: false,
   }));
   const [tried, setTried] = useState(false);
+  const [changing, setChanging] = useState(false);
   const set = (k, v) => { setF(x => ({ ...x, [k]: v })); guard.markDirty(doc); };
   const errs = {
     contact: !f.contact && 'Choose how the contact happened.',
@@ -87,21 +104,27 @@ function NoteEditor({ client, doc, ctx }) {
       clearNoteCtx(client.client_id, doc);
     }
     clearNoteDraft(client.client_id, doc);
+    const rec = service ? sbRecordNote(client, doc, service) : null;
     guard.setToast({ status: 'success', title: doc + ' signed',
-      detail: ctx ? (ctx.n.urgent ? 'Follow-up documented — the alert is closed.' : 'Cleared from your notifications.') : 'Added to ' + client.name.split(' ')[0] + '’s chart.' });
+      detail: ctx ? (ctx.n.urgent ? 'Follow-up documented — the alert is closed.' : 'Cleared from your notifications.')
+        : rec ? (rec.workflow ? 'Step done in ' + rec.s.name + '. The rest are on ' + client.shortName + '’s Services page.' : rec.s.name + ' recorded for ' + client.shortName + '.')
+        : 'Added to ' + client.name.split(' ')[0] + '’s chart.' });
     back();
   };
   return (
     <Panel title={doc}>
       <div className="note-page">
         <NoteLinkBanner ctx={ctx} kind={draft ? 'draft' : 'new'} />
+        {service && <SbAppliedLine client={client} service={service} onChange={() => setChanging(true)} />}
         {saved && !ctx && (
           <div className="chc-note chc-note--info note-link"><Icon name="uiDocumentEdit" size={15} />
             <div><b>Your draft</b>, saved {saved.saved.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}. Signing files it to the chart.</div>
           </div>
         )}
         <div className="ovl-grid ovl-grid--4">
-          <DateField label="Date of service" required value={f.date} onChange={v => set('date', v)} />
+          {service
+            ? <Field label="Date of service" hint="Set with the service."><div className="ff-inline">{fmtDate(service.date)}</div></Field>
+            : <DateField label="Date of service" required value={f.date} onChange={v => set('date', v)} />}
           <Field label="Start time"><Dropdown value={f.time} options={NOTE_TIMES} onChange={v => set('time', v)} /></Field>
           <Field label="Duration"><TextIn value={f.minutes} suffix="min" inputMode="numeric" onChange={v => set('minutes', v.replace(/\D/g, ''))} /></Field>
           <Field label="Location"><Dropdown value={f.place} options={NOTE_PLACES} onChange={v => set('place', v)} /></Field>
@@ -124,10 +147,16 @@ function NoteEditor({ client, doc, ctx }) {
         <div className="note-foot">
           <Button variant="ghost" onClick={back}>Cancel</Button>
           <span className="spacer" />
-          <Button variant="secondary" onClick={() => { saveNoteDraft(client.client_id, doc, f); guard.clearDirty(); guard.setToast({ status: 'success', title: 'Draft saved', detail: ctx ? 'The notification stays open until the note is signed.' : 'Not filed to the chart yet.' }); }}>Save Draft</Button>
+          <Button variant="secondary" onClick={() => { saveNoteDraft(client.client_id, doc, { ...f, service }); guard.clearDirty(); guard.setToast({ status: 'success', title: 'Draft saved', detail: ctx ? 'The notification stays open until the note is signed.' : 'Not filed to the chart yet.' }); }}>Save Draft</Button>
           <Button variant="primary" onClick={sign}>Sign Note</Button>
         </div>
       </div>
+      {changing && (
+        <Overlay title="Change Service" subtitle={doc + ' · ' + client.displayName} size="md" onClose={() => setChanging(false)}>
+          <ServiceStartForm client={client} doc={doc} initial={service} startLabel="Use This Service" onCancel={() => setChanging(false)}
+            onStart={sel => { setChanging(false); onService(sel); setF(x => ({ ...x, date: sel.date })); guard.markDirty(doc); }} />
+        </Overlay>
+      )}
     </Panel>
   );
 }

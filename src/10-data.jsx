@@ -75,6 +75,16 @@ const MY_WEEK_APPTS = (() => {
 })();
 RD.appointments = (RD.appointments || []).concat(MY_WEEK_APPTS);
 
+/* The residential census (tools/build-residential-fixtures.py): ten more
+   residents for Maple Grove, a bed for every residential client, and the new
+   residents' vitals and allergies. Folded in before anything is indexed, so
+   they are ordinary clients everywhere else. */
+const RES = RD.residential || {};
+RD.vitals = (RD.vitals || []).concat(RES.vitals || []);
+RD.allergies = (RD.allergies || []).concat(RES.allergies || []);
+RD.attributeAssignments = (RD.attributeAssignments || []).concat(RES.attributes || []);
+const BED_BY_CLIENT = Object.fromEntries((RES.beds || []).map(b => [b.client_id, b]));
+
 const _byClient = arr => { const o = {}; (arr || []).forEach(r => { (o[r.client_id] = o[r.client_id] || []).push(r); }); return o; };
 const APPT_BY_CLIENT = _byClient(RD.appointments), ALLERGY_BY_CLIENT = _byClient(RD.allergies),
       RX_BY_CLIENT = _byClient(RD.prescriptions), VITAL_BY_CLIENT = _byClient(RD.vitals),
@@ -107,7 +117,7 @@ const HOUSING_TYPES = ['Intermediate', 'Independent', 'Supportive', 'Transitiona
 /* The clinician's own clients plus the rest of the agency's. The rest carry
    `access` (other-program | restricted): opening their chart needs a Client
    Access Request first — see 20-context.jsx. */
-const CLIENTS = (RD.clients || []).concat(RD.agencyClients || []).map(c => {
+const CLIENTS = (RD.clients || []).concat(RD.agencyClients || [], RES.residents || []).map(c => {
   const dx = (DX_BY_CLIENT[c.client_id] || []).slice().sort((a, b) =>
     (PRECEDENCE_ORDER[a.precedence] ?? 9) - (PRECEDENCE_ORDER[b.precedence] ?? 9));
   const probs = (PROB_BY_CLIENT[c.client_id] || []).slice().sort((a, b) =>
@@ -142,9 +152,40 @@ const CLIENTS = (RD.clients || []).concat(RD.agencyClients || []).map(c => {
     sharedServiceId: '*' + String(1000 + seed(c.client_id + 'ss') % 8999) + CIN_ALPHA[seed(c.client_id + 's1') % CIN_ALPHA.length] + CIN_ALPHA[seed(c.client_id + 's2') % CIN_ALPHA.length] + CIN_ALPHA[seed(c.client_id + 's3') % CIN_ALPHA.length],
     residence: RESIDENCES[seed(c.client_id + 'res') % RESIDENCES.length],
     housingType: HOUSING_TYPES[seed(c.client_id + 'ht') % HOUSING_TYPES.length],
+    /* Residential care only: unit, room, bed and the episode around it. Null
+       for everyone else, so a residential header field on an outpatient
+       chart reads as "—" rather than inventing a bed. */
+    bed: BED_BY_CLIENT[c.client_id] || null,
   };
 });
 const CLIENT_BY_ID = _ix(CLIENTS, 'client_id');
+
+/* ---- Residential: who shares a room, and Daily Attendance -------------
+   Roommates are everyone else in the same room: other residents, and the
+   children who live with a parent in family housing (dependents — they hold
+   a bed but aren't clients). Attendance is per person, client or dependent. */
+const RES_DEPENDENTS = RES.dependents || [];
+const ATTENDANCE_BY = _byClient((RES.attendance || []).map(a => ({ ...a, client_id: a.subject_id })));
+function roommatesOf(c) {
+  if (!c || !c.bed) return [];
+  const same = b => b.site_id === c.bed.site_id && b.room === c.bed.room;
+  const residents = (RES.beds || []).filter(b => same(b) && b.client_id !== c.client_id)
+    .map(b => ({ id: b.client_id, name: cName(RAWCLIENT[b.client_id] || (RES.residents || []).find(r => r.client_id === b.client_id)), bed: b.bed, kind: 'resident' }));
+  const kids = RES_DEPENDENTS.filter(d => same(d))
+    .map(d => ({ id: d.dependent_id, name: d.first_name + ' ' + d.last_name, bed: d.bed, kind: 'dependent',
+      relationship: d.parent_client_id === c.client_id ? d.relationship : d.relationship + ' of roommate', age: ageOf(d.dob) }));
+  return residents.concat(kids).sort((a, b) => a.bed.localeCompare(b.bed));
+}
+/* Most recent Daily Attendance record for a client or dependent, and
+   whether it was taken today. */
+function attendanceOf(subjectId) {
+  const recs = (ATTENDANCE_BY[subjectId] || []).slice().sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time));
+  return recs.length ? { ...recs[0], today: recs[0].date === isoOf(TODAY) } : null;
+}
+/* Where the client is, at whatever depth the agency's sites have: campus
+   and building for a residential site ("Maple Grove Residential Campus -
+   Building A"), or the site alone. */
+const locationOf = c => { const n = siteName(c && c.site_id); return n === '—' ? null : n.replace(' - ', ' · '); };
 const careTeam = cid => {
   const c = CLIENT_BY_ID[cid];
   const same = (RD.staff || []).filter(s => s.site_id === c?.site_id);
@@ -189,16 +230,26 @@ const CLIENT_MODULE_NAMES = [
   'MAT', 'Nurse Progress Note', 'Patient Assignment', 'Payor Assignment', 'PC-PTSD', 'PCL5',
   'PHQ', 'PRAPARE', 'Prescription', 'Problem List', 'Programs', 'Progress Note', 'Psych Note',
   'Psychiatric Evaluation', 'Psychosocial Assessment Note', 'Psychotherapy Progress Note',
-  'Scanned Documents', 'SDOH', 'Service Plan', 'Suicide Risk Screening',
+  'Release of Information', 'Scanned Documents', 'SDOH', 'Service Plan', 'Services', 'Suicide Risk Screening',
   'Support & Safety Plan', 'Vitals', 'WHO - Assist', 'WRAP Meeting',
   /* Agency note templates. In production these are configured per agency,
      program and role, so the app can't guess which one a clinician needs —
      see START_NOTE_TYPES and the "Start Note" chooser. */
+  /* Documents services ask for (see 55-service-builder.jsx), and the
+     client's Services page itself. */
+  'Client Satisfaction Survey', 'Quality of Life Questionnaire',
   'CANS', 'Case Management Note', 'Care Coordination Note', 'Crisis Follow-Up Note', 'Engagement Session Note',
   'Hospital Discharge Follow-Up', 'Peer Support Note', 'Residential Check-In', 'Therapy Note',
   /* Reached from the header's Send Text dialog (Open Messages). */
   'Text Messages',
+  /* Residential checks — the Residential roster's per-row Actions, and the
+     ones a bulk worklist can run (see 52-residential.jsx). */
+  'BHT Rounding Sheet', 'Contraband Check', 'Patient Valuables', 'Room Check', 'Restraint And Seclusion',
 ];
+/* The chart's overview page. Not a module, but a client-specific page, so it
+   is the first entry in the tab-set catalogue and the first tab of every seed
+   set. */
+const CHART_HOME_TAB = 'Client Summary';
 const CLIENT_MODULES = Object.fromEntries(CLIENT_MODULE_NAMES.map(n => [slugify(n), n]));
 const isClientModule = name => CLIENT_MODULE_NAMES.indexOf(name) !== -1;
 

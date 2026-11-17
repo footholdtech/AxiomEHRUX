@@ -522,6 +522,151 @@ reason in the client-switch intercept (`INTERCEPT-INTERACTION-SPEC.md`).
   view at 375 / 768 / 1024 / 1280 / 1440, in a chart and in the Admin preview
   with all 24 views, by checking each element's box against its parent's.
 
+### Residential census and bulk worklists (2026-11-05)
+
+Full behaviour in `MULTI-CLIENT-WORKLIST-SPEC.md`. In short:
+
+- **What it is.** Residential (left nav) is now a census with bulk select.
+  Starting a check opens a worklist: a pinned rail beside one client's header
+  and form.
+- **The rail** is searchable, sortable, drag-resizable and collapses to
+  avatars with status badges.
+- **Moving through the list.** Saving auto-advances to the next unfinished
+  client, and unsaved changes become a draft when you move on. Finish is the
+  only confirmation: save drafts to charts and keep a task in Approvals &
+  Tasks, or discard.
+- **Leaving any other way** pauses the worklist into the same task.
+- **Guard change.** `request({ worklist: true })` skips the client-switch
+  intercept, and `clientIdForPath` knows the worklist route. `ChartChrome`
+  stays out of the way there, because the worklist renders its own header.
+- **New Residential header preset**, assigned to no role, plus residential
+  fields in General. The config key is now v5.
+- **Fixtures.** `tools/build-residential-fixtures.py` adds 10 residents and 14
+  beds.
+- **Follow-up, same day.**
+  - General gained Site / Building, Roommates (including children in family
+    housing) and Daily Attendance.
+  - The Finish dialog is now a single required radio choice with one Finish
+    Worklist button, and nothing is pre-selected.
+  - The rail's selected state is the tertiary tint and stroke, matching the
+    pills, with no side bar.
+  - Quick-view pills have hover and pressed states.
+  - Every route change scrolls to the top (`AppShell`).
+  - Cancelling the first client's intercept discards the just-created
+    worklist.
+- **Mobile header.** The agency mark and name now show at every width, left
+  of the top bar beside the menu button; the name truncates below about 360px.
+
+### Tab sets (2026-11-09)
+
+Full behaviour in `TAB-SETS-SPEC.md`; code in `src/53-tabsets.jsx`.
+
+- **Client pages only.** The catalogue is Client Summary plus
+  `CLIENT_MODULE_NAMES`, so no tab can repaint the screen out of the chart.
+  `Quality Management` left the old hard-coded strip for that reason.
+- **Admin** › User Interface Options › Tab Sets. List and edit pages mirror
+  the client header ones: name, roles (one set per role), Active, Default,
+  and a two-column picker with a live preview strip.
+- **Staff** pick a set in Preferences or from Tabs Set in the chart, and can
+  copy an agency set or start one of their own. Personal sets live in prefs.
+- **In the chart**, `ChartTabBar` replaces `TabStrip`. The set keeps its order
+  and the track scrolls. More reaches every client page, and pages outside
+  the set open as temporary tabs you can close.
+- **A chart opens on the set's first tab**, which is no longer always Client
+  Summary. The client breadcrumb follows suit. `CHART_HOME_TAB` moved to
+  `10-data.jsx`.
+- **No config-key bump.** A stored config without `tabSets` keeps its
+  headers and gets the seed sets.
+
+### Due Date Rules and the Service Builder shell (2026-11-12, renamed 11-13)
+
+Full behaviour is in `DUE-DATE-RULES-SPEC.md`; code is in
+`src/54-due-date-rules.jsx`. Service Builder is described in
+`SERVICE-BUILDER-SPEC.md` (see the next section).
+
+- **Admin › Builders › Due Date Rules** was first called Compliance Rules.
+  It was renamed because compliance is broader than cadence. The
+  `/compliance-rules` routes still resolve.
+- **Services subscribe to rules**, on the documents and appointments inside
+  them. Applied To is derived from `services.json`: a count on the list,
+  which opens a searchable modal, and a summary of governed items on the
+  rule's page.
+- **A rule any service uses can't be deleted.**
+- **Seed rules carry admin-style names.** The generated name is short
+  (cadence plus start date) and appears only for unnamed rules.
+- **Admin › Builders › Service Builder** is built; see the next section.
+- **Fixtures.** Run `tools/build-due-date-fixtures.py` and
+  `tools/build-service-fixtures.py` before `tools/build-refdata.py`.
+- **Storage.** Edits persist to `axiom-due-date-rules-v2` in localStorage.
+  The key moved from v1 when the service deadline rules were added.
+
+### Service Builder and the staff side of services (2026-11-13)
+
+Full behaviour and Lisa's decisions are in `SERVICE-BUILDER-SPEC.md`. Admin
+code is in `src/55-service-builder.jsx`; staff code is in
+`src/56-services-staff.jsx`.
+
+- **Admin › Service Builder** has Services, Templates and Building Blocks
+  pills, a versioned editor of compartment cards with side drawers, and
+  Checks alone in the rail. A **Preview as Staff** header button (services
+  only) is locked: `aria-disabled` keeps it focusable for its tooltip. It
+  replaced the rail's What Staff See and Check a Staff Member lists on
+  2026-11-16, because admins found them redundant and hard to follow.
+- **The Services and Templates tables lay out for their own width**
+  (`useSbTableTier`), not the window's, because a docked nav leaves a 1124px
+  window only ~800px of table. Full, then compact (status beside the name,
+  Programs and Roles paired, no Edit button), then narrow (secondary lines
+  under the name), then a single column on phones.
+- **`.badge` sets its own font family and line height.** Inside a page
+  title it used to inherit the display serif.
+- **`.chc .form-field + .form-field` adds 12px above the second field.**
+  That's right for stacked fields, but wrong in a row: it dropped Default
+  Duration 12px below Name. Any grid or flex row of fields inside a `.chc`
+  page needs `> .form-field + .form-field { margin-top: 0 }`, as
+  `.sb-basics` now has. A sweep of every route, dialog and drawer on
+  2026-11-17 (comparing input tops within each row) found no other cases.
+- **Templates only pre-fill.** New Service is three steps and lands as a
+  Draft.
+- **Due date rules apply on steps, and on a workflow as its deadline.**
+- **Staff side.** Every note a service includes starts with "which service,
+  and on what date?", and uses the version in effect on that date. The chart
+  has a **Services** page, also on the left nav and in the seed tab sets.
+  Completing a step anywhere on the chart counts.
+- **Hooks into existing code:**
+  - `NotePage` and `NoteEditor` take the service;
+  - `ChartPage` routes `Services` and every service note;
+  - `PageForm` has an `onSaved` hook;
+  - `DischargePlan` calls `sbDocFiled`;
+  - `ScheduleAppointmentOverlay` has an `onScheduled` hook;
+  - `AddNoteMenu` lists service notes.
+- **Storage.** `axiom-services-v1` holds services, templates and instances.
+  Clear it to reseed.
+
+### Keyboard and control height (2026-11-16)
+
+- **One control height.** Every `.form-input` is 36px, the same as
+  `.dd-trigger`, so number, search, date and dropdown controls line up.
+  Inline icon buttons are compacted so they can't make a box taller. The
+  Due Date Rules overrides that made number and search fields 31px are gone.
+- **Popups (WCAG 2.1.1 and 2.4.3; the APG listbox and menu patterns) live in
+  `FloatMenu`**, so every dropdown and menu gets them:
+  - focus moves in on open;
+  - Up, Down, Home, End and PageUp/PageDown move;
+  - typing jumps to an option;
+  - Enter and Space choose;
+  - Escape and Tab close, returning focus to the trigger.
+
+  Up and Down on a closed `Dropdown` or `MultiSelectDropdown` open it.
+  Options are out of the Tab order, so Tab leaves the menu. Pass
+  `autoFocus={false}` for a popup that shouldn't take focus.
+- **Dialogs.** `useDialogFocus`, used by `Overlay` and the Service Builder
+  drawers, moves focus in, keeps Tab inside the topmost dialog, and puts
+  focus back on the opener when the dialog closes.
+- **`Checkbox presentational`** is for rows that are themselves the control.
+  It takes the inner box out of the Tab order and the accessibility tree.
+- **Not yet covered:** the Preferences and Notifications flyouts and the
+  unsaved-changes intercept don't trap focus yet.
+
 ## 4. Outstanding — needs the artboards
 
 Lisa's list, in her words, with what is blocking each:
@@ -567,6 +712,7 @@ python3 tools/build-attribute-fixtures.py  # attribute catalog, agency list, per
 python3 tools/build-agency-clients.py      # clients outside the caseload, for Client Access Requests (run before build-refdata)
 python3 tools/fetch-attribute-icons.py     # only when adding Fluent glyphs; needs network
 python3 tools/build-notification-fixtures.py  # notification center (run before build-refdata)
+python3 tools/build-residential-fixtures.py   # residents + beds at Maple Grove (run before build-refdata)
 python3 tools/build-refdata.py             # fixtures -> assets/refdata.js
 python3 tools/build.py                     # -> index.html + AxiomEHR-Prototype.html
 python3 tools/serve.py                     # dev server, sends no-store
@@ -604,6 +750,10 @@ current rather than two.
   block (`.qvx-trunc`).
 - **A fixed-width child needs a floor on its shrinking parent.** The 120px
   care-team tile spilled out of a `flex: 1 0 0` box that had shrunk to 111px.
+- **`matchMedia` change events don't fire in a throttled preview tab either.**
+  Resizing the preview after a page loads at phone width leaves `useMedia`
+  stuck on phone; the worklist rail stayed collapsed at 1440. Resize first,
+  then reload.
 - **A blank page is usually a dead dev server**, not a broken build. Check
   `preview_list` before debugging the app.
 - **A blank preview is often a port collision, not a dead server.** Hit twice

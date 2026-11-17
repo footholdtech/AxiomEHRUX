@@ -11,8 +11,6 @@ const STUBS = {
     crumbs: [{ label: 'Foster Home' }] },
   '/inpatient-module': { title: 'Inpatient Module', blurb: 'Program shell. Not tied to any client record.',
     crumbs: [{ label: 'Inpatient Module' }] },
-  '/residential': { title: 'Residential', blurb: 'Program shell. Not tied to any client record.',
-    crumbs: [{ label: 'Residential' }] },
 };
 
 /* Turn any other in-app route into a named destination rather than silently
@@ -33,17 +31,32 @@ function Routes({ config }) {
   if ((m = match('/chart/:id/:module', path))) return <ChartPage id={m.id} module={m.module} config={config} />;
   /* Client-specific module with no client in context — the picker, not a chart. */
   if ((m = match('/module/:slug', path))) return <ModulePage slug={m.slug} />;
+  /* Residential census, and the bulk worklists started from it. */
+  if (match('/residential', path)) return <ResidentialPage />;
+  if ((m = match('/residential/worklist/:wl/:id', path))) return <WorklistPage wlId={m.wl} cid={m.id} />;
   /* Admin › User Interface Options. Agency configuration, never client data —
      these pages must not adopt a client, and they do not. */
   if (match('/notifications', path)) return <NotificationsPage tab="task" />;
   if (match('/notifications/preferences', path)) return <NotifPreferencesPage />;
   if ((m = match('/notifications/:tab', path))) return <NotificationsPage tab={m.tab} />;
+  /* Admin › Due Date Rules and Service Builder — agency configuration,
+     never client data. /compliance-rules was this page's first name. */
+  if (match('/due-date-rules', path) || match('/compliance-rules', path)) return <DueDateRulesPage />;
+  if ((m = match('/due-date-rules/:id', path)) || (m = match('/compliance-rules/:id', path))) return <DueDateRuleEditPage id={m.id} />;
+  if (match('/service-builder', path)) return <ServiceBuilderPage view="services" />;
+  if (match('/service-builder/templates', path)) return <ServiceBuilderPage view="templates" />;
+  if (match('/service-builder/blocks', path)) return <ServiceBuilderPage view="blocks" />;
+  if ((m = match('/service-builder/services/:id', path))) return <ServiceEditPage key={'s' + m.id} id={m.id} kind="service" />;
+  if ((m = match('/service-builder/templates/:id', path))) return <ServiceEditPage key={'t' + m.id} id={m.id} kind="template" />;
+  if ((m = match('/service-builder/blocks/:key', path))) return <SbBlockPage blockKey={m.key} />;
   if (match('/user-interface-options', path)) return <UIOptionsIndex />;
   if (match('/user-interface-options/client-header', path)) return <ClientHeaderListPage />;
   if (match('/user-interface-options/client-attributes', path)) return <ClientAttributesPage />;
   if (match('/user-interface-options/communications', path)) return <CommunicationsPage />;
   if ((m = match('/user-interface-options/communications/:area', path))) return <CommsAreaPage area={m.area} />;
   if ((m = match('/user-interface-options/client-header/:id', path))) return <ClientHeaderEditPage id={m.id} />;
+  if (match('/user-interface-options/tab-sets', path)) return <TabSetListPage />;
+  if ((m = match('/user-interface-options/tab-sets/:id', path))) return <TabSetEditPage id={m.id} />;
   /* Section pages, so a section breadcrumb is never a dead end. */
   if (match('/documents', path) || match('/clinical-forms-search', path)) return <DocumentsPage />;
   if (match('/reports', path)) return <SectionIndexPage sectionKey="reports" />;

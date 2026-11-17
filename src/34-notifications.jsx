@@ -16,7 +16,7 @@
 const NCount = ({ n, className }) => <span className={'ncount' + (className ? ' ' + className : '')} aria-hidden="true">{n > 99 ? '99+' : n}</span>;
 const NDot = ({ tone, className }) => <span className={'ndot ndot--' + tone + (className ? ' ' + className : '')} aria-hidden="true" />;
 const NTag = ({ tone, children }) => <span className={'ntag' + (tone ? ' ntag--' + tone : '')}>{children}</span>;
-const GENERAL_ICON = { report: 'reports', announcement: 'chat', maintenance: 'admin', credential: 'shield', shift: 'calendar' };
+const GENERAL_ICON = { report: 'reports', announcement: 'chat', maintenance: 'admin', credential: 'shield', shift: 'calendar', worklist: 'uiTaskListLTR' };
 /* The production tab an item used to live under, as a short "type" label for
    filtering — so nothing a user could find before is unfindable now. */
 const notifType = n => { const t = n.source.split('›').pop().trim(); return t === 'Pending Notifications' ? 'Pended forms' : t; };
@@ -274,7 +274,11 @@ function NotifActions({ n, client, variant, onNavigate, openChart }) {
   const chartItem = client && variant !== 'chart' ? { label: 'Open ' + client.name.split(' ')[0] + '’s Chart', onClick: openChart } : null;
   const lockedDismiss = { label: 'Dismiss', disabled: true, reason: 'Required by your organization — complete, return or delegate it.' };
 
-  if (n.category === 'task') {
+  if (n.category === 'task' && n.kind === 'worklist') {
+    /* One row per unfinished worklist, not per client: it is one task. */
+    primary = { label: TASK_ACTIONS.worklist.primary, onClick: () => { onNavigate && onNavigate(); resumeWorklist(guard, n.worklist_id); } };
+    more.push({ label: 'Discard Worklist…', onClick: () => setMode('wl-discard') });
+  } else if (n.category === 'task') {
     const A = TASK_ACTIONS[n.kind] || {};
     primary = { label: A.primary, onClick: () => (A.opens ? openDoc(n.link, 'review') : n.kind === 'incomplete' ? openDoc(n.link, 'draft') : n.kind === 'appt-request' ? done('accepted', 'Appointment accepted', n.slot + ' · added to the schedule')
       : n.kind === 'shift-change' ? done('approved', 'On-call swap approved', 'Both calendars are updated.') : setMode(n.kind === 'message' ? 'reply' : n.kind === 'referral' ? 'intake' : 'review')) };
@@ -344,6 +348,7 @@ function NotifActions({ n, client, variant, onNavigate, openChart }) {
       {mode === 'reply' && <ReplyOverlay n={n} client={client} onClose={close} onDone={() => done('replied', 'Reply sent', 'To ' + sName(n.from_staff_id) + '.')} />}
       {mode === 'intake' && <IntakeDateOverlay n={n} client={client} onClose={close} onDone={d => done('confirmed', 'Intake date confirmed', fmtDate(d) + ' · Hope Street Housing notified')} />}
       {mode === 'notes' && client && <ClientNotesOverlay client={client} onClose={close} />}
+      {mode === 'wl-discard' && <DiscardWorklistOverlay wlId={n.worklist_id} onClose={close} />}
     </div>
   );
 }

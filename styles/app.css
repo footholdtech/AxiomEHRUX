@@ -306,7 +306,9 @@ input { font-family: inherit; }
 .select .chev { color: var(--foreground-input-control-default); }
 
 /* ================= Badges / chips ================= */
-.badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 10px; border-radius: var(--radius-full); font-size: 12px; font-weight: 600; background: var(--background-surface-secondary); color: var(--foreground-secondary); }
+/* A badge sets its own type: placed inside a page title it would otherwise
+   inherit the display serif and the heading's line height. */
+.badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 10px; border-radius: var(--radius-full); font-family: var(--font-sans); font-size: 12px; font-weight: 600; line-height: 16px; letter-spacing: normal; background: var(--background-surface-secondary); color: var(--foreground-secondary); }
 .badge.dot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 .badge.status-active { background: #E9FBE7; color: #1F7A32; }
 .badge.status-inactive { background: #FDECEC; color: #B3261E; }
@@ -661,7 +663,13 @@ input { font-family: inherit; }
 /* labeled form fields */
 .form-field { display: flex; flex-direction: column; gap: 6px; }
 .form-field > label { font-size: 12px; font-weight: 600; color: var(--foreground-secondary); }
-.form-input { display: flex; align-items: center; gap: 8px; border: 1px solid var(--border-input-control-primary-default, #b6c2c8); border-radius: var(--radius-sm); background: var(--background-surface-primary); padding: 8px var(--sp-md); }
+/* Every single-line control is 36px tall, the same as .dd-trigger, so a
+   number, a search box, a date and a dropdown line up in one row. The input
+   stretches to fill the box (a full-height click target), and a clear or
+   inline icon button is compacted so it can't make the box taller. */
+.form-input { display: flex; align-items: center; gap: 8px; min-height: 36px; border: 1px solid var(--border-input-control-primary-default, #b6c2c8); border-radius: var(--radius-sm); background: var(--background-surface-primary); padding: 3px var(--sp-md); }
+.form-input > input { align-self: stretch; }
+.form-input > .icon-btn, .form-input > .date-clear { padding: 3px; margin: -3px 0; }
 .form-input:focus-within { border-color: var(--background-interactive-primary-default); }
 .form-input input { border: none; outline: none; background: none; width: 100%; font-size: 13px; color: var(--foreground-primary); font-family: var(--font-sans); }
 .form-input svg { color: var(--foreground-tertiary); flex: none; }

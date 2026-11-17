@@ -52,7 +52,10 @@ const QUICKVIEW_CATALOG = [
     lockedFields: ['First name & last name', 'Preferred name', 'Date of birth', 'Age'],
     options: [
       { key: 'fields', kind: 'fields', label: 'Identifiers to display',
-        choices: ['Axiom ID', 'CIN', 'Shared Service ID', 'MRN', 'Funding', 'Residence', 'Housing Type', 'Primary Language'],
+        /* The second half is the residential episode — what a residential
+           header leads with. They read "—" on a chart with no bed. */
+        choices: ['Axiom ID', 'CIN', 'Shared Service ID', 'MRN', 'Funding', 'Residence', 'Housing Type', 'Primary Language',
+          'Site / Building', 'Unit', 'Room / Bed', 'Roommates', 'Daily Attendance', 'Admit Date', 'Length of Stay', 'Attending', 'Admission Reason', 'Legal Status', 'Expected Discharge', 'Precautions'],
         def: ['Axiom ID', 'CIN', 'Shared Service ID', 'Funding', 'Residence', 'Housing Type'] },
       { key: 'showAttributes', kind: 'bool', label: 'Show client attributes', def: true },
       { key: 'showCareTeam', kind: 'bool', label: 'Show care team', def: true },
@@ -259,12 +262,83 @@ const QUICK_ACTIONS_BY_KEY = Object.fromEntries(QUICK_ACTIONS_CATALOG.map(a => [
 /* Every quick action is on by default; an admin can remove any per header. */
 const DEFAULT_ACTIONS = ['note', 'call', 'text', 'email', 'chat', 'appointment'];
 
+/* ---- Tab sets ------------------------------------------------------
+   A tab set is a named, ordered list of chart pages: the tabs a chart shows
+   and the one it opens on (the first). Same two levels as headers: an admin
+   builds sets and assigns each to roles, and staff can pick a different one,
+   or make their own, for themselves.
+
+   CLIENT PAGES ONLY. Production lets a set mix chart pages with agency pages
+   (CRM, Dashboard, Revenue Cycle Management). Pressing one of those tabs then
+   repaints the whole screen out of the chart, which isn't what a tab does: a
+   tab changes the view inside one context and leaves the context alone. So the
+   catalogue is the client-specific pages and nothing else. Agency pages stay
+   in the left nav and global search, where leaving the chart is expected. */
+const TAB_PAGES = [CHART_HOME_TAB].concat(CLIENT_MODULE_NAMES.slice().sort((a, b) => a.localeCompare(b)));
+const isTabPage = name => TAB_PAGES.indexOf(name) !== -1;
+
+/* Four sets, one per kind of work, assigned like the headers. Residential /
+   Detox goes to no role: unit staff choose it, or an admin assigns it.
+   Billing / Revenue Cycle Specialist is deliberately left unassigned, so the
+   list page shows the falls-back-to-default case. */
+const SEED_TAB_SETS = [
+  {
+    id: 'ts-clinical', name: 'Clinical', status: 'active',
+    description: 'Therapists and social workers: documentation, the plan and the clinical record.',
+    roles: ['Social Worker', 'Clinical Provider / Therapist', 'Clinical Director', 'Program Director',
+      'QA / Compliance Specialist', 'Executive Director'],
+    tabs: [CHART_HOME_TAB, 'Services', 'Progress Note', 'Psychotherapy Progress Note', 'Dynamic Progress Notes', 'Service Plan',
+      'Diagnosis', 'Problem List', 'Psychosocial Assessment Note', 'PHQ', 'GAD-7', 'Support & Safety Plan',
+      'Appointments', 'Discharge Plan', 'Scanned Documents'],
+  },
+  {
+    id: 'ts-case-mgmt', name: 'Case Management', status: 'active',
+    description: 'Case managers, peers, intake and front desk: enrollment, coverage, contacts and coordination.',
+    roles: ['Case Manager', 'Peer Support Specialist', 'Housing Supervisor', 'Intake Coordinator',
+      'Front Desk / Administrative Assistant'],
+    tabs: [CHART_HOME_TAB, 'Services', 'Case Management Note', 'Care Coordination Note', 'Service Plan', 'Appointments',
+      'Programs', 'Enrollment History', 'Payor Assignment', 'Patient Assignment', 'Cover Sheet', 'Demographic',
+      'Encounter Entry', 'SDOH', 'PRAPARE', 'Informed Consent'],
+  },
+  {
+    id: 'ts-prescriber', name: 'Prescriber', status: 'active',
+    description: 'Medical roles: medications, allergies, vitals, labs and the instruments that go with them.',
+    roles: ['Primary Care Provider', 'Psychiatric Provider', 'Nurse'],
+    tabs: [CHART_HOME_TAB, 'Prescription', 'Allergy', 'Vitals', 'Laboratory', 'Diagnosis', 'Problem List',
+      'Psychiatric Evaluation', 'Psych Note', 'Nurse Progress Note', 'AIMS', 'Injection', 'Immunization', 'MAT', 'PHQ'],
+  },
+  {
+    id: 'ts-residential', name: 'Residential / Detox', status: 'active',
+    description: 'Unit staff: med pass, withdrawal scales, rounding and the room checks a shift runs.',
+    roles: [],
+    tabs: [CHART_HOME_TAB, 'eMar', 'Vitals', 'COWS', 'CIWA', 'Flow Sheet', 'Nurse Progress Note', 'BHT Rounding Sheet',
+      'Room Check', 'Contraband Check', 'Patient Valuables', 'Residential Check-In', 'Inpatient Note',
+      'Restraint And Seclusion'],
+  },
+];
+
+/* A set saved by an older build, or a page that has since left the
+   catalogue, must not put a dead tab in front of anyone. */
+function normaliseTabSet(s, keepRoles) {
+  const tabs = (Array.isArray(s.tabs) ? s.tabs : []).filter((t, i, all) => isTabPage(t) && all.indexOf(t) === i);
+  return {
+    id: s.id || 'ts-' + Math.random().toString(36).slice(2, 8),
+    name: s.name || 'Untitled Tab Set',
+    description: s.description || '',
+    status: s.status === 'inactive' ? 'inactive' : 'active',
+    roles: keepRoles && Array.isArray(s.roles) ? s.roles.filter(r => STAFF_ROLE_NAMES.indexOf(r) !== -1) : [],
+    tabs: tabs.length ? tabs : [CHART_HOME_TAB],
+  };
+}
+
 /* ---- Seed presets ------------------------------------------------
    Three, because three is enough to show the argument: a general clinical
    header, one tuned for a children's-services population, and one for
    prescribers. Every role is assigned to exactly one of them. */
 const SEED_CONFIG = {
   defaultPresetId: 'hp-adult',
+  tabSets: SEED_TAB_SETS,
+  defaultTabSetId: 'ts-clinical',
   presets: [
     {
       id: 'hp-adult', name: 'Default Adult', status: 'active',
@@ -300,6 +374,22 @@ const SEED_CONFIG = {
         makeView('pcl5'), makeView('aims'), makeView('audit'), makeView('assessments'),
         makeView('general', { showCareTeam: false }), makeView('appointments', { count: '3' }), makeView('serviceplans')],
     },
+    {
+      /* What a residential agency would build for unit staff: the bed and the
+         episode first, then what a shift needs — meds, allergies, vitals,
+         supports. Assigned to no role, so nobody gets it by default; staff
+         choose it in Preferences, or an admin assigns it. */
+      id: 'hp-residential', name: 'Residential', status: 'active',
+      description: 'Residential and inpatient units. Room, bed, admission and legal status up front, then what a shift needs.',
+      roles: [],
+      showClinicalStrip: true,
+      showActions: true, actions: DEFAULT_ACTIONS.slice(),
+      quickViews: [
+        makeView('general', { fields: ['Site / Building', 'Unit', 'Room / Bed', 'Roommates', 'Daily Attendance',
+          'Length of Stay', 'Attending', 'Legal Status', 'Expected Discharge', 'Precautions'] }),
+        makeView('medications'), makeView('allergies'), makeView('vitals'), makeView('support'),
+        makeView('notes'), makeView('incidents'), makeView('serviceplans')],
+    },
   ],
 };
 
@@ -308,9 +398,14 @@ const SEED_CONFIG = {
    instead of an older saved copy that predates them. */
 /* v3: the seeds gained Service Plans — bumped so reviewers see them (earlier
    in-browser header edits reset). */
-const UI_CONFIG_KEY = 'axiom-ui-config-v4';   // v4: Schedule Appointment on by default
+/* v5: the Residential header joined the seed. v6: its General view gained
+   Site / Building, Roommates and Daily Attendance. */
+const UI_CONFIG_KEY = 'axiom-ui-config-v6';
 const UI_PREFS_KEY = 'axiom-ui-prefs';
-const DEFAULT_PREFS = { headerPreset: 'auto', collapsedByDefault: true };
+/* `tabSet` is 'auto' (whatever my role gets) or a set id, agency or mine.
+   `myTabSets` are sets a staff member made for themselves: per person, never
+   assigned to a role, invisible to everyone else. */
+const DEFAULT_PREFS = { headerPreset: 'auto', collapsedByDefault: true, tabSet: 'auto', myTabSets: [] };
 const clone = o => JSON.parse(JSON.stringify(o));
 
 /* A stored config from an older build can be missing keys this one reads.
@@ -338,7 +433,12 @@ function normaliseConfig(raw) {
   }));
   presets.forEach(p => { if (!p.quickViews.length) p.quickViews = [makeView('general')]; });
   const defaultPresetId = presets.some(p => p.id === raw.defaultPresetId) ? raw.defaultPresetId : presets[0].id;
-  return { presets, defaultPresetId };
+  /* Tab sets arrived after headers. A config saved before them keeps its
+     headers and gets the seed sets, so nobody's header edits are reset. */
+  const tabSets = (Array.isArray(raw.tabSets) && raw.tabSets.length ? raw.tabSets : clone(SEED_TAB_SETS))
+    .map(s => normaliseTabSet(s, true));
+  const defaultTabSetId = tabSets.some(s => s.id === raw.defaultTabSetId) ? raw.defaultTabSetId : tabSets[0].id;
+  return { presets, defaultPresetId, tabSets, defaultTabSetId };
 }
 
 const readStored = (key, fallback) => {
@@ -355,12 +455,22 @@ const presetForRole = (config, roleName) =>
   config.presets.find(p => p.id === config.defaultPresetId) ||
   config.presets[0];
 
+/* Same rule as headers: one set per role, only an active set's roles count,
+   and anything unassigned falls back to the default. */
+const tabSetForRole = (config, roleName) =>
+  config.tabSets.find(s => s.status !== 'inactive' && s.roles.indexOf(roleName) !== -1) ||
+  config.tabSets.find(s => s.id === config.defaultTabSetId) ||
+  config.tabSets[0];
+
 const UIConfigCtx = createContext(null);
 const useUIConfig = () => useContext(UIConfigCtx);
 
 function UIConfigProvider({ children }) {
   const [config, setConfigRaw] = useState(() => normaliseConfig(readStored(UI_CONFIG_KEY, null)));
-  const [prefs, setPrefsRaw] = useState(() => ({ ...DEFAULT_PREFS, ...readStored(UI_PREFS_KEY, {}) }));
+  const [prefs, setPrefsRaw] = useState(() => {
+    const p = { ...DEFAULT_PREFS, ...readStored(UI_PREFS_KEY, {}) };
+    return { ...p, myTabSets: (Array.isArray(p.myTabSets) ? p.myTabSets : []).map(s => ({ ...normaliseTabSet(s, false), mine: true })) };
+  });
 
   useEffect(() => { try { localStorage.setItem(UI_CONFIG_KEY, JSON.stringify(config)); } catch (e) {} }, [config]);
   useEffect(() => { try { localStorage.setItem(UI_PREFS_KEY, JSON.stringify(prefs)); } catch (e) {} }, [prefs]);
@@ -377,8 +487,31 @@ function UIConfigProvider({ children }) {
     ? roleAssigned
     : (config.presets.find(p => p.id === prefs.headerPreset && p.status !== 'inactive') || roleAssigned);
 
+  /* The tab set in front of me. A set I picked counts only while it still
+     exists and is active, the same as a header. My own sets are always
+     active: only I can see them. */
+  const roleTabSet = tabSetForRole(config, ME.role);
+  const agencyTabSets = config.tabSets.filter(s => s.status !== 'inactive');
+  const myTabSets = prefs.myTabSets;
+  const tabSet = prefs.tabSet === 'auto'
+    ? roleTabSet
+    : (agencyTabSets.find(s => s.id === prefs.tabSet) || myTabSets.find(s => s.id === prefs.tabSet) || roleTabSet);
+  /* Picking my role's own set stores 'auto', so I keep following my role if
+     an admin reassigns it later. */
+  const chooseTabSet = id => setPrefs({ tabSet: id === roleTabSet.id ? 'auto' : id });
+  const saveMyTabSet = set => setPrefsRaw(p => {
+    const clean = { ...normaliseTabSet(set, false), mine: true };
+    const exists = p.myTabSets.some(s => s.id === clean.id);
+    return { ...p, myTabSets: exists ? p.myTabSets.map(s => (s.id === clean.id ? clean : s)) : p.myTabSets.concat([clean]) };
+  });
+  const deleteMyTabSet = id => setPrefsRaw(p => ({
+    ...p, myTabSets: p.myTabSets.filter(s => s.id !== id), tabSet: p.tabSet === id ? 'auto' : p.tabSet,
+  }));
+
   const value = {
     config, setConfig, prefs, setPrefs,
+    tabSet, roleTabSet, agencyTabSets, myTabSets, chooseTabSet, saveMyTabSet, deleteMyTabSet,
+    tabSetOverridden: tabSet.id !== roleTabSet.id,
     presets: config.presets,
     roleAssigned,
     header: chosen,

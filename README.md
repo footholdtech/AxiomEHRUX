@@ -215,6 +215,11 @@ you won't get an intercept on those two paths.
 | `src/48-quick-actions.jsx` | The header's round action buttons |
 | `src/49-communications.jsx` | Admin › Communications |
 | `src/50-discharge.jsx` | Chart page, Client Summary and the Discharge Plan form |
+| `src/52-residential.jsx` | Residential census and the bulk worklist (see `MULTI-CLIENT-WORKLIST-SPEC.md`) |
+| `src/53-tabsets.jsx` | Tab sets: the chart's tab bar, the staff editor and the admin pages (see `TAB-SETS-SPEC.md`) |
+| `src/54-due-date-rules.jsx` | Admin › Due Date Rules: cadence rules, the rule builder, and the services using each rule (see `DUE-DATE-RULES-SPEC.md`) |
+| `src/55-service-builder.jsx` | Admin › Service Builder: services, templates, building blocks, the versioned service editor and New Service (see `SERVICE-BUILDER-SPEC.md`) |
+| `src/56-services-staff.jsx` | The staff side of services: "which service?" before a note, and the chart's Services page |
 | `src/60-summary.jsx` | The generated discharge summary |
 | `src/90-app.jsx` | Routes and mount |
 | `vendor/` | React, ReactDOM and Babel, vendored so nothing loads from a CDN |

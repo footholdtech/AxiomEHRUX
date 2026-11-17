@@ -229,7 +229,7 @@ function AttributeLibraryOverlay({ onClose }) {
                   <div key={c.catalog_id} className={'attrmodal-opt' + (have ? ' is-on-chart' : '')} role="checkbox" aria-checked={checked}
                     aria-disabled={!!have} tabIndex={have ? -1 : 0} onClick={act}
                     onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); act(); } }}>
-                    <Checkbox checked={checked} disabled={!!have} onChange={() => {}} ariaLabel={c.name} />
+                    <Checkbox checked={checked} disabled={!!have} onChange={() => {}} ariaLabel={c.name} presentational />
                     <span className="attrm-glyph"><AttrGlyph attr={c} /></span>
                     <span className="attrmodal-opt-text">
                       <span className="attrmodal-opt-name">{c.name}<AttrFlag attr={c} /><AttrInfo attr={c} /></span>

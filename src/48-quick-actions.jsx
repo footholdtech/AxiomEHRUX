@@ -143,7 +143,9 @@ function AddNoteMenu({ anchorRef, client, onClose }) {
   const menuRef = useRef(null);
   useOutside([anchorRef, menuRef], onClose);
   const incomplete = incompleteNotes(client);
-  const types = START_NOTE_TYPES.slice().sort((a, b) => a.localeCompare(b));
+  /* Plus any note a service uses, so every note that starts with "which
+     service?" can be started from here (56-services-staff.jsx). */
+  const types = START_NOTE_TYPES.concat(sbNoteDocs().filter(d => START_NOTE_TYPES.indexOf(d) === -1)).sort((a, b) => a.localeCompare(b));
   const go = (doc, ctx) => {
     onClose();
     guard.go('/chart/' + client.client_id + '/' + slugify(doc), { client: client.client_id,
@@ -718,7 +720,7 @@ const toMin = t => { const [hm, ap] = t.split(' '); let [h, m] = hm.split(':').m
 const fromMin = m => { const h = Math.floor(m / 60) % 24, mm = m % 60; return ((h % 12) || 12) + ':' + String(mm).padStart(2, '0') + (h < 12 ? ' AM' : ' PM'); };
 const TRANSPORT = ['Not needed', 'Client arranges own', 'Agency van', 'Bus pass', 'Rideshare voucher'];
 const FREQUENCY = ['Does not repeat', 'Daily', 'Weekly', 'Every 2 weeks', 'Monthly'];
-function ScheduleAppointmentOverlay({ client, onClose }) {
+function ScheduleAppointmentOverlay({ client, onClose, onScheduled }) {
   const guard = useGuard();
   const nowSlot = () => { const d = new Date(); const m = Math.min(19 * 60, Math.max(7 * 60, Math.ceil((d.getHours() * 60 + d.getMinutes()) / 15) * 15)); return fromMin(m); };
   const [f, setF] = useState({ staff: ME.name, date: isoOf(TODAY), start: '', duration: '30', site: '', reason: '', meeting: '', room: '', transport: '', inRoom: false, comments: '', reminder: true, frequency: FREQUENCY[0] });
@@ -744,6 +746,8 @@ function ScheduleAppointmentOverlay({ client, onClose }) {
     const [h, rest] = f.start.split(':'), hh = (parseInt(h, 10) % 12) + (/PM/.test(rest) ? 12 : 0);
     guests.forEach(g => addPageRow(g.client_id, 'Appointments', { appointment_id: newId('APT'), client_id: g.client_id, staff_id: staffIdByName(f.staff), date: f.date,
       start_time: String(hh).padStart(2, '0') + ':' + rest.slice(0, 2), appointment_reason: f.reason, meeting_type: f.meeting, completion_status: 'Scheduled' }));
+    /* A service step that books this appointment (see 56-services-staff.jsx). */
+    if (onScheduled) onScheduled(f);
     guard.setToast({ status: 'success', title: 'Appointment scheduled', detail: fmtDate(f.date) + ' · ' + f.start + '–' + end + ' with ' + f.staff + (f.frequency !== FREQUENCY[0] ? ' · repeats ' + f.frequency.toLowerCase() : '') });
     onClose();
   };
